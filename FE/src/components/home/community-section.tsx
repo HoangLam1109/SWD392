@@ -1,68 +1,6 @@
 import { Users, Trophy, MessageSquare, Clock } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
-
-interface Activity {
-  id: number;
-  user: {
-    name: string;
-    avatar: string;
-    initial: string;
-  };
-  action: string;
-  game?: string;
-  achievement?: string;
-  time: string;
-}
-
-const mockActivities: Activity[] = [
-  {
-    id: 1,
-    user: { name: 'AlexGamer', avatar: '', initial: 'AG' },
-    action: 'achievement',
-    game: 'Cyber Legends',
-    achievement: 'Master Explorer',
-    time: '2 min ago',
-  },
-  {
-    id: 2,
-    user: { name: 'SarahPro', avatar: '', initial: 'SP' },
-    action: 'review',
-    game: 'Neon Warriors',
-    time: '15 min ago',
-  },
-  {
-    id: 3,
-    user: { name: 'MikeGaming', avatar: '', initial: 'MG' },
-    action: 'achievement',
-    game: 'Space Odyssey',
-    achievement: 'Speed Runner',
-    time: '1 hour ago',
-  },
-  {
-    id: 4,
-    user: { name: 'EmmaPlayer', avatar: '', initial: 'EP' },
-    action: 'playing',
-    game: 'Dragon Realm',
-    time: '2 hours ago',
-  },
-];
-
-const mockReviews = [
-  {
-    id: 1,
-    user: { name: 'GamingExpert', avatar: '', initial: 'GE' },
-    game: 'Cyber Legends',
-    rating: 5,
-    comment: 'Amazing graphics and gameplay! Highly recommended.',
-  },
-  {
-    id: 2,
-    user: { name: 'ProGamer', avatar: '', initial: 'PG' },
-    game: 'Neon Warriors',
-    rating: 4,
-    comment: 'Great game, but could use more content updates.',
-  },
-];
+import { mockActivities, mockReviews } from './mockData';
 
 export function CommunitySection() {
   return (
