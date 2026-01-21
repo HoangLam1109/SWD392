@@ -1,0 +1,8 @@
+export { Navbar } from './navbar'
+export { HeroSection } from './hero-section'
+export { AboutSection } from './about-section'
+export { GamesSection } from './games-section'
+export { FeaturesSection } from './features-section'
+export { CommunitySection } from './community-section'
+export { DealsSection } from './deals-section'
+export { Footer } from './footer'
