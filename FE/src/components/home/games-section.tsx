@@ -1,73 +1,8 @@
 import { Star, Plus } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
+import { mockGames, type Game} from './mockData';
 
-interface Game {
-  id: number;
-  title: string;
-  coverImage: string;
-  price: number;
-  originalPrice?: number;
-  discount?: number;
-  rating: number;
-  reviews: number;
-}
 
-const mockGames: Game[] = [
-  {
-    id: 1,
-    title: 'Cyber Legends',
-    coverImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=600&fit=crop',
-    price: 29.99,
-    originalPrice: 49.99,
-    discount: 40,
-    rating: 4.8,
-    reviews: 12543,
-  },
-  {
-    id: 2,
-    title: 'Neon Warriors',
-    coverImage: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=600&fit=crop',
-    price: 39.99,
-    rating: 4.9,
-    reviews: 8921,
-  },
-  {
-    id: 3,
-    title: 'Space Odyssey',
-    coverImage: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=400&h=600&fit=crop',
-    price: 24.99,
-    originalPrice: 34.99,
-    discount: 29,
-    rating: 4.7,
-    reviews: 15678,
-  },
-  {
-    id: 4,
-    title: 'Dragon Realm',
-    coverImage: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=600&fit=crop',
-    price: 49.99,
-    rating: 4.6,
-    reviews: 10234,
-  },
-  {
-    id: 5,
-    title: 'Racing Legends',
-    coverImage: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400&h=600&fit=crop',
-    price: 19.99,
-    originalPrice: 29.99,
-    discount: 33,
-    rating: 4.5,
-    reviews: 8765,
-  },
-  {
-    id: 6,
-    title: 'Mystic Quest',
-    coverImage: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=400&h=600&fit=crop',
-    price: 34.99,
-    rating: 4.8,
-    reviews: 11234,
-  },
-];
 
 function StarRating({ rating }: { rating: number }) {
   const fullStars = Math.floor(rating);
@@ -105,7 +40,7 @@ export function GamesSection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockGames.map((game) => (
+          {mockGames.map((game: Game) => (
             <div
               key={game.id}
               className="group relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all hover:scale-105"

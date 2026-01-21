@@ -1,43 +1,7 @@
 import { Tag, Clock, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
+import { deals } from './mockData';
 
-interface Deal {
-  id: number;
-  title: string;
-  description: string;
-  discount: number;
-  image: string;
-  endTime: string;
-  featured?: boolean;
-}
-
-const deals: Deal[] = [
-  {
-    id: 1,
-    title: 'Summer Sale',
-    description: 'Up to 70% off on selected games',
-    discount: 70,
-    image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=400&fit=crop',
-    endTime: '3 days left',
-    featured: true,
-  },
-  {
-    id: 2,
-    title: 'Indie Games Week',
-    description: 'Support indie developers with special discounts',
-    discount: 50,
-    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=300&fit=crop',
-    endTime: '5 days left',
-  },
-  {
-    id: 3,
-    title: 'Flash Sale',
-    description: 'Limited time offers - Act fast!',
-    discount: 60,
-    image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&h=300&fit=crop',
-    endTime: '12 hours left',
-  },
-];
 
 export function DealsSection() {
   return (
