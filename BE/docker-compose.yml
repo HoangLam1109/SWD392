@@ -1,0 +1,80 @@
+services:
+  # Gateway service
+  gateway:
+    image: node:20.4.0
+    container_name: example-gateway
+    restart: unless-stopped
+    command: npm run start:dev
+    working_dir: /app
+    networks:
+      - example-network
+    ports:
+      - 3000:3000
+    environment:
+      - GATEWAY_SERVICE_PORT=3000
+      - MONGO_URI=${MONGO_URI}
+    volumes:
+      - ./gateway-service:/app
+    depends_on:
+      mongo:
+        condition: service_started
+
+  # Auth service
+  auth:
+    image: node:20.4.0
+    container_name: example-auth
+    restart: unless-stopped
+    command: npm run start:dev
+    working_dir: /app
+    networks:
+      - example-network
+    ports:
+      - 3001:3000
+    environment:
+      - AUTH_SERVICE_PORT=3000
+      - MONGO_URI=${MONGO_URI}
+    volumes:
+      - ./auth-service:/app
+    depends_on:
+      mongo:
+        condition: service_started
+
+  # User service
+  user:
+    image: node:20.4.0
+    container_name: example-user
+    restart: unless-stopped
+    command: npm run start:dev
+    working_dir: /app
+    networks:
+      - example-network
+    ports:
+      - 3002:3000
+    environment:
+      - USER_SERVICE_PORT=3000
+      - MONGO_URI=${MONGO_URI}
+    volumes:
+      - ./user-service:/app
+    depends_on:
+      mongo:
+        condition: service_started
+
+  # MongoDB service (for user-service)
+  mongo:
+    image: mongo:7.0
+    container_name: example-user-mongo
+    restart: unless-stopped
+    networks:
+      - example-network
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-volume:/data/db
+
+networks:
+  example-network:
+    driver: bridge
+
+volumes:
+  db-volume: # Persist data for the database
+  mongo-volume: # Persist data for MongoDB
