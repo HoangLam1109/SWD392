@@ -1,7 +1,7 @@
 services:
   # Gateway service
   gateway:
-    image: node:20.4.0
+    image: node:lts
     container_name: example-gateway
     restart: unless-stopped
     command: npm run start:dev
@@ -21,7 +21,7 @@ services:
 
   # Auth service
   auth:
-    image: node:20.4.0
+    image: node:lts
     container_name: example-auth
     restart: unless-stopped
     command: npm run start:dev
@@ -41,7 +41,7 @@ services:
 
   # User service
   user:
-    image: node:20.4.0
+    image: node:lts
     container_name: example-user
     restart: unless-stopped
     command: npm run start:dev
@@ -61,7 +61,7 @@ services:
 
   # MongoDB service (for user-service)
   mongo:
-    image: mongo:7.0
+    image: mongo:lts
     container_name: example-user-mongo
     restart: unless-stopped
     networks:
