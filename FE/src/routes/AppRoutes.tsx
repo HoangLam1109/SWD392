@@ -8,7 +8,7 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/admin" element={<AdminLayout onLogout={() => {}} currentPage={''} onNavigate={() => {}} />}>
-                <Route index element={<UserManagementPage />} />
+                <Route path="user-management" element={<UserManagementPage />} />
                 
             </Route>
         </Routes>
