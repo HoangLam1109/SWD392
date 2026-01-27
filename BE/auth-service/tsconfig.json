@@ -29,5 +29,5 @@
     },
     "include": [
         "**/*.ts"
-    ],
+, "../shared/utils/error.util.ts"    ],
 }
