@@ -19,7 +19,7 @@ export function Navbar() {
               </div>
               <span className="text-lg sm:text-xl tracking-tight">NEXUS</span>
             </div>
-
+ 
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center gap-6 xl:gap-8">
               <a href="#" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
