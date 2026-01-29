@@ -95,7 +95,6 @@ export function HeroSection() {
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-slate-950/50 to-transparent" />
                 </div>
-HH
                 {/* Floating elements */}
                 <div className="absolute top-4 right-4 sm:top-8 sm:right-8 lg:top-12 lg:right-12 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl px-3 py-2 sm:px-4 sm:py-3 shadow-xl animate-float">
                   <div className="flex items-center gap-2 sm:gap-3">
