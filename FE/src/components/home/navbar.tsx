@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Gamepad2, ShoppingBag, Library, Users, Tag, User, Menu, X } from 'lucide-react';
+import { Gamepad2, ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket } from 'lucide-react';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,7 +17,7 @@ export function Navbar() {
                   <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <span className="text-lg sm:text-xl tracking-tight">NEXUS</span>
+              <span className="text-lg sm:text-xl tracking-tight">PlatFun</span>
             </div>
  
             {/* Desktop Navigation Links */}
@@ -26,7 +26,7 @@ export function Navbar() {
                 <ShoppingBag className="w-4 h-4" />
                 <span>Store</span>
               </a>
-              <a href="#" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
+              <a href="/library" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Library className="w-4 h-4" />
                 <span>Library</span>
               </a>
@@ -37,6 +37,10 @@ export function Navbar() {
               <a href="#" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Tag className="w-4 h-4" />
                 <span>Deals</span>
+              </a>
+              <a href="#" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
+                <ShoppingBasket className="w-4 h-4" />
+                <span>Cart</span>  
               </a>
               <div className="w-px h-6 bg-white/10" />
               <button className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors">

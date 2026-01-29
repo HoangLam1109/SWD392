@@ -2,6 +2,7 @@ import HomePage from "../pages/HomePage"
 import { Routes, Route } from "react-router-dom"
 import { AdminLayout } from "../layouts/AdminLayout"
 import { UserManagementPage } from "@/pages/UserManagementPage"
+import { LibraryPage } from "@/pages/LibraryPage"
 
 const AppRoutes = () => {
     return (
@@ -11,6 +12,7 @@ const AppRoutes = () => {
                 <Route path="user-management" element={<UserManagementPage />} />
                 
             </Route>
+            <Route path="/library" element={<LibraryPage />} />
         </Routes>
     )
 }
