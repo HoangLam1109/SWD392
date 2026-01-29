@@ -1,21 +1,27 @@
 import mongoose, { type InferSchemaType } from 'mongoose';
-import { UserAccountType } from '../interfaces/User';
-import { capitalizeFirstLetter } from '../utils';
+import { UserAccountType } from '../../shared/constants/role.constant';
+
+export interface IUser extends Document {
+  _id: string;
+  email: string;
+  fullName: string;
+  passwordHash: string;
+  role?: UserAccountType;
+  avatar?: string;
+  status: string;
+}
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true },
-    accountType: {
+    fullName: { type: String, required: true },
+    passwordHash: { type: String, required: true },
+    role: {
       type: String,
-      required: true,
       enum: Object.values(UserAccountType),
     },
-    primaryPhone: { type: String },
-    secondaryPhone: { type: String },
-    deletedAt: { type: Date, default: null },
+    avatar: { type: String },
+    status: { type: String, default: 'ACTIVE' },
   },
   {
     timestamps: true,

@@ -28,6 +28,7 @@
         "strictBindCallApply": true,
     },
     "include": [
-        "**/*.ts"
+        "**/*.ts",
+        "../shared/**/*.ts"
     ],
 }
