@@ -1,15 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { AppError } from '../../shared/utils/error.util';
-import type { UserAccountType } from '../../user-service/interfaces/User';
-
-// Define the type for authenticated user (matches what the authenticate middleware provides)
-interface AuthenticatedUser {
-  id: string;
-  email: string;
-  role: UserAccountType;
-  isActive: boolean;
-  isDeleted: boolean;
-}
+import type { UserAccountType } from '../../shared/constants/role.constant';
+import type { AuthenticatedUser } from "../../shared/types/express.d";
 
 export const authorize = (requiredRoles: UserAccountType | UserAccountType[]) => {
   return (req: Request, _res: Response, next: NextFunction) => {
@@ -20,8 +12,8 @@ export const authorize = (requiredRoles: UserAccountType | UserAccountType[]) =>
         throw new AppError(401, 'Unauthorized: User or role missing');
       }
 
-      if (!user.isActive || user.isDeleted) {
-        throw new AppError(401, 'Unauthorized: User is not active or deleted');
+      if (user.status !== 'ACTIVE') {
+        throw new AppError(401, 'Unauthorized: User is not active');
       }
 
       // Simple role-based authorization

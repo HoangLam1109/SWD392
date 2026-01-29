@@ -4,7 +4,8 @@ import { AppError } from '../../shared/utils/error.util';
 export const errorHandler = (
   err: Error | AppError,
   req: Request,
-  res: Response
+  res: Response,
+  _next: NextFunction
 ) => {
   const statusCode = 'statusCode' in err && err.statusCode ? err.statusCode : 500;
   const message = err.message || 'Internal Server Error';
