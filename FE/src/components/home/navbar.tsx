@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Gamepad2, ShoppingBag, Library, Users, Tag, User, Menu, X } from 'lucide-react';
+import { Gamepad2, ShoppingBag, Library, Users, Tag, User, Menu, X ,ShoppingBasket} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function Navbar() {
@@ -27,7 +27,7 @@ export function Navbar() {
                 <ShoppingBag className="w-4 h-4" />
                 <span>Store</span>
               </Link>
-              <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
+              <Link to="/library" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Library className="w-4 h-4" />
                 <span>Library</span>
               </Link>
@@ -38,6 +38,10 @@ export function Navbar() {
               <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Tag className="w-4 h-4" />
                 <span>Deals</span>
+              </Link>
+              <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
+                <ShoppingBasket className="w-4 h-4" />
+                <span>Cart</span>
               </Link>
               <div className="w-px h-6 bg-white/10" />
               <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors">
