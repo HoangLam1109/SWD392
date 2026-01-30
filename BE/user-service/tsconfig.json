@@ -30,8 +30,8 @@
     "include": [
         "app/**/*.ts",
         "config/**/*.ts",
-        "interfaces/**/*.ts",
         "models/**/*.ts",
-        "utils/**/*.ts"
+        "utils/**/*.ts",
+        "../shared/**/*.ts"
     ],
 }
