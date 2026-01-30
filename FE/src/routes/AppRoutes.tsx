@@ -5,10 +5,7 @@ import Temp from "@/auth/page/Temp"
 import RegisterPage from "@/auth/page/Register"
 import ForgotPasswordPage from "@/auth/page/ForgotPasswordPage"
 // import Dasboard from "@/pages/user/Dashboard"
-import ProfilePage from "@/pages/ProfilePage"
-import { UserManagementPage } from "@/pages"
-import { AdminLayout } from "@/layouts/AdminLayout"
-import { LibraryPage } from "@/pages/LibraryPage"
+
 const AppRoutes = () => {
     return (
         <Routes>
