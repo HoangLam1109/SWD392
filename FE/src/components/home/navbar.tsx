@@ -2,12 +2,17 @@ import { useState } from 'react';
 import { Gamepad2, ShoppingBag, Library, Users, Tag, User, Menu, X ,ShoppingBasket} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export function Navbar() {
+interface NavbarProps {
+  /** Navbar cố định ở top khi scroll (dùng cho LibraryPage) */
+  fixed?: boolean;
+}
+
+export function Navbar({ fixed }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="relative z-50">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <nav className={`z-50 w-full ${fixed ? 'fixed top-0 left-0 right-0' : 'relative'}`}>
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl px-4 sm:px-6 lg:px-8 py-3 sm:py-4 shadow-2xl shadow-blue-500/10">
           <div className="flex items-center justify-between">
             {/* Logo */}
