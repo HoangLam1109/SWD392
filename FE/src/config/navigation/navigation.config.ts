@@ -7,6 +7,6 @@ export const navigationConfig: NavigationItem[] = [
         label: 'User Management',
         icon: Users,
         roles: ['admin'],
-        path: 'admin/user-management',
+        path: '/admin/user-management',
     },
 ];
