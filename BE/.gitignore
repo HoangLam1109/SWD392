@@ -29,3 +29,11 @@ coverage
 dist
 dist-ssr
 *.local
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.test
+.env.*.local
+.env.*
