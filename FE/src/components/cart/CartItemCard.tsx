@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Trash2, Tag } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
 import type { CartItem } from './mockCartData';
@@ -11,6 +12,7 @@ interface CartItemCardProps {
 }
 
 export function CartItemCard({ item, onRemove }: CartItemCardProps) {
+  const { t } = useTranslation();
   const [isRemoving, setIsRemoving] = useState(false);
 
   const handleRemove = () => {
@@ -71,7 +73,7 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
               <button
                 onClick={handleRemove}
                 className="p-2 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-colors shrink-0"
-                aria-label="Remove item"
+                aria-label={t('cart.removeItem')}
               >
                 <Trash2 className="w-5 h-5" />
               </button>

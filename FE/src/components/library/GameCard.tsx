@@ -1,4 +1,4 @@
-
+import { useTranslation } from 'react-i18next';
 import type { Game } from '@/types/Game.types';
 
 interface GameCardProps {
@@ -6,6 +6,7 @@ interface GameCardProps {
 }
 
 export function GameCard({ game }: GameCardProps) {
+    const { t } = useTranslation();
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
@@ -45,13 +46,13 @@ export function GameCard({ game }: GameCardProps) {
                 <div className="flex items-center justify-between">
                     <div className="text-xs text-slate-400 space-y-1">
                         <p>
-                            <span className="text-blue-400">Developer:</span> {game.developer}
+                            <span className="text-blue-400">{t('common.developer')}:</span> {game.developer}
                         </p>
                         <p>
-                            <span className="text-blue-400">Publisher:</span> {game.publisher}
+                            <span className="text-blue-400">{t('common.publisher')}:</span> {game.publisher}
                         </p>
                     </div>
-                    <button className="text-blue-400 ml-4 whitespace-nowrap bg-slate-800/50 border border-slate-600 rounded-md px-2 py-1 hover:bg-slate-700 hover:text-white transition-colors">Play</button>
+                    <button className="text-blue-400 ml-4 whitespace-nowrap bg-slate-800/50 border border-slate-600 rounded-md px-2 py-1 hover:bg-slate-700 hover:text-white transition-colors">{t('common.play')}</button>
                 </div>
             </div>
         </div>

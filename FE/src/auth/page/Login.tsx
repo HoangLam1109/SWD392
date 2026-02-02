@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ import { toast } from "sonner";
   };
 
 export default function SigninPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { setUser } = useAuth();
   const { mutate: login, isPending, error } = useLogin();
@@ -35,7 +37,7 @@ export default function SigninPage() {
         {
           onSuccess: (res) => {
             localStorage.setItem("token", res.accessToken);
-            toast.success("Login successful");
+            toast.success(t("auth.login.loginSuccess"));
             setUser(res.user);
             navigate("/");
           },
@@ -58,10 +60,10 @@ export default function SigninPage() {
           <Card className="border-0 rounded-2xl shadow-2xl bg-[#0A0F24] shadow-[#000060]">
             <CardHeader className="space-y-2 text-center pb-2 pt-8">
               <CardTitle className="text-3xl font-bold tracking-tight text-white">
-                Welcome back
+                {t("auth.login.welcomeBack")}
               </CardTitle>
               <p className="text-sm text-gray-400">
-                Enter your credentials to access your account
+                {t("auth.login.enterCredentials")}
               </p>
               <Button
                 variant="outline"
@@ -90,7 +92,7 @@ export default function SigninPage() {
                     d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
                   />
                 </svg>
-                <span>Continue with Google</span>
+                <span>{t("common.continueWithGoogle")}</span>
               </Button>
             </CardHeader>
             <div className="relative">
@@ -100,7 +102,7 @@ export default function SigninPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-[#0A0F24] text-[#717182] px-2">
-                  Or
+                  {t("common.or")}
                 </span>
               </div>
             </div>
@@ -114,22 +116,22 @@ export default function SigninPage() {
                     control={form.control}
                     name="email"
                     rules={{
-                      required: "Email is required",
+                      required: t("auth.login.emailRequired"),
                       pattern: {
                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address",
+                        message: t("auth.login.invalidEmail"),
                       },
                     }}
                     render={({ field }) => (
                       <FormItem>
                         <Label htmlFor="email" className="text-sm font-medium" style={{ color: '#CBD5E1' }}>
-                          Email
+                          {t("auth.login.email")}
                         </Label>
                         <FormControl>
                           <Input
                             id="email"
                             type="email"
-                            placeholder="Enter your email"
+                            placeholder={t("auth.login.enterEmail")}
                             className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
                             {...field}
                           />
@@ -142,22 +144,22 @@ export default function SigninPage() {
                     control={form.control}
                     name="password"
                     rules={{
-                      required: "Password is required",
+                      required: t("auth.login.passwordRequired"),
                       minLength: {
                         value: 8,
-                        message: "Password must be at least 8 characters",
+                        message: t("auth.login.passwordMinLength"),
                       },
                     }}
                     render={({ field }) => (
                       <FormItem>
                         <Label htmlFor="password" className="text-sm font-medium" style={{ color: '#CBD5E1' }}>
-                          Password
+                          {t("auth.login.password")}
                         </Label>
                         <FormControl>
                           <Input
                             id="password"
                             type={form.watch("showPassword") ? "text" : "password"}
-                            placeholder="Enter your password"
+                            placeholder={t("auth.login.enterPassword")}
                             className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
                             {...field}
                           />
@@ -198,7 +200,7 @@ export default function SigninPage() {
                             style={{ color: '#A1A1AA' }}
                             onClick={() => field.onChange(!field.value)}
                           >
-                            Show password
+                            {t("auth.login.showPassword")}
                           </Label>
                         </FormItem>
                       )}
@@ -214,7 +216,7 @@ export default function SigninPage() {
                         e.currentTarget.style.color = '#ffffff';
                       }}
                     >
-                      Forgot password?
+                      {t("auth.login.forgotPassword")}
                     </a>
                   </div>
 
@@ -223,7 +225,7 @@ export default function SigninPage() {
                     disabled={isPending}
                     className="w-full h-9 font-semibold text-white rounded-lg bg-[#5865F2] hover:bg-[#4452bb] mt-6 hover:cursor-pointer hover:scale-105 transition-transform duration-500 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
-                    {isPending ? "Logging in..." : "Login"}
+                    {isPending ? t("auth.login.loggingIn") : t("auth.login.loginButton")}
                   </Button>
                 </form>
               </Form>
@@ -232,7 +234,7 @@ export default function SigninPage() {
 
           {/* Register Link */}
           <p className="text-center text-sm" style={{ color: '#A1A1AA' }}>
-            Don't have an account?{" "}
+            {t("auth.login.noAccount")}{" "}
             <a
               href="/register"
               className="font-semibold transition-colors"
@@ -244,7 +246,7 @@ export default function SigninPage() {
                 e.currentTarget.style.color = '#ffffff';
               }}
             >
-              Register for free
+              {t("auth.login.registerForFree")}
             </a>
           </p>
         </div>

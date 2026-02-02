@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Filter, ChevronDown, ChevronUp, DollarSign, Star, Calendar } from 'lucide-react';
 
 interface StoreFiltersProps {
@@ -13,6 +14,7 @@ export interface FilterState {
 }
 
 export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState({
     price: true,
     rating: true,
@@ -27,20 +29,28 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
     sortBy: 'popular',
   });
 
+  const categoryKeys: Record<string, string> = {
+    action: 'store.categories.action',
+    rpg: 'store.categories.rpg',
+    strategy: 'store.categories.strategy',
+    sports: 'store.categories.sports',
+    racing: 'store.categories.racing',
+  };
+
   const categories = [
-    { id: 'action', name: 'Action', count: 87 },
-    { id: 'rpg', name: 'RPG', count: 62 },
-    { id: 'strategy', name: 'Strategy', count: 45 },
-    { id: 'sports', name: 'Sports', count: 28 },
-    { id: 'racing', name: 'Racing', count: 23 },
+    { id: 'action', count: 87 },
+    { id: 'rpg', count: 62 },
+    { id: 'strategy', count: 45 },
+    { id: 'sports', count: 28 },
+    { id: 'racing', count: 23 },
   ];
 
   const sortOptions = [
-    { id: 'popular', name: 'Most Popular' },
-    { id: 'newest', name: 'Newest' },
-    { id: 'price-low', name: 'Price: Low to High' },
-    { id: 'price-high', name: 'Price: High to Low' },
-    { id: 'rating', name: 'Highest Rated' },
+    { id: 'popular', key: 'store.filters.mostPopular' },
+    { id: 'newest', key: 'store.filters.newest' },
+    { id: 'price-low', key: 'store.filters.priceLowToHigh' },
+    { id: 'price-high', key: 'store.filters.priceHighToLow' },
+    { id: 'rating', key: 'store.filters.highestRated' },
   ];
 
   const toggleCategory = (categoryId: string) => {
@@ -70,7 +80,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
       {/* Header */}
       <div className="flex items-center gap-2">
         <Filter className="w-5 h-5 text-blue-400" />
-        <h3 className="text-xl font-semibold">Filters</h3>
+        <h3 className="text-xl font-semibold">{t('store.filters.title')}</h3>
       </div>
 
       {/* Sort By */}
@@ -81,7 +91,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
         >
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-blue-400" />
-            <span className="font-medium">Sort By</span>
+            <span className="font-medium">{t('store.filters.sortBy')}</span>
           </div>
           {expanded.sort ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
@@ -100,7 +110,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
                   onChange={() => handleSortChange(option.id)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm">{option.name}</span>
+                <span className="text-sm">{t(option.key)}</span>
               </label>
             ))}
           </div>
@@ -113,7 +123,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
           onClick={() => setExpanded({ ...expanded, category: !expanded.category })}
           className="flex items-center justify-between w-full mb-3"
         >
-          <span className="font-medium">Category</span>
+          <span className="font-medium">{t('store.filters.category')}</span>
           {expanded.category ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         
@@ -131,7 +141,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
                     onChange={() => toggleCategory(category.id)}
                     className="w-4 h-4 accent-blue-500"
                   />
-                  <span className="text-sm">{category.name}</span>
+                  <span className="text-sm">{t(categoryKeys[category.id])}</span>
                 </div>
                 <span className="text-xs text-slate-500">{category.count}</span>
               </label>
@@ -148,7 +158,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
         >
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-yellow-400" />
-            <span className="font-medium">Rating</span>
+            <span className="font-medium">{t('store.filters.rating')}</span>
           </div>
           {expanded.rating ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
@@ -176,7 +186,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
                       }`}
                     />
                   ))}
-                  <span className="text-sm ml-1">& up</span>
+                  <span className="text-sm ml-1">{t('store.filters.andUp')}</span>
                 </div>
               </label>
             ))}
@@ -192,7 +202,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
         >
           <div className="flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-green-400" />
-            <span className="font-medium">Price Range</span>
+            <span className="font-medium">{t('store.filters.priceRange')}</span>
           </div>
           {expanded.price ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
@@ -219,7 +229,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
               <span className="text-sm text-slate-400">${filters.priceRange[1]}</span>
             </div>
             <div className="text-center text-sm text-slate-400">
-              Up to ${filters.priceRange[1]}
+              {t('store.filters.upTo', { value: filters.priceRange[1] })}
             </div>
           </div>
         )}
@@ -239,7 +249,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
         }}
         className="w-full py-2 px-4 rounded-lg border border-white/20 hover:bg-white/5 transition-colors text-sm"
       >
-        Reset Filters
+        {t('store.filters.resetFilters')}
       </button>
     </div>
   );
