@@ -6,7 +6,7 @@ import RegisterPage from "@/auth/page/Register"
 import ForgotPasswordPage from "@/auth/page/ForgotPasswordPage"
 import ProfilePage from "@/pages/ProfilePage"
 import { AdminLayout } from "@/layouts/AdminLayout"
-import { LibraryPage, UserManagementPage } from "@/pages"
+import { LibraryPage, UserManagementPage, StorePage, CartPage } from "@/pages"
 // import Dasboard from "@/pages/user/Dashboard"
 
 const AppRoutes = () => {
@@ -24,6 +24,8 @@ const AppRoutes = () => {
 
             </Route>
             <Route path="/library" element={<LibraryPage />} />
+            <Route path="/store" element={<StorePage />} />
+            <Route path="/cart" element={<CartPage />} />
         </Routes>
     )
 }
