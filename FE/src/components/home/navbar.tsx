@@ -1,6 +1,15 @@
 import { useState } from 'react';
-import { ShoppingBag, Library, Users, Tag, User, Menu, X ,ShoppingBasket} from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface NavbarProps {
   /** Navbar cố định ở top khi scroll (dùng cho LibraryPage) */
@@ -9,6 +18,8 @@ interface NavbarProps {
 
 export function Navbar({ fixed }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className={`z-50 w-full ${fixed ? 'fixed top-0 left-0 right-0' : 'relative'}`}>
@@ -51,10 +62,44 @@ export function Navbar({ fixed }: NavbarProps) {
                 </span>
               </Link>
               <div className="w-px h-6 bg-white/10" />
-              <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors">
-                <User className="w-4 h-4" />
-                <span>Profile</span>
-              </Link>
+              {isAuthenticated ? (
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                      <Avatar className="h-8 w-8 border-2 border-white/20">
+                        <AvatarImage src={user?.avatar} alt={user?.fullName} />
+                        <AvatarFallback className="bg-blue-500/20 text-white text-sm">
+                          {user?.fullName?.charAt(0)?.toUpperCase() ?? 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    side="bottom"
+                    sideOffset={8}
+                    className="w-48 z-[100] backdrop-blur-xl bg-slate-900/95 border border-white/10 text-white shadow-xl shadow-black/20 rounded-lg"
+                  >
+                    <DropdownMenuItem
+                      onClick={() => navigate('/profile')}
+                      className="text-white focus:bg-white/10 focus:text-white cursor-pointer [&_svg]:text-white/90"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/login')}
+                  className="flex items-center gap-2 text-white bg-transparent border-white/20 hover:bg-white/10 hover:border-white/30 hover:text-white"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </Button>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -118,14 +163,37 @@ export function Navbar({ fixed }: NavbarProps) {
                 </span>
               </Link>
               <div className="w-full h-px bg-white/10 my-2" />
-              <Link
-                to="/profile"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm w-full"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <User className="w-4 h-4" />
-                Profile
-              </Link>
+              {isAuthenticated ? (
+                <div className="flex items-center gap-3 px-4 py-2">
+                  <Avatar className="h-9 w-9 border-2 border-white/20">
+                    <AvatarImage src={user?.avatar} alt={user?.fullName} />
+                    <AvatarFallback className="bg-blue-500/20 text-white text-sm">
+                      {user?.fullName?.charAt(0)?.toUpperCase() ?? 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="w-4 h-4" />
+                    Profile
+                  </Link>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate('/login');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 text-white bg-transparent border-white/20 hover:bg-white/10 hover:border-white/30 hover:text-white"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </Button>
+              )}
             </div>
           )}
         </div>
