@@ -14,6 +14,7 @@ async function bootstrap() {
     .addBearerAuth()
     .addTag('auth', 'Authentication service endpoints')
     .addTag('users', 'User management service endpoints')
+    .addTag('games', 'Game management service endpoints')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
