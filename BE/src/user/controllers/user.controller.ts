@@ -6,17 +6,21 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { UserService } from '../services/user.service';
-import { CreateUserServiceDto } from '../dto/create-user.dto';
-import { UpdateUserServiceDto } from '../dto/update-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
+import { PaginationOptionsDto } from '../../common/dto/pagination-option.dto';
+import { PaginationResponseDto } from '../../common/dto/pagination-response.dto';
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -35,19 +39,55 @@ export class UserController {
     description: 'Bad request - invalid input data',
   })
   @Post()
-  create(@Body() createUserServiceDto: CreateUserServiceDto) {
-    return this.userService.createUser(createUserServiceDto);
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.createUser(createUserDto);
   }
 
-  @ApiOperation({ summary: 'Get all users' })
+  @ApiOperation({ summary: 'Get all users with pagination' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of items per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    type: String,
+    description: 'Field to sort by (default: _id)',
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    enum: ['asc', 'desc'],
+    description: 'Sort order (default: desc)',
+  })
+  @ApiQuery({
+    name: 'cursor',
+    required: false,
+    type: String,
+    description: 'Cursor for pagination',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search keyword',
+  })
+  @ApiQuery({
+    name: 'searchField',
+    required: false,
+    type: String,
+    description: 'Field to search in',
+  })
   @ApiResponse({
     status: 200,
-    description: 'List of all users',
-    type: [UserResponseDto],
+    description: 'List of all users with pagination',
+    type: PaginationResponseDto,
   })
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() query: PaginationOptionsDto) {
+    return this.userService.findAllWithPagination(query);
   }
 
   @ApiOperation({ summary: 'Get user by ID' })
@@ -75,11 +115,8 @@ export class UserController {
     description: 'User not found',
   })
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserServiceDto: UpdateUserServiceDto,
-  ) {
-    return this.userService.updateUser(id, updateUserServiceDto);
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.updateUser(id, updateUserDto);
   }
 
   @ApiOperation({ summary: 'Delete user' })

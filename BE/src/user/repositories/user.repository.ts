@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { IUser, User, UserDocument } from '../models/user.model';
+import { IUser, User, UserDocument } from '../entities/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
@@ -12,18 +12,20 @@ export interface IUserRepository {
   findByPhoneNumber(identityNumber: string): Promise<any>;
   create(userData: any): Promise<any>;
   updateById(id: string, userData: any): Promise<any>;
-  deleteById(id: string): Promise<any>;
-  findAll(fields?: string): Promise<any[]>;
-  //   findWithPagination(options: PaginationOptions): Promise<{
-  //     data: any[];
-  //     hasNextPage: boolean;
-  //     totalCount?: number;
-  //   }>;
+  deleteById(id: string): Promise<UserDocument | null>;
+  findAll(fields?: string): Promise<UserDocument[]>;
+  findWithQuery(
+    query: Record<string, any>,
+    options: { limit: number; sortBy: string; sortOrder: string },
+  ): Promise<UserDocument[] | undefined>;
+  countDocument(query: Record<string, any>): Promise<number>;
 }
 
 @Injectable()
 export class UserRepository implements IUserRepository {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name, 'USER_DB') private userModel: Model<UserDocument>,
+  ) {}
 
   async findById(id: string, fields?: string): Promise<UserDocument | null> {
     return await this.userModel.findById(
@@ -88,62 +90,26 @@ export class UserRepository implements IUserRepository {
       .lean();
   }
 
-  //   async findWithPagination(
-  //     options: PaginationOptions
-  //   ): Promise<{ data: any[]; hasNextPage: boolean; totalCount?: number }> {
-  //     const { limit, sortBy, sortOrder, cursor, filters, search, searchField } =
-  //       options;
-  //     const query: any = { ...filters };
-  //     const sortDirection = sortOrder === "asc" ? 1 : -1;
-  //     const sortObj = { [sortBy || "_id"]: sortDirection };
+  async findWithQuery(
+    query: Record<string, any>,
+    options: {
+      limit: number;
+      sortBy: string;
+      sortOrder: string;
+    },
+  ): Promise<UserDocument[] | undefined> {
+    const sortField = options?.sortBy || '_id';
+    const sortDirection = options.sortOrder === 'asc' ? 1 : -1;
+    const sortObj: Record<string, 1 | -1> = { [sortField]: sortDirection };
+    return await this.userModel
+      .find(query)
+      .sort(sortObj)
+      .collation({ locale: 'en', strength: 2 })
+      .limit(options?.limit)
+      .lean();
+  }
 
-  //     if (search && searchField) {
-  //       if (searchField == "updatedAt") {
-  //         const dateSearch = new Date(search);
-  //         if (!isNaN(dateSearch.getTime())) {
-  //           const dateStart = new Date(dateSearch);
-  //           dateStart.setHours(0, 0, 0, 0);
-
-  //           const dateEnd = new Date(dateSearch);
-  //           dateEnd.setHours(23, 59, 59, 59);
-
-  //           query.updatedAt = {
-  //             $gte: dateStart,
-  //             $lte: dateEnd,
-  //           };
-  //         }
-  //       } else {
-  //         query.$or = [searchField].map((field) => ({
-  //           [field]: { $regex: search, $options: "i" },
-  //         }));
-  //       }
-  //     }
-
-  //     if (cursor) {
-  //       const cursorField = sortBy || "_id";
-
-  //       // For proper cursor pagination, we need to find items that come AFTER the cursor
-  //       // in the sort order, not just exclude the cursor item
-  //       if (sortDirection === -1) {
-  //         // Descending order: get items BEFORE cursor in time (but after in pagination)
-  //         // We need items where field < cursor to get the next page
-  //         query[cursorField] = { $lt: cursor };
-  //       } else {
-  //         // Ascending order: get items AFTER cursor in time
-  //         query[cursorField] = { $gt: cursor };
-  //       }
-  //     }
-
-  //     const data = await this.userModel
-  //       .find(query)
-  //       .sort(sortObj)
-  //       .collation({ locale: "en", strength: 2 })
-  //       .limit(limit + 1);
-  //     const hasNextPage = data.length > limit;
-  //     return {
-  //       data: data.slice(0, limit),
-  //       hasNextPage,
-  //       totalCount: await this.userModel.countDocuments(query),
-  //     };
-  //   }
+  async countDocument(query: Record<string, any>): Promise<number> {
+    return await this.userModel.countDocuments(query);
+  }
 }
