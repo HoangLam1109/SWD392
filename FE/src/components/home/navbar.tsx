@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Gamepad2, ShoppingBag, Library, Users, Tag, User, Menu, X ,ShoppingBasket} from 'lucide-react';
+import { ShoppingBag, Library, Users, Tag, User, Menu, X ,ShoppingBasket} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface NavbarProps {
@@ -19,16 +19,15 @@ export function Navbar({ fixed }: NavbarProps) {
             <Link to="/" className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
                 <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-600 rounded-lg blur-lg opacity-50" />
-                <div className="relative bg-linear-to-r from-blue-500 to-purple-600 p-1.5 sm:p-2 rounded-lg">
-                  <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <div className="relative">
+                  <img src="/src/assets/platfun-logo.svg" alt="logo" className="h-12" />
                 </div>
               </div>
-              <span className="text-lg sm:text-xl tracking-tight">NEXUS</span>
             </Link>
 
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center gap-6 xl:gap-8">
-              <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
+              <Link to="/store" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <ShoppingBag className="w-4 h-4" />
                 <span>Store</span>
               </Link>
@@ -44,9 +43,12 @@ export function Navbar({ fixed }: NavbarProps) {
                 <Tag className="w-4 h-4" />
                 <span>Deals</span>
               </Link>
-              <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
+              <Link to="/cart" className="relative flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <ShoppingBasket className="w-4 h-4" />
                 <span>Cart</span>
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-[10px] flex items-center justify-center font-bold">
+                  3
+                </span>
               </Link>
               <div className="w-px h-6 bg-white/10" />
               <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors">
@@ -73,7 +75,7 @@ export function Navbar({ fixed }: NavbarProps) {
           {isMenuOpen && (
             <div className="lg:hidden mt-4 pt-4 border-t border-white/10 space-y-3">
               <Link
-                to="/"
+                to="/store"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -81,7 +83,7 @@ export function Navbar({ fixed }: NavbarProps) {
                 Store
               </Link>
               <Link
-                to="/"
+                to="/library"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -103,6 +105,17 @@ export function Navbar({ fixed }: NavbarProps) {
               >
                 <Tag className="w-4 h-4" />
                 Deals
+              </Link>
+              <Link
+                to="/cart"
+                className="relative flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <ShoppingBasket className="w-4 h-4" />
+                Cart
+                <span className="ml-auto px-2 py-0.5 bg-blue-500 rounded-full text-xs font-bold">
+                  3
+                </span>
               </Link>
               <div className="w-full h-px bg-white/10 my-2" />
               <Link
