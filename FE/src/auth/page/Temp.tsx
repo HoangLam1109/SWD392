@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -11,6 +12,7 @@ const signInWithGoogle = () => {
 }
 
 export default function InputInvalid() {
+    const { t } = useTranslation();
     return (
         <>
             <div className="relative w-64 h-64 bg-gray-200">
@@ -56,26 +58,26 @@ export default function InputInvalid() {
 
                 </svg>
 
-                <span>Continue with Google</span>
+                <span>{t("common.continueWithGoogle")}</span>
             </Button>
 
             <Card className="w-[380px] text-center space-y-4">
                 <Mail className="mx-auto h-10 w-10" />
 
                 <h2 className="text-xl font-semibold">
-                    Check your email
+                    {t("auth.temp.checkEmail")}
                 </h2>
 
                 <p className="text-sm text-muted-foreground">
-                    We’ve sent a verification link to your inbox.
+                    {t("auth.temp.verificationSent")}
                 </p>
 
                 <Button disabled className="w-full">
-                    Resend email (30s)
+                    {t("auth.temp.resendEmail")}
                 </Button>
 
                 <Link to="/login" className="text-sm underline">
-                    Back to login
+                    {t("auth.temp.backToLogin")}
                 </Link>
             </Card>
 

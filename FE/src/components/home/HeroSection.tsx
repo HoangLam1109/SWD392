@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { Sparkles, ArrowRight, Users } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
 
 export function HeroSection() {
+  const { t } = useTranslation();
   return (
     <main className="relative">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
@@ -11,21 +13,21 @@ export function HeroSection() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-linear-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 backdrop-blur-sm">
               <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
-              <span className="text-xs sm:text-sm text-blue-300">The Future of Gaming</span>
+              <span className="text-xs sm:text-sm text-blue-300">{t('home.hero.badge')}</span>
             </div>
 
             {/* Main Headline */}
             <div className="space-y-4 sm:space-y-6">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.1] tracking-tight">
-                Your Ultimate
+                {t('home.hero.title')}
                 <br />
                 <span className="bg-linear-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
-                  Gaming Platform
+                  {t('home.hero.titleHighlight')}
                 </span>
               </h1>
 
               <p className="text-base sm:text-lg lg:text-xl text-slate-400 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                Buy, manage, and play thousands of games in one unified ecosystem. Experience seamless gaming with powerful social features and exclusive deals.
+                {t('home.hero.description')}
               </p>
             </div>
 
@@ -36,13 +38,13 @@ export function HeroSection() {
                 <div className="absolute inset-0 bg-linear-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="absolute inset-0 shadow-[0_0_30px_rgba(59,130,246,0.5)] group-hover:shadow-[0_0_50px_rgba(59,130,246,0.8)] transition-all" />
                 <span className="relative flex items-center justify-center gap-2 text-white text-sm sm:text-base">
-                  Explore Store
+                  {t('home.hero.exploreStore')}
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
               <button className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl border border-white/10 backdrop-blur-sm bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all">
                 <span className="flex items-center justify-center gap-2 text-sm sm:text-base">
-                  Join Now
+                  {t('home.hero.joinNow')}
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
@@ -54,21 +56,21 @@ export function HeroSection() {
                 <div className="text-2xl sm:text-3xl bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   50M+
                 </div>
-                <div className="text-xs sm:text-sm text-slate-500">Active Players</div>
+                <div className="text-xs sm:text-sm text-slate-500">{t('home.hero.activePlayers')}</div>
               </div>
               <div className="hidden sm:block w-px h-12 bg-white/10" />
               <div className="space-y-1">
                 <div className="text-2xl sm:text-3xl bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   10K+
                 </div>
-                <div className="text-xs sm:text-sm text-slate-500">Games Available</div>
+                <div className="text-xs sm:text-sm text-slate-500">{t('home.hero.gamesAvailable')}</div>
               </div>
               <div className="hidden sm:block w-px h-12 bg-white/10" />
               <div className="space-y-1">
                 <div className="text-2xl sm:text-3xl bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   24/7
                 </div>
-                <div className="text-xs sm:text-sm text-slate-500">Support</div>
+                <div className="text-xs sm:text-sm text-slate-500">{t('home.hero.support')}</div>
               </div>
             </div>
           </div>
@@ -99,13 +101,13 @@ export function HeroSection() {
                 <div className="absolute top-4 right-4 sm:top-8 sm:right-8 lg:top-12 lg:right-12 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl px-3 py-2 sm:px-4 sm:py-3 shadow-xl animate-float">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-xs sm:text-sm">Online</span>
+                    <span className="text-xs sm:text-sm">{t('home.hero.online')}</span>
                   </div>
                 </div>
                 <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 lg:bottom-12 lg:left-12 backdrop-blur-xl bg-white/10 border border-white/20 rounded-xl px-3 py-2 sm:px-4 sm:py-3 shadow-xl animate-float-delayed">
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
-                    <span className="text-xs sm:text-sm">5.2M Playing Now</span>
+                    <span className="text-xs sm:text-sm">{t('home.hero.playingNow')}</span>
                   </div>
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/auth/useAuth';
@@ -10,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { LanguageSwitchButton } from '@/components/common/LanguageSwitchButton';
 
 interface NavbarProps {
   /** Navbar cố định ở top khi scroll (dùng cho LibraryPage) */
@@ -17,6 +19,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ fixed }: NavbarProps) {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -40,28 +43,29 @@ export function Navbar({ fixed }: NavbarProps) {
             <div className="hidden lg:flex items-center gap-6 xl:gap-8">
               <Link to="/store" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <ShoppingBag className="w-4 h-4" />
-                <span>Store</span>
+                <span>{t('common.store')}</span>
               </Link>
               <Link to="/library" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Library className="w-4 h-4" />
-                <span>Library</span>
+                <span>{t('common.library')}</span>
               </Link>
               <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Users className="w-4 h-4" />
-                <span>Community</span>
+                <span>{t('common.community')}</span>
               </Link>
               <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Tag className="w-4 h-4" />
-                <span>Deals</span>
+                <span>{t('common.deals')}</span>
               </Link>
               <Link to="/cart" className="relative flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <ShoppingBasket className="w-4 h-4" />
-                <span>Cart</span>
+                <span>{t('common.cart')}</span>
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-[10px] flex items-center justify-center font-bold">
                   3
                 </span>
               </Link>
               <div className="w-px h-6 bg-white/10" />
+              <LanguageSwitchButton className="text-white bg-transparent border-white/20 hover:bg-white/10 hover:border-white/30 hover:text-white" />
               {isAuthenticated ? (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
@@ -85,7 +89,7 @@ export function Navbar({ fixed }: NavbarProps) {
                       className="text-white focus:bg-white/10 focus:text-white cursor-pointer [&_svg]:text-white/90"
                     >
                       <User className="w-4 h-4 mr-2" />
-                      Profile
+                      {t('common.profile')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -97,7 +101,7 @@ export function Navbar({ fixed }: NavbarProps) {
                   className="flex items-center gap-2 text-white bg-transparent border-white/20 hover:bg-white/10 hover:border-white/30 hover:text-white"
                 >
                   <LogIn className="w-4 h-4" />
-                  Login
+                  {t('common.login')}
                 </Button>
               )}
             </div>
@@ -106,7 +110,7 @@ export function Navbar({ fixed }: NavbarProps) {
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
-              aria-label="Toggle menu"
+              aria-label={t('common.toggleMenu')}
             >
               {isMenuOpen ? (
                 <X className="w-6 h-6" />
@@ -163,6 +167,9 @@ export function Navbar({ fixed }: NavbarProps) {
                 </span>
               </Link>
               <div className="w-full h-px bg-white/10 my-2" />
+              <div className="px-4 py-2" onClick={() => setIsMenuOpen(false)}>
+                <LanguageSwitchButton className="w-full justify-center text-white bg-transparent border-white/20 hover:bg-white/10 hover:border-white/30 hover:text-white" />
+              </div>
               {isAuthenticated ? (
                 <div className="flex items-center gap-3 px-4 py-2">
                   <Avatar className="h-9 w-9 border-2 border-white/20">
@@ -177,7 +184,7 @@ export function Navbar({ fixed }: NavbarProps) {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <User className="w-4 h-4" />
-                    Profile
+                    {t('common.profile')}
                   </Link>
                 </div>
               ) : (
@@ -191,7 +198,7 @@ export function Navbar({ fixed }: NavbarProps) {
                   className="w-full flex items-center justify-center gap-2 text-white bg-transparent border-white/20 hover:bg-white/10 hover:border-white/30 hover:text-white"
                 >
                   <LogIn className="w-4 h-4" />
-                  Login
+                  {t('common.login')}
                 </Button>
               )}
             </div>

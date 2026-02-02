@@ -2,6 +2,7 @@
  * LibrarySidebar Component
  * Sidebar chứa search, filter theo genre và danh sách tên game
  */
+import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -45,6 +46,7 @@ export function LibrarySidebar({
     selectedGameId,
     onSelectGame,
 }: LibrarySidebarProps) {
+    const { t } = useTranslation();
     return (
         <aside
             className={cn(
@@ -60,7 +62,7 @@ export function LibrarySidebar({
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                         type="text"
-                        placeholder="Tìm theo tên game..."
+                        placeholder={t('library.sidebar.searchPlaceholder')}
                         value={searchValue}
                         onChange={(e) => onSearchChange(e.target.value)}
                         className="pl-9 h-9 bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400 text-sm"
@@ -71,7 +73,7 @@ export function LibrarySidebar({
             {/* Filter by Genre */}
             <div className="px-4 pb-4 border-b border-slate-700/50 shrink-0">
                 <label className="text-slate-400 text-xs font-medium block mb-2">
-                    Thể loại
+                    {t('library.sidebar.genre')}
                 </label>
                 <Select
                     value={genreFilter}
@@ -80,14 +82,14 @@ export function LibrarySidebar({
                     }
                 >
                     <SelectTrigger className="w-full h-9 bg-slate-800/50 border-slate-600 text-white text-sm focus:border-blue-400">
-                        <SelectValue placeholder="Tất cả thể loại" />
+                        <SelectValue placeholder={t('library.sidebar.allGenres')} />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-900 border-slate-600">
                         <SelectItem
                             value="all"
                             className="text-white hover:bg-slate-700 focus:bg-slate-700"
                         >
-                            Tất cả thể loại
+                            {t('library.sidebar.allGenres')}
                         </SelectItem>
                         {genres.map((genre) => (
                             <SelectItem
@@ -106,12 +108,12 @@ export function LibrarySidebar({
             <div className="flex-1 overflow-y-auto py-3">
                 <div className="px-2">
                     <p className="text-slate-400 text-xs font-medium px-2 pb-2">
-                        Danh sách game ({games.length})
+                        {t('library.sidebar.gameList', { count: games.length })}
                     </p>
                     <ul className="space-y-0.5">
                         {games.length === 0 ? (
                             <li className="px-3 py-2 text-sm text-slate-400">
-                                Không có game nào
+                                {t('library.sidebar.noGames')}
                             </li>
                         ) : (
                             games.map((game) => {
