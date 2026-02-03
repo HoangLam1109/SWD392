@@ -1,4 +1,14 @@
+import { useTranslation } from 'react-i18next';
 import { categories } from './mockStoreData';
+
+const categoryKeyMap: Record<string, string> = {
+  all: 'store.categories.allGames',
+  action: 'store.categories.action',
+  rpg: 'store.categories.rpg',
+  strategy: 'store.categories.strategy',
+  sports: 'store.categories.sports',
+  racing: 'store.categories.racing',
+};
 
 interface CategoryNavProps {
   selectedCategory: string;
@@ -6,6 +16,7 @@ interface CategoryNavProps {
 }
 
 export function CategoryNav({ selectedCategory, onCategoryChange }: CategoryNavProps) {
+  const { t } = useTranslation();
   return (
     <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-2">
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
@@ -22,7 +33,7 @@ export function CategoryNav({ selectedCategory, onCategoryChange }: CategoryNavP
               }
             `}
           >
-            <span>{category.name}</span>
+            <span>{t(categoryKeyMap[category.id] ?? category.name)}</span>
             <span className="ml-2 text-xs opacity-70">({category.count})</span>
           </button>
         ))}

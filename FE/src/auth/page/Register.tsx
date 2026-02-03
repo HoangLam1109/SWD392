@@ -1,43 +1,57 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
-
+import { useRegister } from "@/hooks/auth/useRegister.ts";
+import { useAuth } from "@/hooks/auth/useAuth.ts";
+import { toast } from "sonner";
 type FormValues = {
     email: string;
     password: string;
     confirmPassword: string;
     termsAccepted: boolean;
+    fullName: string;
 };
 
 export default function RegisterPage() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
-    
+    const { setUser } = useAuth();
+    const { mutate: register, isPending, error } = useRegister();
     const form = useForm<FormValues>({
         defaultValues: {
             email: "",
             password: "",
             confirmPassword: "",
             termsAccepted: false,
+            fullName: "",
         },
     });
 
-    const handleRegister = (data: FormValues) => {
+    const handleRegister = async (data: FormValues) => {
         if (data.password !== data.confirmPassword) {
             form.setError("confirmPassword", {
                 type: "manual",
-                message: "Passwords do not match",
+                message: t("auth.register.passwordsDoNotMatch"),
             });
             return;
         }
-        console.log("Submitted:", data);
-        // Add your registration logic here
-        navigate("/temp");
+        register({ email: data.email, fullName: data.fullName, password: data.password }, {
+            onSuccess: (res) => {
+                toast.success(t("auth.register.accountCreated"));
+                setUser(res.user);
+                navigate("/login");
+            },
+            onError: (error) => {
+                toast.error(error.message);
+            },
+        });
     };
 
 
@@ -54,9 +68,9 @@ export default function RegisterPage() {
                 {/* Card */}
                 <Card className="border-0 rounded-2xl shadow-2xl bg-[#0A0F24] shadow-[#000060]">
                     <CardHeader className="space-y-2 text-center pb-6 pt-8">
-                        <CardTitle className="text-3xl font-bold tracking-tight text-white">Create an account</CardTitle>
+                        <CardTitle className="text-3xl font-bold tracking-tight text-white">{t("auth.register.createAccount")}</CardTitle>
                         <p className="text-sm text-gray-400">
-                            Register to get started
+                            {t("auth.register.registerToStart")}
                         </p>
                     </CardHeader>
 
@@ -77,13 +91,13 @@ export default function RegisterPage() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <Label htmlFor="email" className="text-sm font-medium text-[#CBD5E1]">
-                                                Email
+                                                {t("auth.login.email")}
                                             </Label>
                                             <FormControl>
                                                 <Input
                                                     id="email"
                                                     type="email"
-                                                    placeholder="Enter your email"
+                                                    placeholder={t("auth.login.enterEmail")}
                                                     className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
                                                     {...field}
                                                 />
@@ -93,28 +107,62 @@ export default function RegisterPage() {
                                     )}
                                 />
 
-
+                                {/* Full Name Field */}
+                                <FormField
+                                    control={form.control}
+                                    name="fullName"
+                                    rules={{
+                                        required: t("auth.register.fullNameRequired"),
+                                    }}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <Label htmlFor="fullName" className="text-sm font-medium text-[#CBD5E1]">
+                                                {t("auth.register.fullName")}
+                                            </Label>
+                                            <FormControl>
+                                                <Input
+                                                    id="fullName"
+                                                    type="text"
+                                                    placeholder={t("auth.register.enterFullName")}
+                                                    className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-xs text-[#FF6B6B]" />
+                                        </FormItem>
+                                    )}
+                                />
                                 {/* Password Field */}
                                 <FormField
                                     control={form.control}
                                     name="password"
                                     rules={{
-                                        required: "Password is required",
+                                        required: t("auth.login.passwordRequired"),
                                         minLength: {
                                             value: 8,
-                                            message: "Password must be at least 8 characters",
+                                            message: t("auth.login.passwordMinLength"),
+                                        },
+                                        validate: (value: string) => {
+                                            const failed: string[] = [];
+                                            if (!/[A-Z]/.test(value)) failed.push(t("auth.register.passwordUppercase"));
+                                            if (!/[a-z]/.test(value)) failed.push(t("auth.register.passwordLowercase"));
+                                            if (!/[!@#$%^&*(),.?\":{}|<>_\\\-\\\/[\]=;`~]/.test(value)) failed.push(t("auth.register.passwordSpecial"));
+                                            if (failed.length > 0) {
+                                                return t("auth.register.passwordMustContain", { failed: failed.join(", ") });
+                                            }
+                                            return true;
                                         },
                                     }}
                                     render={({ field }) => (
                                         <FormItem>
                                             <Label htmlFor="password" className="text-sm font-medium text-[#CBD5E1]">
-                                                Password
+                                                {t("auth.login.password")}
                                             </Label>
                                             <FormControl>
                                                 <Input
                                                     id="password"
                                                     type="password"
-                                                    placeholder="Create a password"
+                                                    placeholder={t("auth.register.createPassword")}
                                                     className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
                                                     {...field}
                                                 />
@@ -129,18 +177,18 @@ export default function RegisterPage() {
                                     control={form.control}
                                     name="confirmPassword"
                                     rules={{
-                                        required: "Please confirm your password",
+                                        required: t("auth.register.confirmPasswordRequired"),
                                     }}
                                     render={({ field }) => (
                                         <FormItem>
                                             <Label htmlFor="confirmPassword" className="text-sm font-medium text-[#CBD5E1]">
-                                                Confirm Password
+                                                {t("auth.register.confirmPassword")}
                                             </Label>
                                             <FormControl>
                                                 <Input
                                                     id="confirmPassword"
                                                     type="password"
-                                                    placeholder="Confirm your password"
+                                                    placeholder={t("auth.register.confirmPasswordPlaceholder")}
                                                     className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
                                                     {...field}
                                                 />
@@ -155,7 +203,7 @@ export default function RegisterPage() {
                                     control={form.control}
                                     name="termsAccepted"
                                     rules={{
-                                        required: "You must accept the terms and conditions",
+                                        required: t("auth.register.termsRequired"),
                                     }}
                                     render={({ field }) => (
                                         <FormItem className="flex flex-row items-start space-x-3 space-y-0">
@@ -168,9 +216,9 @@ export default function RegisterPage() {
                                             </FormControl>
                                             <div className="space-y-1 leading-none">
                                                 <Label className="text-sm font-normal cursor-pointer" style={{ color: '#A1A1AA' }}>
-                                                    I agree to the{" "}
+                                                    {t("auth.register.agreeTerms")}{" "}
                                                     <a href="/terms-and-conditions" className="transition-colors underline" style={{ color: '#00E5FF' }}>
-                                                        terms and conditions
+                                                        {t("auth.register.termsAndConditions")}
                                                     </a>
                                                 </Label>
                                                 <FormMessage className="text-xs text-[#FF6B6B]" />
@@ -178,14 +226,16 @@ export default function RegisterPage() {
                                         </FormItem>
                                     )}
                                 />
-
+                                {error && (
+                                    <p className="text-xs text-[#FF6B6B]">{error.message}</p>
+                                )}
                                 {/* Submit Button */}
                                 <Button
                                     type="submit"
                                     className="w-full h-9 font-semibold text-white rounded-lg bg-[#5865F2] hover:bg-[#4452bb] hover:cursor-pointer hover:scale-105 transition-transform duration-500 ease-out mt-6"
-                                    disabled={form.formState.isSubmitting}
+                                    disabled={isPending}
                                 >
-                                    {form.formState.isSubmitting ? "Creating account..." : "Create account"}
+                                    {isPending ? t("auth.register.creatingAccount") : t("auth.register.createAccountButton")}
                                 </Button>
                             </form>
                         </Form>
@@ -197,7 +247,7 @@ export default function RegisterPage() {
                             </div>
                             <div className="relative flex justify-center text-xs uppercase">
                                 <span className="bg-[#0A0F24] text-[#717182] px-2">
-                                    Or
+                                    {t("common.or")}
                                 </span>
                             </div>
                         </div>
@@ -232,7 +282,7 @@ export default function RegisterPage() {
                                     />
                                     <path fill="none" d="M0 0h48v48H0z" />
                                 </svg>
-                                <span>Continue with Google</span>
+                                <span>{t("common.continueWithGoogle")}</span>
                             </Button>
                         </div>
 
@@ -241,12 +291,12 @@ export default function RegisterPage() {
 
                 {/* Login Link */}
                 <p className="text-center text-sm text-[#A1A1AA]">
-                    Already have an account?{" "}
+                    {t("auth.register.alreadyHaveAccount")}{" "}
                     <a
                         href="/login"
                         className="font-semibold transition-colors text-[#00E5FF] hover:underline hover:cursor-pointer hover:text-white"
                     >
-                        Sign in
+                        {t("auth.register.signIn")}
                     </a>
                 </p>
             </div>

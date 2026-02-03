@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +23,7 @@ type PasswordFormValues = {
 };
 
 export default function ForgotPasswordPage() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [step, setStep] = useState<"email" | "code" | "password">("email");
     const [submittedEmail, setSubmittedEmail] = useState("");
@@ -64,7 +66,7 @@ export default function ForgotPasswordPage() {
         if (data.newPassword !== data.confirmPassword) {
             passwordForm.setError("confirmPassword", {
                 type: "manual",
-                message: "Passwords do not match",
+                message: t("auth.register.passwordsDoNotMatch"),
             });
             return;
         }
@@ -92,14 +94,14 @@ export default function ForgotPasswordPage() {
                 <Card className="border-0 rounded-2xl shadow-2xl bg-[#0A0F24] shadow-[#000060]">
                     <CardHeader className="space-y-2 text-center pb-6 pt-8">
                         <CardTitle className="text-3xl font-bold tracking-tight text-white">
-                            {step === "email" && "Forgot Password"}
-                            {step === "code" && "Verify Code"}
-                            {step === "password" && "Reset Password"}
+                            {step === "email" && t("auth.forgotPassword.title")}
+                            {step === "code" && t("auth.forgotPassword.verifyCode")}
+                            {step === "password" && t("auth.forgotPassword.resetPassword")}
                         </CardTitle>
                         <p className="text-sm text-gray-400">
-                            {step === "email" && "Enter your email to receive a reset code"}
-                            {step === "code" && `We've sent a code to ${submittedEmail}`}
-                            {step === "password" && "Create your new password"}
+                            {step === "email" && t("auth.forgotPassword.enterEmailForCode")}
+                            {step === "code" && t("auth.forgotPassword.codeSentTo", { email: submittedEmail })}
+                            {step === "password" && t("auth.forgotPassword.createNewPassword")}
                         </p>
                     </CardHeader>
                     <div className="relative">
@@ -116,22 +118,22 @@ export default function ForgotPasswordPage() {
                                         control={emailForm.control}
                                         name="email"
                                         rules={{
-                                            required: "Email is required",
+                                            required: t("auth.login.emailRequired"),
                                             pattern: {
                                                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                                message: "Invalid email address",
+                                                message: t("auth.login.invalidEmail"),
                                             },
                                         }}
                                         render={({ field }) => (
                                             <FormItem>
                                                 <Label htmlFor="email" className="text-sm font-medium text-[#CBD5E1]">
-                                                    Email
+                                                    {t("auth.login.email")}
                                                 </Label>
                                                 <FormControl>
                                                     <Input
                                                         id="email"
                                                         type="email"
-                                                        placeholder="Enter your email"
+                                                        placeholder={t("auth.login.enterEmail")}
                                                         className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
                                                         {...field}
                                                     />
@@ -142,7 +144,7 @@ export default function ForgotPasswordPage() {
                                     />
 
                                     <Button type="submit" className="w-full h-9 font-semibold text-white rounded-lg bg-[#5865F2] hover:bg-[#4452bb] mt-6 hover:cursor-pointer hover:scale-105 transition-transform duration-300 ease-out">
-                                        Send Reset Code
+                                        {t("auth.forgotPassword.sendResetCode")}
                                     </Button>
                                 </form>
                             </Form>
@@ -156,14 +158,14 @@ export default function ForgotPasswordPage() {
                                         control={codeForm.control}
                                         name="code"
                                         rules={{
-                                            required: "Verification code is required",
+                                            required: t("auth.forgotPassword.codeRequired"),
                                             minLength: {
                                                 value: 6,
-                                                message: "Code must be at least 6 characters",
+                                                message: t("auth.forgotPassword.codeMinLength"),
                                             },
                                             maxLength: {
                                                 value: 6,
-                                                message: "Code must be at most 6 characters",
+                                                message: t("auth.forgotPassword.codeMaxLength"),
                                             }
                                         }}
                                         render={({ field }) => {
@@ -195,7 +197,7 @@ export default function ForgotPasswordPage() {
                                             return (
                                                 <FormItem>
                                                     <Label className="text-sm font-medium text-[#CBD5E1]">
-                                                        Verification Code
+                                                        {t("auth.forgotPassword.verificationCode")}
                                                     </Label>
                                                     <FormControl>
                                                         <div className="flex gap-2 justify-center">
@@ -221,18 +223,18 @@ export default function ForgotPasswordPage() {
                                     />
 
                                     <Button type="submit" className="w-full h-9 font-semibold text-white rounded-lg bg-[#5865F2] hover:bg-[#4452bb] hover:cursor-pointer hover:scale-105 transition-transform duration-300 ease-out mt-6">
-                                        Verify Code
+                                        {t("auth.forgotPassword.verifyCodeButton")}
                                     </Button>
 
                                     {/* Resend Code */}
                                     <div className="text-center gap-1 flex justify-center items-center">
-                                        <span className="text-sm text-[#A1A1AA]">Didn't receive the code?</span>
+                                        <span className="text-sm text-[#A1A1AA]">{t("auth.forgotPassword.didntReceiveCode")}</span>
                                         <button
                                             type="button"
                                             onClick={handleResendCode}
                                             className="text-sm text-[#00E5FF] hover:underline hover:text-white"
                                         >
-                                            Resend
+                                            {t("auth.forgotPassword.resend")}
                                         </button>
                                     </div>
                                 </form>
@@ -247,22 +249,22 @@ export default function ForgotPasswordPage() {
                                         control={passwordForm.control}
                                         name="newPassword"
                                         rules={{
-                                            required: "New password is required",
+                                            required: t("auth.forgotPassword.newPasswordRequired"),
                                             minLength: {
                                                 value: 8,
-                                                message: "Password must be at least 8 characters",
+                                                message: t("auth.login.passwordMinLength"),
                                             },
                                         }}
                                         render={({ field }) => (
                                             <FormItem>
                                                 <Label htmlFor="newPassword" className="text-sm font-medium text-[#CBD5E1]">
-                                                    New Password
+                                                    {t("auth.forgotPassword.newPassword")}
                                                 </Label>
                                                 <FormControl>
                                                     <Input
                                                         id="newPassword"
                                                         type="password"
-                                                        placeholder="Create a new password"
+                                                        placeholder={t("auth.forgotPassword.newPasswordPlaceholder")}
                                                         className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
                                                         {...field}
                                                     />
@@ -277,18 +279,18 @@ export default function ForgotPasswordPage() {
                                         control={passwordForm.control}
                                         name="confirmPassword"
                                         rules={{
-                                            required: "Please confirm your password",
+                                            required: t("auth.register.confirmPasswordRequired"),
                                         }}
                                         render={({ field }) => (
                                             <FormItem>
                                                 <Label htmlFor="confirmPassword" className="text-sm font-medium text-[#CBD5E1]">
-                                                    Confirm Password
+                                                    {t("auth.forgotPassword.confirmNewPassword")}
                                                 </Label>
                                                 <FormControl>
                                                     <Input
                                                         id="confirmPassword"
                                                         type="password"
-                                                        placeholder="Confirm your new password"
+                                                        placeholder={t("auth.forgotPassword.confirmNewPassword")}
                                                         className="h-9 w-full rounded-lg border-2 border-[#1E293B] transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#00E5FF] bg-[#040C26] text-white"
                                                         {...field}
                                                     />
@@ -299,7 +301,7 @@ export default function ForgotPasswordPage() {
                                     />
 
                                     <Button type="submit" className="w-full h-9 font-semibold text-white rounded-lg bg-[#5865F2] hover:bg-[#4452bb] hover:cursor-pointer hover:scale-105 transition-transform duration-300 ease-out mt-6">
-                                        Reset Password
+                                        {t("auth.forgotPassword.resetPasswordButton")}
                                     </Button>
                                 </form>
                             </Form>
@@ -309,9 +311,9 @@ export default function ForgotPasswordPage() {
 
                 {/* Back to Login Link */}
                 <p className="text-center text-sm text-[#A1A1AA]">
-                    Remember your password?{" "}
+                    {t("auth.forgotPassword.rememberPassword")}{" "}
                     <a href="/login" className="font-semibold text-[#00E5FF] hover:underline hover:text-white transition-colors">
-                        Back to Login
+                        {t("auth.forgotPassword.backToLogin")}
                     </a>
                 </p>
             </div>

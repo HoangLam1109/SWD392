@@ -1,22 +1,24 @@
+import { useTranslation } from 'react-i18next';
 import { Tag, Clock, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
 import { deals } from './mockData';
 
 
 export function DealsSection() {
+  const { t } = useTranslation();
   return (
     <section className="relative py-12 sm:py-16 lg:py-24">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-linear-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 backdrop-blur-sm mb-3 sm:mb-4">
             <Tag className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
-            <span className="text-xs sm:text-sm text-red-300">Limited Time Offers</span>
+            <span className="text-xs sm:text-sm text-red-300">{t('home.deals.badge')}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
-            Deals & <span className="bg-linear-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">Promotions</span>
+            {t('home.deals.title')} <span className="bg-linear-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">{t('home.deals.titleHighlight')}</span>
           </h2>
           <p className="text-base sm:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto px-4">
-            Don't miss out on these amazing deals and exclusive offers
+            {t('home.deals.description')}
           </p>
         </div>
 
@@ -48,7 +50,7 @@ export function DealsSection() {
                       <span>{deal.endTime}</span>
                     </div>
                     <button className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg bg-linear-to-r from-red-500 to-orange-600 hover:from-red-400 hover:to-orange-500 transition-all text-sm sm:text-base">
-                      <span>Shop Now</span>
+                      <span>{t('home.deals.shopNow')}</span>
                       <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                   </div>

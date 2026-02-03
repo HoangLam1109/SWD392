@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Star, ShoppingCart } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
 import type { Product } from './mockStoreData';
@@ -29,6 +30,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { t } = useTranslation();
   return (
     <div className="group relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all hover:scale-[1.02]">
       {/* Cover Image */}
@@ -50,7 +52,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Featured Badge */}
         {product.featured && (
           <div className="absolute top-3 left-3 bg-linear-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
-            Featured
+            {t('common.featured')}
           </div>
         )}
 
@@ -87,13 +89,13 @@ export function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
             <span className={`text-xl font-bold ${product.price === 0 ? 'text-green-400' : 'text-white'}`}>
-              {product.price === 0 ? 'Free' : `$${product.price}`}
+              {product.price === 0 ? t('common.free') : `$${product.price}`}
             </span>
           </div>
 
           <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 transition-all group/btn shadow-lg">
             <ShoppingCart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-            <span className="text-sm font-medium">Add</span>
+            <span className="text-sm font-medium">{t('common.add')}</span>
           </button>
         </div>
       </div>
