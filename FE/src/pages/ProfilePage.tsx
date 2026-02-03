@@ -11,7 +11,7 @@ import {
     Star
 } from 'lucide-react';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
-
+//add comment to check author email
 export default function ProfilePage() {
     const stats = [
         { label: 'Games Owned', value: '124', icon: Gamepad2, color: 'text-blue-400' },
