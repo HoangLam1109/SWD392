@@ -31,7 +31,7 @@ import { GameModule } from './game/game.module';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '10m' },
     }),
     AuthModule,
     ProfileModule,
