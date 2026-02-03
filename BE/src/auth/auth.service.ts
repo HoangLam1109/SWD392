@@ -60,4 +60,31 @@ export class AuthService {
       },
     };
   }
+
+  async refresh(
+    refreshToken: string,
+  ): Promise<
+    { accessToken: string; user: Partial<UserResponseDto> } | undefined
+  > {
+    const validToken = this.jwtService.verify(refreshToken);
+    if (validToken) {
+      const user = await this.userService.findUserById(
+        validToken.userId as string,
+      );
+      if (user) {
+        const payload = { userId: user.id, email: user.email, role: user.role };
+        const accessToken = await this.jwtService.signAsync(payload);
+        return {
+          accessToken,
+          user: {
+            email: user.email,
+            fullName: user.fullName,
+            avatar: user.avatar,
+            role: user.role,
+          },
+        };
+      }
+    }
+    return undefined;
+  }
 }

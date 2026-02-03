@@ -23,9 +23,12 @@ import { PaginationOptionsDto } from '../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../common/dto/pagination-response.dto';
 import { GetUser } from '../decorator/user.decorator';
 import { UserDocument } from '../entities/user.entity';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('users')
+@Role(UserRole.ADMIN)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
