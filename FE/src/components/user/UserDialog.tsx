@@ -20,18 +20,20 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import type { User, CreateUserDTO, UpdateUserDTO, UserAccountType } from '@/types/User.types';
+import type { User, CreateUserDTO, UpdateUserDTO, UserRole, UserStatus } from '@/types/User.types';
 import { Loader2 } from 'lucide-react';
 
 const userSchema = z.object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
+    fullName: z.string().min(1, 'Full name is required'),
     email: z.string().email('Invalid email address'),
-    accountType: z.enum(['player', 'manager', 'admin'], {
-        required_error: 'Account type is required',
+    password: z.string().min(8, 'Password must be at least 8 characters').optional(),
+    role: z.enum(['Admin', 'Moderator', 'Player'], {
+        required_error: 'Role is required',
     }),
-    primaryPhone: z.string().optional(),
-    secondaryPhone: z.string().optional(),
+    status: z.enum(['ACTIVE', 'INACTIVE'], {
+        required_error: 'Status is required',
+    }),
+    avatar: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -58,26 +60,27 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
         resolver: zodResolver(userSchema),
     });
 
-    const accountType = watch('accountType');
+    const role = watch('role');
+    const status = watch('status');
 
     useEffect(() => {
         if (user) {
             reset({
-                firstName: user.firstName,
-                lastName: user.lastName,
+                fullName: user.fullName,
                 email: user.email,
-                accountType: user.accountType,
-                primaryPhone: user.primaryPhone,
-                secondaryPhone: user.secondaryPhone,
+                password: undefined, // Don't populate password for edit mode
+                role: user.role,
+                status: user.status,
+                avatar: user.avatar || '',
             });
         } else {
             reset({
-                firstName: '',
-                lastName: '',
+                fullName: '',
                 email: '',
-                accountType: undefined,
-                primaryPhone: '',
-                secondaryPhone: '',
+                password: '',
+                role: undefined,
+                status: 'ACTIVE',
+                avatar: '',
             });
         }
     }, [user, reset]);
@@ -87,22 +90,25 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
         try {
             if (isEditMode) {
                 const updateData: UpdateUserDTO = {
-                    firstName: data.firstName,
-                    lastName: data.lastName,
+                    fullName: data.fullName,
                     email: data.email,
-                    accountType: data.accountType as UserAccountType,
-                    primaryPhone: data.primaryPhone,
-                    secondaryPhone: data.secondaryPhone,
+                    role: data.role as UserRole,
+                    status: data.status as UserStatus,
+                    avatar: data.avatar || undefined,
                 };
+                // Only include password if provided
+                if (data.password) {
+                    updateData.password = data.password;
+                }
                 await onSave(updateData);
             } else {
                 const createData: CreateUserDTO = {
-                    firstName: data.firstName,
-                    lastName: data.lastName,
+                    fullName: data.fullName,
                     email: data.email,
-                    accountType: data.accountType as UserAccountType,
-                    primaryPhone: data.primaryPhone,
-                    secondaryPhone: data.secondaryPhone,
+                    password: data.password || '',
+                    role: data.role as UserRole,
+                    status: data.status as UserStatus,
+                    avatar: data.avatar || undefined,
                 };
                 await onSave(createData);
             }
@@ -127,36 +133,19 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="firstName">
-                                First Name <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                id="firstName"
-                                {...register('firstName')}
-                                placeholder="John"
-                                className={errors.firstName ? 'border-red-500' : ''}
-                            />
-                            {errors.firstName && (
-                                <p className="text-sm text-red-500">{errors.firstName.message}</p>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="lastName">
-                                Last Name <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                id="lastName"
-                                {...register('lastName')}
-                                placeholder="Doe"
-                                className={errors.lastName ? 'border-red-500' : ''}
-                            />
-                            {errors.lastName && (
-                                <p className="text-sm text-red-500">{errors.lastName.message}</p>
-                            )}
-                        </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="fullName">
+                            Full Name <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                            id="fullName"
+                            {...register('fullName')}
+                            placeholder="John Doe"
+                            className={errors.fullName ? 'border-red-500' : ''}
+                        />
+                        {errors.fullName && (
+                            <p className="text-sm text-red-500">{errors.fullName.message}</p>
+                        )}
                     </div>
 
                     <div className="space-y-2">
@@ -174,45 +163,74 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="accountType">
-                            Account Type <span className="text-red-500">*</span>
+                        <Label htmlFor="password">
+                            Password {!isEditMode && <span className="text-red-500">*</span>}
+                            {isEditMode && <span className="text-sm text-gray-500"> (leave blank to keep current)</span>}
                         </Label>
-                        <Select
-                            value={accountType}
-                            onValueChange={(value) => setValue('accountType', value as any)}
-                        >
-                            <SelectTrigger className={errors.accountType ? 'border-red-500' : ''}>
-                                <SelectValue placeholder="Select account type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="player">Player</SelectItem>
-                                <SelectItem value="manager">Manager</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        {errors.accountType && (
-                            <p className="text-sm text-red-500">{errors.accountType.message}</p>
-                        )}
+                        <Input
+                            id="password"
+                            type="password"
+                            {...register('password')}
+                            placeholder={isEditMode ? '••••••••' : 'Enter password'}
+                            className={errors.password ? 'border-red-500' : ''}
+                        />
+                        {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="primaryPhone">Primary Phone</Label>
-                            <Input
-                                id="primaryPhone"
-                                {...register('primaryPhone')}
-                                placeholder="+1234567890"
-                            />
+                            <Label htmlFor="role">
+                                Role <span className="text-red-500">*</span>
+                            </Label>
+                            <Select
+                                value={role}
+                                onValueChange={(value) => setValue('role', value as any)}
+                            >
+                                <SelectTrigger className={errors.role ? 'border-red-500' : ''}>
+                                    <SelectValue placeholder="Select role" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Player">Player</SelectItem>
+                                    <SelectItem value="Moderator">Moderator</SelectItem>
+                                    <SelectItem value="Admin">Admin</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {errors.role && (
+                                <p className="text-sm text-red-500">{errors.role.message}</p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="secondaryPhone">Secondary Phone</Label>
-                            <Input
-                                id="secondaryPhone"
-                                {...register('secondaryPhone')}
-                                placeholder="+1234567891"
-                            />
+                            <Label htmlFor="status">
+                                Status <span className="text-red-500">*</span>
+                            </Label>
+                            <Select
+                                value={status}
+                                onValueChange={(value) => setValue('status', value as any)}
+                            >
+                                <SelectTrigger className={errors.status ? 'border-red-500' : ''}>
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="ACTIVE">Active</SelectItem>
+                                    <SelectItem value="INACTIVE">Inactive</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {errors.status && (
+                                <p className="text-sm text-red-500">{errors.status.message}</p>
+                            )}
                         </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="avatar">Avatar URL</Label>
+                        <Input
+                            id="avatar"
+                            {...register('avatar')}
+                            placeholder="https://example.com/avatar.jpg"
+                            className={errors.avatar ? 'border-red-500' : ''}
+                        />
+                        {errors.avatar && <p className="text-sm text-red-500">{errors.avatar.message}</p>}
                     </div>
 
                     <DialogFooter>

@@ -1,158 +1,131 @@
-import type { User, CreateUserDTO, UpdateUserDTO, UsersResponse, UserAccountType } from '@/types/User.types';
-
-// Mock data for development
-let mockUsers: User[] = [
-    {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.doe@example.com',
-        accountType: 'admin' as UserAccountType,
-        primaryPhone: '+1234567890',
-        secondaryPhone: '+1234567891',
-        createdAt: new Date('2024-01-15').toISOString(),
-        updatedAt: new Date('2024-01-15').toISOString(),
-    },
-    {
-        id: '2',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        email: 'jane.smith@example.com',
-        accountType: 'manager' as UserAccountType,
-        primaryPhone: '+1234567892',
-        secondaryPhone: '',
-        createdAt: new Date('2024-01-16').toISOString(),
-        updatedAt: new Date('2024-01-16').toISOString(),
-    },
-    {
-        id: '3',
-        firstName: 'Bob',
-        lastName: 'Johnson',
-        email: 'bob.johnson@example.com',
-        accountType: 'player' as UserAccountType,
-        primaryPhone: '+1234567893',
-        secondaryPhone: '+1234567894',
-        createdAt: new Date('2024-01-17').toISOString(),
-        updatedAt: new Date('2024-01-17').toISOString(),
-    },
-    {
-        id: '4',
-        firstName: 'Alice',
-        lastName: 'Williams',
-        email: 'alice.williams@example.com',
-        accountType: 'player' as UserAccountType,
-        primaryPhone: '+1234567895',
-        secondaryPhone: '',
-        createdAt: new Date('2024-01-18').toISOString(),
-        updatedAt: new Date('2024-01-18').toISOString(),
-    },
-    {
-        id: '5',
-        firstName: 'Charlie',
-        lastName: 'Brown',
-        email: 'charlie.brown@example.com',
-        accountType: 'manager' as UserAccountType,
-        primaryPhone: '+1234567896',
-        secondaryPhone: '+1234567897',
-        createdAt: new Date('2024-01-19').toISOString(),
-        updatedAt: new Date('2024-01-19').toISOString(),
-    },
-];
-
-// Simulate async delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import apiClient from '@/lib/apiClient';
+import type {
+    User,
+    CreateUserDTO,
+    UpdateUserDTO,
+    UsersResponse,
+    PaginationOptions,
+    PaginationResponse,
+} from '@/types/User.types';
 
 export const userService = {
-    // Get all users with pagination, search, and filter
-    async getUsers(
-        page: number = 1,
-        pageSize: number = 10,
-        search: string = '',
-        accountTypeFilter?: UserAccountType
-    ): Promise<UsersResponse> {
-        await delay(500); // Simulate network delay
+    /**
+     * Get all users with pagination and optional filters
+     * @param options - Pagination and filter options
+     * @returns Promise with users data and pagination info
+     */
+    async getUsers(options: PaginationOptions = {}): Promise<UsersResponse> {
+        try {
+            const params = new URLSearchParams();
 
-        let filteredUsers = [...mockUsers];
+            // Add pagination parameters
+            if (options.limit) params.append('limit', options.limit.toString());
+            if (options.sortBy) params.append('sortBy', options.sortBy);
+            if (options.sortOrder) params.append('sortOrder', options.sortOrder);
+            if (options.cursor) params.append('cursor', options.cursor);
+            if (options.search) params.append('search', options.search);
+            if (options.searchField) params.append('searchField', options.searchField);
 
-        // Apply search filter
-        if (search) {
-            const searchLower = search.toLowerCase();
-            filteredUsers = filteredUsers.filter(
-                user =>
-                    user.firstName.toLowerCase().includes(searchLower) ||
-                    user.lastName.toLowerCase().includes(searchLower) ||
-                    user.email.toLowerCase().includes(searchLower)
+            const response = await apiClient.get<PaginationResponse<User>>(
+                `/users?${params.toString()}`
             );
+
+            // Transform backend pagination response to frontend format
+            return {
+                users: response.data.data,
+                total: response.data.totalCount || response.data.data.length,
+                hasNextPage: response.data.hasNextPage,
+                nextCursor: response.data.nextCursor,
+            };
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            throw new Error('Failed to fetch users. Please try again later.');
         }
-
-        // Apply account type filter
-        if (accountTypeFilter) {
-            filteredUsers = filteredUsers.filter(user => user.accountType === accountTypeFilter);
-        }
-
-        // Calculate pagination
-        const total = filteredUsers.length;
-        const startIndex = (page - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-        return {
-            users: paginatedUsers,
-            total,
-            page,
-            pageSize,
-        };
     },
 
-    // Get single user by ID
+    /**
+     * Get a single user by ID
+     * @param id - User ID
+     * @returns Promise with user data or null if not found
+     */
     async getUserById(id: string): Promise<User | null> {
-        await delay(300);
-        const user = mockUsers.find(u => u.id === id);
-        return user || null;
+        try {
+            const response = await apiClient.get<User>(`/users/${id}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.status === 404) {
+                return null;
+            }
+            console.error(`Error fetching user ${id}:`, error);
+            throw new Error('Failed to fetch user details. Please try again later.');
+        }
     },
 
-    // Create new user
+    /**
+     * Create a new user
+     * @param data - User creation data
+     * @returns Promise with created user data
+     */
     async createUser(data: CreateUserDTO): Promise<User> {
-        await delay(500);
+        try {
+            const response = await apiClient.post<User>('/users', data);
+            return response.data;
+        } catch (error: any) {
+            console.error('Error creating user:', error);
 
-        const newUser: User = {
-            id: (mockUsers.length + 1).toString(),
-            ...data,
-            primaryPhone: data.primaryPhone || '',
-            secondaryPhone: data.secondaryPhone || '',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
+            // Handle validation errors
+            if (error.response?.status === 400) {
+                const message = error.response?.data?.message || 'Invalid user data';
+                throw new Error(message);
+            }
 
-        mockUsers.push(newUser);
-        return newUser;
+            throw new Error('Failed to create user. Please try again later.');
+        }
     },
 
-    // Update existing user
+    /**
+     * Update an existing user
+     * @param id - User ID
+     * @param data - User update data
+     * @returns Promise with updated user data or null if not found
+     */
     async updateUser(id: string, data: UpdateUserDTO): Promise<User | null> {
-        await delay(500);
+        try {
+            const response = await apiClient.patch<User>(`/users/${id}`, data);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.status === 404) {
+                return null;
+            }
 
-        const userIndex = mockUsers.findIndex(u => u.id === id);
-        if (userIndex === -1) return null;
+            console.error(`Error updating user ${id}:`, error);
 
-        const updatedUser: User = {
-            ...mockUsers[userIndex],
-            ...data,
-            updatedAt: new Date().toISOString(),
-        };
+            // Handle validation errors
+            if (error.response?.status === 400) {
+                const message = error.response?.data?.message || 'Invalid user data';
+                throw new Error(message);
+            }
 
-        mockUsers[userIndex] = updatedUser;
-        return updatedUser;
+            throw new Error('Failed to update user. Please try again later.');
+        }
     },
 
-    // Delete user (soft delete simulation)
+    /**
+     * Delete a user
+     * @param id - User ID
+     * @returns Promise with boolean indicating success
+     */
     async deleteUser(id: string): Promise<boolean> {
-        await delay(500);
+        try {
+            await apiClient.delete(`/users/${id}`);
+            return true;
+        } catch (error: any) {
+            if (error.response?.status === 404) {
+                return false;
+            }
 
-        const userIndex = mockUsers.findIndex(u => u.id === id);
-        if (userIndex === -1) return false;
-
-        mockUsers.splice(userIndex, 1);
-        return true;
+            console.error(`Error deleting user ${id}:`, error);
+            throw new Error('Failed to delete user. Please try again later.');
+        }
     },
 };

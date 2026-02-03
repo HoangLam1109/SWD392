@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { userService } from '@/service/user.service';
-import type { User, UserAccountType, CreateUserDTO, UpdateUserDTO } from '@/types/User.types';
+import type { User, UserRole, CreateUserDTO, UpdateUserDTO } from '@/types/User.types';
 import { UserDialog, DeleteUserDialog } from '@/components/user';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +29,7 @@ export function UserManagementPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [accountTypeFilter, setAccountTypeFilter] = useState<UserAccountType | 'all'>('all');
+    const [roleFilter, setRoleFilter] = useState<UserRole | 'all'>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalUsers, setTotalUsers] = useState(0);
     const pageSize = 10;
@@ -44,14 +44,20 @@ export function UserManagementPage() {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const response = await userService.getUsers(
-                currentPage,
-                pageSize,
-                search,
-                accountTypeFilter === 'all' ? undefined : accountTypeFilter
-            );
-            setUsers(response.users);
-            setTotalUsers(response.total);
+            const response = await userService.getUsers({
+                limit: pageSize,
+                search: search || undefined,
+                searchField: search ? 'fullName' : undefined,
+            });
+
+            // Apply role filter on client side for now
+            let filteredUsers = response.users;
+            if (roleFilter !== 'all') {
+                filteredUsers = filteredUsers.filter(user => user.role === roleFilter);
+            }
+
+            setUsers(filteredUsers);
+            setTotalUsers(filteredUsers.length);
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
@@ -61,7 +67,7 @@ export function UserManagementPage() {
 
     useEffect(() => {
         fetchUsers();
-    }, [currentPage, search, accountTypeFilter]);
+    }, [currentPage, search, roleFilter]);
 
     // Handle create user
     const handleCreateUser = async (data: CreateUserDTO | UpdateUserDTO) => {
@@ -115,14 +121,21 @@ export function UserManagementPage() {
     const canGoPrevious = currentPage > 1;
     const canGoNext = currentPage < totalPages;
 
-    // Get account type badge variant
-    const getAccountTypeBadge = (accountType: UserAccountType) => {
-        const variants: Record<UserAccountType, string> = {
-            admin: 'bg-blue-100 text-blue-700 hover:bg-blue-100',
-            manager: 'bg-purple-100 text-purple-700 hover:bg-purple-100',
-            player: 'bg-green-100 text-green-700 hover:bg-green-100',
+    // Get role badge variant
+    const getRoleBadge = (role: UserRole) => {
+        const variants: Record<UserRole, string> = {
+            'Admin': 'bg-blue-100 text-blue-700 hover:bg-blue-100',
+            'Moderator': 'bg-purple-100 text-purple-700 hover:bg-purple-100',
+            'Player': 'bg-green-100 text-green-700 hover:bg-green-100',
         };
-        return variants[accountType] || 'bg-gray-100 text-gray-700';
+        return variants[role] || 'bg-gray-100 text-gray-700';
+    };
+
+    // Get status badge variant
+    const getStatusBadge = (status: string) => {
+        return status === 'ACTIVE'
+            ? 'bg-green-100 text-green-700 hover:bg-green-100'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-100';
     };
 
     return (
@@ -156,22 +169,22 @@ export function UserManagementPage() {
                             </div>
                         </div>
                         <div className="w-full sm:w-[200px] space-y-2">
-                            <Label htmlFor="sort">Sort</Label>
+                            <Label htmlFor="roleFilter">Filter by Role</Label>
                             <Select
-                                value={accountTypeFilter}
+                                value={roleFilter}
                                 onValueChange={(value) => {
-                                    setAccountTypeFilter(value as UserAccountType | 'all');
+                                    setRoleFilter(value as UserRole | 'all');
                                     setCurrentPage(1);
                                 }}
                             >
-                                <SelectTrigger id="sort">
-                                    <SelectValue placeholder="Filter by type" />
+                                <SelectTrigger id="roleFilter">
+                                    <SelectValue placeholder="Filter by role" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Types</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
-                                    <SelectItem value="manager">Manager</SelectItem>
-                                    <SelectItem value="player">Player</SelectItem>
+                                    <SelectItem value="all">All Roles</SelectItem>
+                                    <SelectItem value="Admin">Admin</SelectItem>
+                                    <SelectItem value="Moderator">Moderator</SelectItem>
+                                    <SelectItem value="Player">Player</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -193,8 +206,8 @@ export function UserManagementPage() {
                                 <TableRow>
                                     <TableHead>Name</TableHead>
                                     <TableHead>Email</TableHead>
-                                    <TableHead>Account Type</TableHead>
-                                    <TableHead>Primary Phone</TableHead>
+                                    <TableHead>Role</TableHead>
+                                    <TableHead>Status</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -206,7 +219,7 @@ export function UserManagementPage() {
                                             <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                                             <TableCell><Skeleton className="h-4 w-48" /></TableCell>
                                             <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-                                            <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                                            <TableCell><Skeleton className="h-6 w-16" /></TableCell>
                                             <TableCell><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
                                         </TableRow>
                                     ))
@@ -217,7 +230,7 @@ export function UserManagementPage() {
                                             <div className="flex flex-col items-center justify-center text-gray-500">
                                                 <p className="text-lg font-semibold">No users found</p>
                                                 <p className="text-sm mt-1">
-                                                    {search || accountTypeFilter !== 'all'
+                                                    {search || roleFilter !== 'all'
                                                         ? 'Try adjusting your filters'
                                                         : 'Get started by adding your first user'}
                                                 </p>
@@ -229,16 +242,18 @@ export function UserManagementPage() {
                                     users.map((user) => (
                                         <TableRow key={user.id} className="hover:bg-gray-50">
                                             <TableCell className="font-medium">
-                                                {user.firstName} {user.lastName}
+                                                {user.fullName}
                                             </TableCell>
                                             <TableCell className="text-gray-600">{user.email}</TableCell>
                                             <TableCell>
-                                                <Badge className={getAccountTypeBadge(user.accountType)}>
-                                                    {user.accountType.charAt(0).toUpperCase() + user.accountType.slice(1)}
+                                                <Badge className={getRoleBadge(user.role)}>
+                                                    {user.role}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-gray-600">
-                                                {user.primaryPhone || '-'}
+                                            <TableCell>
+                                                <Badge className={getStatusBadge(user.status)}>
+                                                    {user.status}
+                                                </Badge>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
