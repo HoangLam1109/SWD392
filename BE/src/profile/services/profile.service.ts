@@ -24,28 +24,35 @@ export class ProfileService {
   }
 
   async updateProfile(
-    id: string,
-    updateProfileDto: UpdateProfileDto,
-  ): Promise<ProfileDocument> {
-    const existingProfile = await this.profileRepository.findById(id);
-    if (!existingProfile) {
-      throw new NotFoundException('Profile not found');
-    }
+  userId: string,
+  updateProfileDto: UpdateProfileDto,
+): Promise<ProfileDocument> {
 
-    const updateData: any = {
-      ...updateProfileDto,
-      dateOfBirth: updateProfileDto.dateOfBirth
-        ? new Date(updateProfileDto.dateOfBirth)
-        : undefined,
+  const updateData: any = {
+    bio: updateProfileDto.bio,
+    phoneNumber: updateProfileDto.phoneNumber,
+    address: updateProfileDto.address,
+    country: updateProfileDto.country,
+    sex: updateProfileDto.sex,
+    dateOfBirth: updateProfileDto.dateOfBirth
+      ? new Date(updateProfileDto.dateOfBirth)
+      : undefined,
+  };
+
+  // 🔥 Merge socialLinks (không overwrite toàn bộ)
+  if (updateProfileDto.socialLinks) {
+    const existingProfile =
+      await this.profileRepository.findByUserId(userId);
+
+    updateData.socialLinks = {
+      ...(existingProfile?.socialLinks || {}),
+      ...updateProfileDto.socialLinks,
     };
-
-    if (updateProfileDto.socialLinks) {
-      updateData.socialLinks = {
-        ...existingProfile.socialLinks,
-        ...updateProfileDto.socialLinks,
-      };
-    }
-
-    return this.profileRepository.updateById(id, updateData);
   }
+
+  // ❗ userId chỉ lấy từ token, không bao giờ từ DTO
+  return this.profileRepository.upsertByUserId(userId, updateData);
+}
+
+
 }

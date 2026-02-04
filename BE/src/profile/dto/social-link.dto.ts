@@ -13,7 +13,7 @@ export class SocialLinksDto {
     example: 'https://discord.gg/abc123',
   })
   @IsOptional()
-  @IsString() // discord invite/link không phải lúc nào cũng là URL chuẩn
+  @IsString()
   discord?: string;
 
   @ApiPropertyOptional({
