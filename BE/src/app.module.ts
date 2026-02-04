@@ -5,6 +5,10 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ProfileModule } from './profile/profile.module';
 import { GameModule } from './game/game.module';
+import { BlogModule } from './blog/blog.module';
+import { CommentModule } from './comment/comment.module';
+import { CategoryModule } from './category/category.module';
+import { SystemRequirementModule } from './system_requirement/system_requirement.module';
 
 @Module({
   imports: [
@@ -31,11 +35,15 @@ import { GameModule } from './game/game.module';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '10m' },
     }),
     AuthModule,
     ProfileModule,
     GameModule,
+    BlogModule,
+    CommentModule,
+    CategoryModule,
+    SystemRequirementModule,
   ],
 })
 export class AppModule {}

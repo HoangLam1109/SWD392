@@ -15,6 +15,11 @@ async function bootstrap() {
     .addTag('auth', 'Authentication service endpoints')
     .addTag('users', 'User management service endpoints')
     .addTag('games', 'Game management service endpoints')
+    .addTag('categories', 'Category management service endpoints')
+    .addTag('comments', 'Comment management service endpoints')
+    .addTag('profiles', 'Profile management service endpoints')
+    .addTag('blogs', 'Blog management service endpoints')
+    .addTag('system-requirements', 'System requirement management service endpoints')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
