@@ -135,6 +135,7 @@
 
   html {
     font-size: var(--font-size);
+    overflow-x: hidden;
   }
 
   h1 {

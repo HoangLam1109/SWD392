@@ -1,2 +1,11 @@
 @import './tailwind.css';
 @import './theme.css';
+::selection {
+  background: rgba(0, 229, 255, 0.8);
+  color: #000;
+}
+
+::-moz-selection {
+  background: rgba(0, 229, 255, 0.8);
+  color: #000;
+}

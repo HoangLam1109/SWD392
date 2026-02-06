@@ -2,4 +2,6 @@
  * Pages exports
  */
 export { UserManagementPage } from './UserManagementPage';
-export { GameManagementPage } from './LibraryPage';
+export { LibraryPage } from './LibraryPage';
+export { default as StorePage } from './StorePage';
+export { default as CartPage } from './CartPage';

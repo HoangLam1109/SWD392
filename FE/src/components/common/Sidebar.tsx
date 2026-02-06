@@ -108,7 +108,11 @@ export function Sidebar({
                           : 'text-gray-700 hover:bg-gray-100'
                         } rounded-md text-sm sm:text-base`}
                       onClick={() => {
-                        onNavigate(item.id);
+                        if(item.path){
+                          navigate(item.path);
+                        }else{
+                          onNavigate(item.id);
+                        }
                         // Close sidebar on mobile (< 768px) after navigation
                         if (window.innerWidth < 768) {
                           setSidebarCollapsed(true);
