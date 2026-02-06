@@ -5,10 +5,10 @@ import { Blog, BlogDocument, IBlog } from '../entities/blog.entity';
 
 export interface IBlogRepository {
   findById(id: string, fields?: string): Promise<BlogDocument | null>;
-  findByUserId(userId: string): Promise<BlogDocument[]>;
+  findByUserId(userId: string, status?: string): Promise<BlogDocument[]>;
   create(blogData: any): Promise<BlogDocument>;
-  updateById(id: string, blogData: any): Promise<BlogDocument | null>;
-  softDeleteById(id: string): Promise<BlogDocument | null>;
+  updateById(id: string, blogData: any): Promise<BlogDocument>;
+  deleteById(id: string): Promise<void>;
   findAll(fields?: string): Promise<BlogDocument[]>;
   findWithQuery(
     query: Record<string, any>,
@@ -21,18 +21,22 @@ export interface IBlogRepository {
 @Injectable()
 export class BlogRepository implements IBlogRepository {
   constructor(
-    @InjectModel(Blog.name, 'GAME_DB') private blogModel: Model<BlogDocument>,
+    @InjectModel(Blog.name, 'BLOG_DB') private blogModel: Model<BlogDocument>,
   ) {}
 
   async findById(id: string, fields?: string): Promise<BlogDocument | null> {
     return await this.blogModel.findOne(
-      { _id: id, deletedAt: null },
+      { _id: id },
       fields || '_id title content thumbnailUrl status viewCount publishedAt userId created_at updated_at',
     );
   }
 
-  async findByUserId(userId: string): Promise<BlogDocument[]> {
-    return await this.blogModel.find({ userId, deletedAt: null }).lean();
+  async findByUserId(userId: string, status?: string): Promise<BlogDocument[]> {
+    const query: any = { userId };
+    if (status) {
+      query.status = status;
+    }
+    return await this.blogModel.find(query).lean();
   }
 
   async create(blogData: any): Promise<BlogDocument> {
@@ -43,10 +47,10 @@ export class BlogRepository implements IBlogRepository {
   async updateById(
     id: string,
     blogData: Partial<IBlog>,
-  ): Promise<BlogDocument | null> {
+  ): Promise<BlogDocument> {
     return await this.blogModel
       .findOneAndUpdate(
-        { _id: id, deletedAt: null },
+        { _id: id },
         blogData,
         { new: true },
       )
@@ -54,19 +58,12 @@ export class BlogRepository implements IBlogRepository {
       .exec();
   }
 
-  async softDeleteById(id: string): Promise<BlogDocument | null> {
-    return await this.blogModel
-      .findOneAndUpdate(
-        { _id: id, deletedAt: null },
-        { deletedAt: new Date() },
-        { new: true },
-      )
-      .orFail(new NotFoundException('Blog not found'))
-      .exec();
-  }
+  async deleteById(id: string): Promise<void> {
+  await this.blogModel.findByIdAndDelete(id).exec();
+}
 
   async findAll(fields?: string): Promise<BlogDocument[]> {
-    return await this.blogModel.find({ deletedAt: null }, fields);
+    return await this.blogModel.find({}, fields);
   }
 
   async findWithQuery(
@@ -81,9 +78,6 @@ export class BlogRepository implements IBlogRepository {
     const sortDirection = options.sortOrder === 'asc' ? 1 : -1;
     const sortObj: Record<string, 1 | -1> = { [sortField]: sortDirection };
     
-    // Always filter out soft-deleted blogs
-    query.deletedAt = null;
-    
     return await this.blogModel
       .find(query)
       .sort(sortObj)
@@ -93,15 +87,13 @@ export class BlogRepository implements IBlogRepository {
   }
 
   async countDocument(query: Record<string, any>): Promise<number> {
-    // Always filter out soft-deleted blogs
-    query.deletedAt = null;
     return await this.blogModel.countDocuments(query);
   }
 
   async incrementViewCount(id: string): Promise<BlogDocument | null> {
     return await this.blogModel
       .findOneAndUpdate(
-        { _id: id, deletedAt: null },
+        { _id: id },
         { $inc: { viewCount: 1 } },
         { new: true },
       )

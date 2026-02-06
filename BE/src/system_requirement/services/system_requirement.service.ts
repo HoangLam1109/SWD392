@@ -5,16 +5,25 @@ import { SystemRequirementRepository } from '../repositories/system_requirement.
 import { SystemRequirementDocument } from '../entities/system_requirement.entity';
 import { PaginationOptionsDto } from '../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../common/dto/pagination-response.dto';
+import { GameRepository } from '../../game/repositories/game.repository';
 
 @Injectable()
 export class SystemRequirementService {
   constructor(
     private readonly systemRequirementRepository: SystemRequirementRepository,
+    private readonly gameRepository: GameRepository,
   ) {}
 
   async create(
     createSystemRequirementDto: CreateSystemRequirementDto,
   ): Promise<SystemRequirementDocument> {
+    const game = await this.gameRepository.findById(
+      createSystemRequirementDto.gameId,
+      '_id',
+    );
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
     return await this.systemRequirementRepository.create(
       createSystemRequirementDto,
     );
@@ -92,6 +101,15 @@ export class SystemRequirementService {
     id: string,
     updateSystemRequirementDto: UpdateSystemRequirementDto,
   ): Promise<SystemRequirementDocument | null> {
+    if (updateSystemRequirementDto.gameId) {
+      const game = await this.gameRepository.findById(
+        updateSystemRequirementDto.gameId,
+        '_id',
+      );
+      if (!game) {
+        throw new NotFoundException('Game not found');
+      }
+    }
     return await this.systemRequirementRepository.updateById(
       id,
       updateSystemRequirementDto,

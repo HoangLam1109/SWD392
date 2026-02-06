@@ -14,8 +14,4 @@ export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {
   @IsMongoId()
   @IsOptional()
   parentCategoryId?: string;
-
-  @IsMongoId()
-  @IsOptional()
-  gameId?: string;
 }

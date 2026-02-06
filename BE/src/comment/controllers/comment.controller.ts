@@ -44,7 +44,7 @@ export class CommentController {
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() createCommentDto: CreateCommentDto, @Request() req) {
-    return this.commentService.create(createCommentDto, req.user.sub);
+    return this.commentService.create(createCommentDto, req.user.userId);
   }
 
   @ApiOperation({ summary: 'Get all comments with pagination' })
@@ -84,6 +84,12 @@ export class CommentController {
     type: String,
     description: 'Field to search in',
   })
+  @ApiQuery({
+    name: 'isDeleted',
+    required: false,
+    type: Boolean,
+    description: 'Filter by deleted status',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of all comments with pagination',
@@ -110,36 +116,54 @@ export class CommentController {
   }
 
   @ApiOperation({ summary: 'Get comments by blog ID' })
+  @ApiQuery({
+    name: 'isDeleted',
+    required: false,
+    type: Boolean,
+    description: 'Filter by deleted status',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of comments for blog',
     type: [CommentResponseDto],
   })
   @Get('blog/:blogId')
-  findByBlogId(@Param('blogId') blogId: string) {
-    return this.commentService.findByBlogId(blogId);
+  findByBlogId(@Param('blogId') blogId: string, @Query('isDeleted') isDeleted?: string) {
+    return this.commentService.findByBlogId(blogId, isDeleted);
   }
 
   @ApiOperation({ summary: 'Get comments by user ID' })
+  @ApiQuery({
+    name: 'isDeleted',
+    required: false,
+    type: Boolean,
+    description: 'Filter by deleted status',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of comments by user',
     type: [CommentResponseDto],
   })
   @Get('user/:userId')
-  findByUserId(@Param('userId') userId: string) {
-    return this.commentService.findByUserId(userId);
+  findByUserId(@Param('userId') userId: string, @Query('isDeleted') isDeleted?: string) {
+    return this.commentService.findByUserId(userId, isDeleted);
   }
 
   @ApiOperation({ summary: 'Get replies by parent comment ID' })
+  @ApiQuery({
+    name: 'isDeleted',
+    required: false,
+    type: Boolean,
+    description: 'Filter by deleted status',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of replies to comment',
     type: [CommentResponseDto],
   })
   @Get('parent/:parentCommentId')
-  findByParentCommentId(@Param('parentCommentId') parentCommentId: string) {
-    return this.commentService.findByParentCommentId(parentCommentId);
+  findByParentCommentId(@Param('parentCommentId') parentCommentId: string, @Query('isDeleted') isDeleted?: string) {
+    return this.commentService.findByParentCommentId(parentCommentId, isDeleted);
   }
 
   @ApiOperation({ summary: 'Update comment' })
@@ -163,7 +187,7 @@ export class CommentController {
     @Body() updateCommentDto: UpdateCommentDto,
     @Request() req,
   ) {
-    return this.commentService.update(id, updateCommentDto, req.user.sub);
+    return this.commentService.update(id, updateCommentDto, req.user.userId);
   }
 
   @ApiOperation({ summary: 'Delete comment (soft delete)' })
@@ -182,6 +206,6 @@ export class CommentController {
   @UseGuards(AuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req) {
-    return this.commentService.remove(id, req.user.sub);
+    return this.commentService.remove(id, req.user.userId);
   }
 }

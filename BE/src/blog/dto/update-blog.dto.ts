@@ -1,22 +1,23 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { CreateBlogDto } from './create-blog.dto';
-import { IsString, IsEnum, IsUrl, IsOptional } from 'class-validator';
-import { BlogStatus } from '../enum/blog.enum';
 
 export class UpdateBlogDto extends PartialType(CreateBlogDto) {
-  @IsString()
+  @ApiPropertyOptional({
+    description: 'Remove current thumbnail',
+    example: false,
+    default: false,
+  })
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') return false;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true' || value === '1';
+    }
+    return value;
+  })
   @IsOptional()
-  title?: string;
-
-  @IsString()
-  @IsOptional()
-  content?: string;
-
-  @IsUrl()
-  @IsOptional()
-  thumbnailUrl?: string;
-
-  @IsEnum(BlogStatus)
-  @IsOptional()
-  status?: BlogStatus;
+  @IsBoolean()
+  removeThumbnail: boolean = false;
 }

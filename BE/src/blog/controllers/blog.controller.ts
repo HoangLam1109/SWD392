@@ -9,6 +9,8 @@ import {
   Query,
   Request,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,14 +18,21 @@ import {
   ApiOperation,
   ApiResponse,
   ApiQuery,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
+import type { Multer } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { BlogService } from '../services/blog.service';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { UpdateBlogDto } from '../dto/update-blog.dto';
+import { UpdateBlogStatusDto } from '../dto/update-status-blog.dto';
 import { BlogResponseDto } from '../dto/blog-response.dto';
 import { PaginationOptionsDto } from '../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../common/dto/pagination-response.dto';
 import { AuthGuard } from '../../auth/guards/auth.guard';
+import { BlogStatus } from '../enum/blog.enum';
+import { CloudinaryInterceptor } from '../../common/interceptors/cloudinary.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('blogs')
@@ -41,10 +50,32 @@ export class BlogController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['title', 'content'],
+      properties: {
+        title: { type: 'string' },
+        content: { type: 'string' },
+        thumbnail: { type: 'string', format: 'binary' },
+      },
+    },
+  })
   @UseGuards(AuthGuard)
+  @UseInterceptors(
+    FileInterceptor('thumbnail', CloudinaryInterceptor('blogs')),
+  )
   @Post()
-  create(@Body() createBlogDto: CreateBlogDto, @Request() req) {
-    return this.blogService.create(createBlogDto, req.user.sub);
+  create(
+    @Body() createBlogDto: CreateBlogDto,
+    @UploadedFile() file: Multer.File,
+    @Request() req,
+  ) {
+    if (file?.path) {
+      createBlogDto.thumbnailUrl = file.path;
+    }
+    return this.blogService.create(createBlogDto, req.user.userId);
   }
 
   @ApiOperation({ summary: 'Get all blogs with pagination' })
@@ -84,6 +115,12 @@ export class BlogController {
     type: String,
     description: 'Field to search in',
   })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: BlogStatus,
+    description: 'Filter by blog status',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of all blogs with pagination',
@@ -110,14 +147,20 @@ export class BlogController {
   }
 
   @ApiOperation({ summary: 'Get blogs by user ID' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: BlogStatus,
+    description: 'Filter by blog status',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of blogs by user',
     type: [BlogResponseDto],
   })
   @Get('user/:userId')
-  findByUserId(@Param('userId') userId: string) {
-    return this.blogService.findByUserId(userId);
+  findByUserId(@Param('userId') userId: string, @Query('status') status?: BlogStatus) {
+    return this.blogService.findByUserId(userId, status);
   }
 
   @ApiOperation({ summary: 'Update blog' })
@@ -134,17 +177,36 @@ export class BlogController {
     status: 403,
     description: 'Forbidden - not the owner',
   })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        content: { type: 'string' },
+        thumbnail: { type: 'string', format: 'binary' },
+        removeThumbnail: { type: 'boolean', default: false },
+      },
+    },
+  })
   @UseGuards(AuthGuard)
+  @UseInterceptors(
+    FileInterceptor('thumbnail', CloudinaryInterceptor('blogs')),
+  )
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateBlogDto: UpdateBlogDto,
+    @UploadedFile() file: Multer.File,
     @Request() req,
   ) {
-    return this.blogService.update(id, updateBlogDto, req.user.sub);
+    if (file?.path) {
+      updateBlogDto.thumbnailUrl = file.path;
+    }
+    return this.blogService.update(id, updateBlogDto, req.user.userId);
   }
 
-  @ApiOperation({ summary: 'Delete blog (soft delete)' })
+  @ApiOperation({ summary: 'Delete blog' })
   @ApiResponse({
     status: 200,
     description: 'Blog deleted successfully',
@@ -160,6 +222,25 @@ export class BlogController {
   @UseGuards(AuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req) {
-    return this.blogService.remove(id, req.user.sub);
+    return this.blogService.remove(id, req.user.userId);
+  }
+
+  @ApiOperation({ summary: 'Update blog status' })
+  @ApiResponse({
+    status: 200,
+    description: 'Blog status updated successfully',
+    type: BlogResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Blog not found',
+  })
+  @UseGuards(AuthGuard)
+  @Patch(':id/status')
+  updateStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: UpdateBlogStatusDto,
+  ) {
+    return this.blogService.updateStatus(id, updateStatusDto.status);
   }
 }

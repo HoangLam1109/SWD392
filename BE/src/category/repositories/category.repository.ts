@@ -9,10 +9,10 @@ import {
 
 export interface ICategoryRepository {
   findById(id: string, fields?: string): Promise<CategoryDocument | null>;
-  findByGameId(gameId: string): Promise<CategoryDocument[]>;
   findByParentCategoryId(
     parentCategoryId: string,
   ): Promise<CategoryDocument[]>;
+  hasChildren(parentCategoryId: string): Promise<boolean>;
   findAllParentCategories(): Promise<CategoryDocument[]>;
   create(categoryData: any): Promise<CategoryDocument>;
   updateById(
@@ -42,15 +42,8 @@ export class CategoryRepository implements ICategoryRepository {
     return await this.categoryModel.findOne(
       { _id: id },
       fields ||
-        '_id categoryName description parentCategoryId gameId created_at',
+        '_id categoryName description parentCategoryId created_at',
     );
-  }
-
-  async findByGameId(gameId: string): Promise<CategoryDocument[]> {
-    return await this.categoryModel
-      .find({ gameId })
-      .sort({ categoryName: 1 })
-      .lean();
   }
 
   async findByParentCategoryId(
@@ -60,6 +53,11 @@ export class CategoryRepository implements ICategoryRepository {
       .find({ parentCategoryId })
       .sort({ categoryName: 1 })
       .lean();
+  }
+
+  async hasChildren(parentCategoryId: string): Promise<boolean> {
+    const exists = await this.categoryModel.exists({ parentCategoryId });
+    return Boolean(exists);
   }
 
   async findAllParentCategories(): Promise<CategoryDocument[]> {

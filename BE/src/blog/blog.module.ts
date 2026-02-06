@@ -9,11 +9,11 @@ import { BlogRepository } from './repositories/blog.repository';
   imports: [
     MongooseModule.forFeature(
       [{ name: Blog.name, schema: BlogSchema }],
-      'GAME_DB',
+      'BLOG_DB',
     ),
   ],
   controllers: [BlogController],
   providers: [BlogService, BlogRepository],
-  exports: [BlogService],
+  exports: [BlogService, BlogRepository],
 })
 export class BlogModule {}

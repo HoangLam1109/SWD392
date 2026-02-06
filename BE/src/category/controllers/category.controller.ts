@@ -90,7 +90,7 @@ export class CategoryController {
     return this.categoryService.findAllWithPagination(query);
   }
 
-  @ApiOperation({ summary: 'Get all parent categories (no parent)' })
+  @ApiOperation({ summary: 'Get all parent categories' })
   @ApiResponse({
     status: 200,
     description: 'List of parent categories',
@@ -114,17 +114,6 @@ export class CategoryController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.categoryService.findById(id);
-  }
-
-  @ApiOperation({ summary: 'Get categories by game ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of categories for game',
-    type: [CategoryResponseDto],
-  })
-  @Get('game/:gameId')
-  findByGameId(@Param('gameId') gameId: string) {
-    return this.categoryService.findByGameId(gameId);
   }
 
   @ApiOperation({ summary: 'Get subcategories by parent category ID' })

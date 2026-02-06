@@ -7,6 +7,7 @@ import {
   SystemRequirementSchema,
 } from './entities/system_requirement.entity';
 import { SystemRequirementRepository } from './repositories/system_requirement.repository';
+import { GameModule } from '../game/game.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { SystemRequirementRepository } from './repositories/system_requirement.r
       [{ name: SystemRequirement.name, schema: SystemRequirementSchema }],
       'GAME_DB',
     ),
+    GameModule,
   ],
   controllers: [SystemRequirementController],
   providers: [SystemRequirementService, SystemRequirementRepository],

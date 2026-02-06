@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   ForbiddenException,
@@ -9,15 +10,39 @@ import { CommentRepository } from '../repositories/comment.repository';
 import { CommentDocument } from '../entities/comment.entity';
 import { PaginationOptionsDto } from '../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../common/dto/pagination-response.dto';
+import { BlogRepository } from '../../blog/repositories/blog.repository';
 
 @Injectable()
 export class CommentService {
-  constructor(private readonly commentRepository: CommentRepository) {}
+  constructor(
+    private readonly commentRepository: CommentRepository,
+    private readonly blogRepository: BlogRepository,
+  ) {}
 
   async create(
     createCommentDto: CreateCommentDto,
     userId: string,
   ): Promise<CommentDocument> {
+    const blog = await this.blogRepository.findById(
+      createCommentDto.blogId,
+      '_id',
+    );
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    if (createCommentDto.parentCommentId) {
+      const parentComment = await this.commentRepository.findById(
+        createCommentDto.parentCommentId,
+      );
+      if (!parentComment) {
+        throw new NotFoundException('Parent comment not found');
+      }
+      if (parentComment.blogId?.toString() !== createCommentDto.blogId) {
+        throw new BadRequestException('Parent comment does not belong to blog');
+      }
+    }
+
     const commentData = {
       ...createCommentDto,
       userId,
@@ -88,18 +113,22 @@ export class CommentService {
     return comment;
   }
 
-  async findByBlogId(blogId: string): Promise<CommentDocument[]> {
-    return await this.commentRepository.findByBlogId(blogId);
+  async findByBlogId(blogId: string, isDeleted?: string): Promise<CommentDocument[]> {
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : undefined;
+    return await this.commentRepository.findByBlogId(blogId, isDeletedFilter);
   }
 
-  async findByUserId(userId: string): Promise<CommentDocument[]> {
-    return await this.commentRepository.findByUserId(userId);
+  async findByUserId(userId: string, isDeleted?: string): Promise<CommentDocument[]> {
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : undefined;
+    return await this.commentRepository.findByUserId(userId, isDeletedFilter);
   }
 
   async findByParentCommentId(
     parentCommentId: string,
+    isDeleted?: string,
   ): Promise<CommentDocument[]> {
-    return await this.commentRepository.findByParentCommentId(parentCommentId);
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : undefined;
+    return await this.commentRepository.findByParentCommentId(parentCommentId, isDeletedFilter);
   }
 
   async update(

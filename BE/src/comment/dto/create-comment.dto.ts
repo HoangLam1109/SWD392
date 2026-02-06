@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsMongoId, IsOptional } from 'class-validator';
+import { IsString, IsMongoId, IsOptional, ValidateIf } from 'class-validator';
 
 export class CreateCommentDto {
   @ApiProperty({
@@ -20,7 +20,7 @@ export class CreateCommentDto {
     description: 'Parent comment ID for replies',
     example: '507f1f77bcf86cd799439011',
   })
-  @IsMongoId()
   @IsOptional()
+  @IsMongoId()
   parentCommentId?: string;
 }

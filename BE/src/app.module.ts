@@ -32,6 +32,14 @@ import { SystemRequirementModule } from './system_requirement/system_requirement
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      connectionName: 'BLOG_DB',
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('BLOG_MONGO_URL'),
+      }),
+      inject: [ConfigService],
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
@@ -40,8 +48,8 @@ import { SystemRequirementModule } from './system_requirement/system_requirement
     AuthModule,
     ProfileModule,
     GameModule,
-    BlogModule,
     CommentModule,
+    BlogModule,
     CategoryModule,
     SystemRequirementModule,
   ],
