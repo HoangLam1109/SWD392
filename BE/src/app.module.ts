@@ -5,6 +5,10 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ProfileModule } from './profile/profile.module';
 import { GameModule } from './game/game.module';
+import { BlogModule } from './blog/blog.module';
+import { CommentModule } from './comment/comment.module';
+import { CategoryModule } from './category/category.module';
+import { SystemRequirementModule } from './system_requirement/system_requirement.module';
 
 @Module({
   imports: [
@@ -28,6 +32,14 @@ import { GameModule } from './game/game.module';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      connectionName: 'BLOG_DB',
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('BLOG_MONGO_URL'),
+      }),
+      inject: [ConfigService],
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
@@ -36,6 +48,10 @@ import { GameModule } from './game/game.module';
     AuthModule,
     ProfileModule,
     GameModule,
+    CommentModule,
+    BlogModule,
+    CategoryModule,
+    SystemRequirementModule,
   ],
 })
 export class AppModule {}

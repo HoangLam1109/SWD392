@@ -1,6 +1,6 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { IProfile, Profile, ProfileDocument } from '../entities/profile.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 export interface IProfileRepository {
@@ -21,8 +21,15 @@ export class ProfileRepository implements IProfileRepository {
   }
 
   async findByUserId(userId: string): Promise<ProfileDocument | null> {
-    return await this.profileModel.findOne({ userId });
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new BadRequestException('Invalid userId');
   }
+
+  return this.profileModel.findOne({
+    userId: new Types.ObjectId(userId),
+  });
+}
+
 
   async updateById(
     id: string,
@@ -33,4 +40,26 @@ export class ProfileRepository implements IProfileRepository {
       .orFail(new NotFoundException('Profile not found'))
       .exec();
   }
+
+  async upsertByUserId(
+  userId: string,
+  data: any,
+): Promise<ProfileDocument> {
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new BadRequestException('Invalid userId');
+  }
+
+  return this.profileModel.findOneAndUpdate(
+    { userId: new Types.ObjectId(userId) },
+    {
+      ...data,
+      userId: new Types.ObjectId(userId),
+    },
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+    },
+  );
+}
 }
