@@ -92,6 +92,17 @@ export class SystemRequirementController {
     return this.systemRequirementService.findAllWithPagination(query);
   }
 
+  @ApiOperation({ summary: 'Get system requirements by game ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of system requirements for game',
+    type: [SystemRequirementResponseDto],
+  })
+  @Get('game/:gameId')
+  findByGameId(@Param('gameId') gameId: string) {
+    return this.systemRequirementService.findByGameId(gameId);
+  }
+
   @ApiOperation({ summary: 'Get system requirement by ID' })
   @ApiResponse({
     status: 200,
@@ -105,17 +116,6 @@ export class SystemRequirementController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.systemRequirementService.findById(id);
-  }
-
-  @ApiOperation({ summary: 'Get system requirements by game ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of system requirements for game',
-    type: [SystemRequirementResponseDto],
-  })
-  @Get('game/:gameId')
-  findByGameId(@Param('gameId') gameId: string) {
-    return this.systemRequirementService.findByGameId(gameId);
   }
 
   @ApiOperation({ summary: 'Update system requirement' })

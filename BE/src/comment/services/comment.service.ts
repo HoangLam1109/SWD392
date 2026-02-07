@@ -67,6 +67,12 @@ export class CommentService {
       ...filters
     } = options;
 
+    if (filters.isDeleted === undefined) {
+      filters.isDeleted = false;
+    } else {
+      filters.isDeleted = filters.isDeleted === true || filters.isDeleted === 'true';
+    }
+
     // Build query
     const query = this.buildQuery(
       filters,
@@ -114,12 +120,12 @@ export class CommentService {
   }
 
   async findByBlogId(blogId: string, isDeleted?: string): Promise<CommentDocument[]> {
-    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : undefined;
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
     return await this.commentRepository.findByBlogId(blogId, isDeletedFilter);
   }
 
   async findByUserId(userId: string, isDeleted?: string): Promise<CommentDocument[]> {
-    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : undefined;
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
     return await this.commentRepository.findByUserId(userId, isDeletedFilter);
   }
 
@@ -127,7 +133,7 @@ export class CommentService {
     parentCommentId: string,
     isDeleted?: string,
   ): Promise<CommentDocument[]> {
-    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : undefined;
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
     return await this.commentRepository.findByParentCommentId(parentCommentId, isDeletedFilter);
   }
 
@@ -179,7 +185,13 @@ export class CommentService {
 
     // Handle search
     if (search && searchField) {
-      if (searchField === 'updatedAt' || searchField === 'createdAt') {
+      const dateFieldMap: Record<string, string> = {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+      };
+      const resolvedSearchField = dateFieldMap[searchField] || searchField;
+
+      if (resolvedSearchField === 'updated_at' || resolvedSearchField === 'created_at') {
         // Date search
         const dateSearch = new Date(search);
         if (!isNaN(dateSearch.getTime())) {
@@ -187,14 +199,14 @@ export class CommentService {
           dateStart.setHours(0, 0, 0, 0);
           const dateEnd = new Date(dateSearch);
           dateEnd.setHours(23, 59, 59, 999);
-          query[searchField] = {
+          query[resolvedSearchField] = {
             $gte: dateStart,
             $lte: dateEnd,
           };
         }
       } else {
         // Text search (regex)
-        query[searchField] = { $regex: search, $options: 'i' };
+        query[resolvedSearchField] = { $regex: search, $options: 'i' };
       }
     }
 

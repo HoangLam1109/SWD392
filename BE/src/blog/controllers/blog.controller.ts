@@ -21,8 +21,8 @@ import {
   ApiConsumes,
   ApiBody,
 } from '@nestjs/swagger';
-import type { Multer } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
+import type { Multer } from 'multer';
 import { BlogService } from '../services/blog.service';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { UpdateBlogDto } from '../dto/update-blog.dto';
@@ -131,21 +131,6 @@ export class BlogController {
     return this.blogService.findAllWithPagination(query);
   }
 
-  @ApiOperation({ summary: 'Get blog by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Blog found',
-    type: BlogResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Blog not found',
-  })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.blogService.findById(id);
-  }
-
   @ApiOperation({ summary: 'Get blogs by user ID' })
   @ApiQuery({
     name: 'status',
@@ -161,6 +146,21 @@ export class BlogController {
   @Get('user/:userId')
   findByUserId(@Param('userId') userId: string, @Query('status') status?: BlogStatus) {
     return this.blogService.findByUserId(userId, status);
+  }
+
+  @ApiOperation({ summary: 'Get blog by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Blog found',
+    type: BlogResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Blog not found',
+  })
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.blogService.findById(id);
   }
 
   @ApiOperation({ summary: 'Update blog' })
@@ -241,6 +241,9 @@ export class BlogController {
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateBlogStatusDto,
   ) {
-    return this.blogService.updateStatus(id, updateStatusDto.status);
+    return this.blogService.updateStatus(
+      id,
+      updateStatusDto.status,
+    );
   }
 }

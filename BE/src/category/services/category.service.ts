@@ -142,7 +142,13 @@ export class CategoryService {
 
     // Handle search
     if (search && searchField) {
-      if (searchField === 'createdAt') {
+      const dateFieldMap: Record<string, string> = {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+      };
+      const resolvedSearchField = dateFieldMap[searchField] || searchField;
+
+      if (resolvedSearchField === 'created_at' || resolvedSearchField === 'updated_at') {
         // Date search
         const dateSearch = new Date(search);
         if (!isNaN(dateSearch.getTime())) {
@@ -150,14 +156,14 @@ export class CategoryService {
           dateStart.setHours(0, 0, 0, 0);
           const dateEnd = new Date(dateSearch);
           dateEnd.setHours(23, 59, 59, 999);
-          query[searchField] = {
+          query[resolvedSearchField] = {
             $gte: dateStart,
             $lte: dateEnd,
           };
         }
       } else {
         // Text search (regex)
-        query[searchField] = { $regex: search, $options: 'i' };
+        query[resolvedSearchField] = { $regex: search, $options: 'i' };
       }
     }
 

@@ -100,21 +100,6 @@ export class CommentController {
     return this.commentService.findAllWithPagination(query);
   }
 
-  @ApiOperation({ summary: 'Get comment by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Comment found',
-    type: CommentResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Comment not found',
-  })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findById(id);
-  }
-
   @ApiOperation({ summary: 'Get comments by blog ID' })
   @ApiQuery({
     name: 'isDeleted',
@@ -164,6 +149,21 @@ export class CommentController {
   @Get('parent/:parentCommentId')
   findByParentCommentId(@Param('parentCommentId') parentCommentId: string, @Query('isDeleted') isDeleted?: string) {
     return this.commentService.findByParentCommentId(parentCommentId, isDeleted);
+  }
+
+  @ApiOperation({ summary: 'Get comment by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Comment found',
+    type: CommentResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Comment not found',
+  })
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.commentService.findById(id);
   }
 
   @ApiOperation({ summary: 'Update comment' })

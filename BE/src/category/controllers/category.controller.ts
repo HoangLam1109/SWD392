@@ -101,6 +101,17 @@ export class CategoryController {
     return this.categoryService.findAllParentCategories();
   }
 
+  @ApiOperation({ summary: 'Get subcategories by parent category ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of subcategories',
+    type: [CategoryResponseDto],
+  })
+  @Get('parent/:parentCategoryId')
+  findByParentCategoryId(@Param('parentCategoryId') parentCategoryId: string) {
+    return this.categoryService.findByParentCategoryId(parentCategoryId);
+  }
+
   @ApiOperation({ summary: 'Get category by ID' })
   @ApiResponse({
     status: 200,
@@ -114,17 +125,6 @@ export class CategoryController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.categoryService.findById(id);
-  }
-
-  @ApiOperation({ summary: 'Get subcategories by parent category ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of subcategories',
-    type: [CategoryResponseDto],
-  })
-  @Get('parent/:parentCategoryId')
-  findByParentCategoryId(@Param('parentCategoryId') parentCategoryId: string) {
-    return this.categoryService.findByParentCategoryId(parentCategoryId);
   }
 
   @ApiOperation({ summary: 'Update category' })
