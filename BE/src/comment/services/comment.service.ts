@@ -11,6 +11,7 @@ import { CommentDocument } from '../entities/comment.entity';
 import { PaginationOptionsDto } from '../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../common/dto/pagination-response.dto';
 import { BlogRepository } from '../../blog/repositories/blog.repository';
+import { BlogStatus } from '../../blog/enum/blog.enum';
 
 @Injectable()
 export class CommentService {
@@ -25,10 +26,14 @@ export class CommentService {
   ): Promise<CommentDocument> {
     const blog = await this.blogRepository.findById(
       createCommentDto.blogId,
-      '_id',
+      '_id status',
     );
     if (!blog) {
       throw new NotFoundException('Blog not found');
+    }
+
+    if (blog.status !== BlogStatus.PUBLISHED) {
+      throw new BadRequestException('Blog is not published');
     }
 
     if (createCommentDto.parentCommentId) {
@@ -66,12 +71,6 @@ export class CommentService {
       searchField,
       ...filters
     } = options;
-
-    if (filters.isDeleted === undefined) {
-      filters.isDeleted = false;
-    } else {
-      filters.isDeleted = filters.isDeleted === true || filters.isDeleted === 'true';
-    }
 
     // Build query
     const query = this.buildQuery(

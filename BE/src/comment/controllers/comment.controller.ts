@@ -100,7 +100,7 @@ export class CommentController {
     return this.commentService.findAllWithPagination(query);
   }
 
-  @ApiOperation({ summary: 'Get comments by blog ID' })
+  @ApiOperation({ summary: 'Get comments by blog ID(not deleted)' })
   @ApiQuery({
     name: 'isDeleted',
     required: false,

@@ -11,6 +11,7 @@ export interface ICommentRepository {
   create(commentData: any): Promise<CommentDocument>;
   updateById(id: string, commentData: any): Promise<CommentDocument | null>;
   softDeleteById(id: string): Promise<CommentDocument | null>;
+  deleteByBlogId(blogId: string): Promise<number>;
   findAll(fields?: string): Promise<CommentDocument[]>;
   findWithQuery(
     query: Record<string, any>,
@@ -95,6 +96,11 @@ export class CommentRepository implements ICommentRepository {
       )
       .orFail(new NotFoundException('Comment not found'))
       .exec();
+  }
+
+  async deleteByBlogId(blogId: string): Promise<number> {
+    const result = await this.commentModel.deleteMany({ blogId });
+    return result.deletedCount || 0;
   }
 
   async findAll(fields?: string): Promise<CommentDocument[]> {

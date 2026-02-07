@@ -10,10 +10,14 @@ import { BlogDocument } from '../entities/blog.entity';
 import { PaginationOptionsDto } from '../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../common/dto/pagination-response.dto';
 import { BlogStatus } from '../enum/blog.enum';
+import { CommentRepository } from '../../comment/repositories/comment.repository';
 
 @Injectable()
 export class BlogService {
-  constructor(private readonly blogRepository: BlogRepository) {}
+  constructor(
+    private readonly blogRepository: BlogRepository,
+    private readonly commentRepository: CommentRepository,
+  ) {}
 
   async create(
   createBlogDto: CreateBlogDto,
@@ -131,6 +135,7 @@ export class BlogService {
     throw new ForbiddenException('You do not have permission to delete this blog');
   }
 
+  await this.commentRepository.deleteByBlogId(id);
   await this.blogRepository.deleteById(id);
   return { message: 'Blog deleted successfully' };
 }
