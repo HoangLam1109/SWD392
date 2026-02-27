@@ -19,6 +19,11 @@ export interface IGameRepository {
     fields?: string,
   ): Promise<GameDocument[]>;
   findAll(): Promise<GameDocument[]>;
+  findWithQuery(
+    query: Record<string, any>,
+    options: { limit: number; sortBy: string; sortOrder: string },
+  ): Promise<GameDocument[] | undefined>;
+  countDocument(query: Record<string, any>): Promise<number>;
 }
 
 @Injectable()
@@ -85,5 +90,28 @@ export class GameRepository implements IGameRepository {
       .find({ title: regex }, fields)
       .limit(limit)
       .lean();
+  }
+
+  async findWithQuery(
+    query: Record<string, any>,
+    options: {
+      limit: number;
+      sortBy: string;
+      sortOrder: string;
+    },
+  ): Promise<GameDocument[] | undefined> {
+    const sortField = options?.sortBy || '_id';
+    const sortDirection = options.sortOrder === 'asc' ? 1 : -1;
+    const sortObj: Record<string, 1 | -1> = { [sortField]: sortDirection };
+    return await this.gameModel
+      .find(query)
+      .sort(sortObj)
+      .collation({ locale: 'en', strength: 2 })
+      .limit(options?.limit)
+      .lean();
+  }
+
+  async countDocument(query: Record<string, any>): Promise<number> {
+    return await this.gameModel.countDocuments(query);
   }
 }
