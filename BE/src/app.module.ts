@@ -3,12 +3,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { ProfileModule } from './profile/profile.module';
-import { GameModule } from './game/game.module';
-import { BlogModule } from './blog/blog.module';
-import { CommentModule } from './comment/comment.module';
-import { CategoryModule } from './category/category.module';
-import { SystemRequirementModule } from './system_requirement/system_requirement.module';
+import { ProfileModule } from './user-service/profile/profile.module';
+import { GameModule } from './game-service/game/game.module';
+import { BlogModule } from './blog-service/blog/blog.module';
+import { CommentModule } from './blog-service/comment/comment.module';
+import { CategoryModule } from './game-service/category/category.module';
+import { SystemRequirementModule } from './game-service/system_requirement/system_requirement.module';
+import { PaymentModule } from './payment-service/payment/payment.module';
+import { WebWalletModule } from './payment-service/web-wallet/web-wallet.module';
+import { TransactionModule } from './payment-service/transaction/transaction.module';
 
 @Module({
   imports: [
@@ -32,6 +35,14 @@ import { SystemRequirementModule } from './system_requirement/system_requirement
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      connectionName: 'PAYMENT_DB',
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('PAYMENT_MONGO_URL'),
+      }),
+      inject: [ConfigService],
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
@@ -44,6 +55,9 @@ import { SystemRequirementModule } from './system_requirement/system_requirement
     CommentModule,
     CategoryModule,
     SystemRequirementModule,
+    PaymentModule,
+    WebWalletModule,
+    TransactionModule,
   ],
 })
 export class AppModule {}
