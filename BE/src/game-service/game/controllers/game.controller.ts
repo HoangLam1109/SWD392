@@ -21,8 +21,6 @@ import { UpdateGameDto } from '../dto/update-game.dto';
 import { GameResponseDto } from '../dto/game-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
-import { Role } from '../../../auth/decorators/role.decorator';
-import { UserRole } from '../../../user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('games')
@@ -85,7 +83,6 @@ export class GameController {
     status: 403,
     description: 'Forbidden - Admin access required',
   })
-  @Role(UserRole.ADMIN)
   @Get()
   findAllWithPagination(@Query() query: PaginationOptionsDto) {
     return this.gameService.findAllWithPagination(query);
