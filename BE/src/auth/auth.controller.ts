@@ -55,4 +55,27 @@ export class AuthController {
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
+
+  @ApiOperation({ summary: 'User refresh token - Currently unavailable' })
+  @ApiResponse({
+    status: 200,
+    description: 'Refresh successful',
+    type: ResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid token',
+    schema: {
+      example: {
+        message: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  @Public()
+  refresh(@Body() refreshToken: string) {
+    return this.authService.refresh(refreshToken);
+  }
 }

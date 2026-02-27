@@ -1,0 +1,5 @@
+export enum BlogStatus {
+  PENDING_APPROVAL = 'PENDING_APPROVAL',
+  PUBLISHED = 'PUBLISHED',
+  REJECTED = 'REJECTED',
+}

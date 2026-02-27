@@ -1,0 +1,11 @@
+[
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15d8" },
+    "userId": "698175d5c4308f3653af15d4",
+    "balance": 1500.00,
+    "currency": "USD",
+    "status": "ACTIVE",
+    "created_at": { "$date": "2024-02-20T08:00:00Z" },
+    "updated_at": { "$date": "2024-02-24T10:30:00Z" }
+  }
+]

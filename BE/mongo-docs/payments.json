@@ -1,0 +1,32 @@
+// Payment documents for user: 698175d5c4308f3653af15d4 (James Doe)
+// Use: db.payments.insertMany(payments)
+
+[
+  {
+    "_id": ObjectId(),
+    "userId": "698175d5c4308f3653af15d4",
+    "transactionId": "txn_001",
+    "transactionCode": "PAY_20240224_001",
+    "paymentMethod": "credit_card",
+    "created_at": new Date("2024-02-24T10:30:00Z"),
+    "updated_at": new Date("2024-02-24T10:30:00Z")
+  },
+  {
+    "_id": ObjectId(),
+    "userId": "698175d5c4308f3653af15d4",
+    "transactionId": "txn_002", 
+    "transactionCode": "PAY_20240223_002",
+    "paymentMethod": "paypal",
+    "created_at": new Date("2024-02-23T14:15:00Z"),
+    "updated_at": new Date("2024-02-23T14:15:00Z")
+  },
+  {
+    "_id": ObjectId(),
+    "userId": "698175d5c4308f3653af15d4",
+    "transactionId": "txn_003",
+    "transactionCode": "PAY_20240222_003", 
+    "paymentMethod": "bank_transfer",
+    "created_at": new Date("2024-02-22T09:45:00Z"),
+    "updated_at": new Date("2024-02-22T09:45:00Z")
+  }
+]

@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../user/services/user.service';
+import { UserService } from '../user-service/user/services/user.service';
 import bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
-import { UserRole, UserStatus } from '../user/enum/user.enum';
-import { UserResponseDto } from '../user/dto/user-response.dto';
+import { UserRole, UserStatus } from '../user-service/user/enum/user.enum';
+import { UserResponseDto } from '../user-service/user/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -59,5 +59,32 @@ export class AuthService {
         role: user.role,
       },
     };
+  }
+
+  async refresh(
+    refreshToken: string,
+  ): Promise<
+    { accessToken: string; user: Partial<UserResponseDto> } | undefined
+  > {
+    const validToken = this.jwtService.verify(refreshToken);
+    if (validToken) {
+      const user = await this.userService.findUserById(
+        validToken.userId as string,
+      );
+      if (user) {
+        const payload = { userId: user.id, email: user.email, role: user.role };
+        const accessToken = await this.jwtService.signAsync(payload);
+        return {
+          accessToken,
+          user: {
+            email: user.email,
+            fullName: user.fullName,
+            avatar: user.avatar,
+            role: user.role,
+          },
+        };
+      }
+    }
+    return undefined;
   }
 }
