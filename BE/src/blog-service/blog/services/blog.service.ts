@@ -10,29 +10,28 @@ import { BlogDocument } from '../entities/blog.entity';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { BlogStatus } from '../enum/blog.enum';
+import { CommentRepository } from '../../comment/repositories/comment.repository';
 
 @Injectable()
 export class BlogService {
-  constructor(private readonly blogRepository: BlogRepository) {}
+  constructor(
+    private readonly blogRepository: BlogRepository,
+    private readonly commentRepository: CommentRepository,
+  ) {}
 
   async create(
-    createBlogDto: CreateBlogDto,
-    userId: string,
-  ): Promise<BlogDocument> {
-    const blogData = {
-      ...createBlogDto,
-      userId,
-      status: createBlogDto.status || BlogStatus.DRAFT,
-      publishedAt:
-        createBlogDto.status === BlogStatus.PUBLISHED ? new Date() : null,
-    };
-    return await this.blogRepository.create(blogData);
-  }
-
-  async findAll(): Promise<BlogDocument[]> {
-    return await this.blogRepository.findAll();
-  }
-
+  createBlogDto: CreateBlogDto,
+  userId: string,
+): Promise<BlogDocument> {
+  return this.blogRepository.create({
+    title: createBlogDto.title,
+    content: createBlogDto.content,
+    thumbnailUrl: createBlogDto.thumbnailUrl,
+    userId,
+    status: BlogStatus.PENDING_APPROVAL,
+    publishedAt: null,
+  });
+}
   async findAllWithPagination(
     options: PaginationOptionsDto,
   ): Promise<PaginationResponseDto<BlogDocument>> {
@@ -94,55 +93,75 @@ export class BlogService {
     return blog;
   }
 
-  async findByUserId(userId: string): Promise<BlogDocument[]> {
-    return await this.blogRepository.findByUserId(userId);
+  async findByUserId(userId: string, status?: BlogStatus): Promise<BlogDocument[]> {
+    return await this.blogRepository.findByUserId(userId, status);
   }
 
   async update(
-    id: string,
-    updateBlogDto: UpdateBlogDto,
-    userId: string,
-  ): Promise<BlogDocument | null> {
-    const blog = await this.blogRepository.findById(id);
-    if (!blog) {
-      throw new NotFoundException('Blog not found');
-    }
-
-    // Check if user owns the blog
-    if (blog.userId.toString() !== userId) {
-      throw new ForbiddenException(
-        'You do not have permission to update this blog',
-      );
-    }
-
-    const updateData: any = { ...updateBlogDto };
-
-    // If status is being changed to PUBLISHED and not yet published
-    if (
-      updateBlogDto.status === BlogStatus.PUBLISHED &&
-      blog.status !== BlogStatus.PUBLISHED
-    ) {
-      updateData.publishedAt = new Date();
-    }
-
-    return await this.blogRepository.updateById(id, updateData);
+  id: string,
+  updateBlogDto: UpdateBlogDto,
+  userId: string,
+): Promise<BlogDocument> {
+  const blog = await this.blogRepository.findById(id);
+  if (!blog) {
+    throw new NotFoundException('Blog not found');
   }
 
-  async remove(id: string, userId: string): Promise<BlogDocument | null> {
-    const blog = await this.blogRepository.findById(id);
-    if (!blog) {
-      throw new NotFoundException('Blog not found');
-    }
-
-    // Check if user owns the blog
-    if (blog.userId.toString() !== userId) {
-      throw new ForbiddenException(
-        'You do not have permission to delete this blog',
-      );
-    }
-
-    return await this.blogRepository.softDeleteById(id);
+  if (blog.userId.toString() !== userId) {
+    throw new ForbiddenException('You do not have permission to update this blog');
   }
+
+  const { status, publishedAt, removeThumbnail, ...safeUpdateData } =
+    updateBlogDto as any;
+
+  const shouldRemoveThumbnail =
+    removeThumbnail === true || removeThumbnail === 'true' || removeThumbnail === '1';
+
+  if (shouldRemoveThumbnail && !safeUpdateData.thumbnailUrl) {
+    safeUpdateData.thumbnailUrl = null;
+  }
+
+  return this.blogRepository.updateById(id, safeUpdateData);
+}
+
+
+  async remove(id: string, userId: string): Promise<{ message: string }> {
+  const blog = await this.blogRepository.findById(id);
+  if (!blog) {
+    throw new NotFoundException('Blog not found');
+  }
+
+  if (blog.userId.toString() !== userId) {
+    throw new ForbiddenException('You do not have permission to delete this blog');
+  }
+
+  await this.commentRepository.deleteByBlogId(id);
+  await this.blogRepository.deleteById(id);
+  return { message: 'Blog deleted successfully' };
+}
+
+async updateStatus(
+  id: string,
+  status: BlogStatus,
+): Promise<BlogDocument> {
+  const blog = await this.blogRepository.findById(id);
+  if (!blog) {
+    throw new NotFoundException('Blog not found');
+  }
+
+  const updateData: any = { status };
+
+  if (status === BlogStatus.PUBLISHED && blog.status !== BlogStatus.PUBLISHED) {
+    updateData.publishedAt = new Date();
+  }
+
+  if (status !== BlogStatus.PUBLISHED) {
+    updateData.publishedAt = null;
+  }
+
+  return this.blogRepository.updateById(id, updateData);
+}
+
 
   private buildQuery(
     filters: Record<string, any>,
@@ -156,7 +175,13 @@ export class BlogService {
 
     // Handle search
     if (search && searchField) {
-      if (searchField === 'updatedAt' || searchField === 'createdAt') {
+      const dateFieldMap: Record<string, string> = {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+      };
+      const resolvedSearchField = dateFieldMap[searchField] || searchField;
+
+      if (resolvedSearchField === 'updated_at' || resolvedSearchField === 'created_at') {
         // Date search
         const dateSearch = new Date(search);
         if (!isNaN(dateSearch.getTime())) {
@@ -164,14 +189,14 @@ export class BlogService {
           dateStart.setHours(0, 0, 0, 0);
           const dateEnd = new Date(dateSearch);
           dateEnd.setHours(23, 59, 59, 999);
-          query[searchField] = {
+          query[resolvedSearchField] = {
             $gte: dateStart,
             $lte: dateEnd,
           };
         }
       } else {
         // Text search (regex)
-        query[searchField] = { $regex: search, $options: 'i' };
+        query[resolvedSearchField] = { $regex: search, $options: 'i' };
       }
     }
 

@@ -26,12 +26,6 @@ export class CategoryResponseDto {
   parentCategoryId?: string;
 
   @ApiProperty({
-    description: 'Game ID',
-    example: '507f1f77bcf86cd799439011',
-  })
-  gameId: string;
-
-  @ApiProperty({
     description: 'Category creation date',
     example: '2024-01-01T00:00:00.000Z',
   })

@@ -5,7 +5,6 @@ export interface ICategory {
   categoryName: string;
   description?: string;
   parentCategoryId?: string;
-  gameId: string;
 }
 
 export type CategoryDocument = HydratedDocument<Category>;
@@ -25,9 +24,6 @@ export class Category {
 
   @Prop({ default: null, type: MongooseSchema.Types.ObjectId, ref: 'Category' })
   parentCategoryId: string;
-
-  @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'Game' })
-  gameId: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

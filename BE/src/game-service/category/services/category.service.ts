@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { CategoryRepository } from '../repositories/category.repository';
@@ -13,6 +13,14 @@ export class CategoryService {
   async create(
     createCategoryDto: CreateCategoryDto,
   ): Promise<CategoryDocument> {
+    if (createCategoryDto.parentCategoryId) {
+      const parentCategory = await this.categoryRepository.findById(
+        createCategoryDto.parentCategoryId,
+      );
+      if (!parentCategory) {
+        throw new NotFoundException('Parent category not found');
+      }
+    }
     return await this.categoryRepository.create(createCategoryDto);
   }
 
@@ -79,10 +87,6 @@ export class CategoryService {
     return category;
   }
 
-  async findByGameId(gameId: string): Promise<CategoryDocument[]> {
-    return await this.categoryRepository.findByGameId(gameId);
-  }
-
   async findByParentCategoryId(
     parentCategoryId: string,
   ): Promise<CategoryDocument[]> {
@@ -99,10 +103,30 @@ export class CategoryService {
     id: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<CategoryDocument | null> {
+    if (updateCategoryDto.parentCategoryId) {
+      const parentCategory = await this.categoryRepository.findById(
+        updateCategoryDto.parentCategoryId,
+      );
+      if (!parentCategory) {
+        throw new NotFoundException('Parent category not found');
+      }
+    }
     return await this.categoryRepository.updateById(id, updateCategoryDto);
   }
 
   async remove(id: string): Promise<CategoryDocument | null> {
+    const category = await this.categoryRepository.findById(id);
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    const hasChildren = await this.categoryRepository.hasChildren(id);
+    if (hasChildren) {
+      throw new BadRequestException(
+        'Cannot delete category because it has subcategories',
+      );
+    }
+
     return await this.categoryRepository.deleteById(id);
   }
 
@@ -118,7 +142,13 @@ export class CategoryService {
 
     // Handle search
     if (search && searchField) {
-      if (searchField === 'createdAt') {
+      const dateFieldMap: Record<string, string> = {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+      };
+      const resolvedSearchField = dateFieldMap[searchField] || searchField;
+
+      if (resolvedSearchField === 'created_at' || resolvedSearchField === 'updated_at') {
         // Date search
         const dateSearch = new Date(search);
         if (!isNaN(dateSearch.getTime())) {
@@ -126,14 +156,14 @@ export class CategoryService {
           dateStart.setHours(0, 0, 0, 0);
           const dateEnd = new Date(dateSearch);
           dateEnd.setHours(23, 59, 59, 999);
-          query[searchField] = {
+          query[resolvedSearchField] = {
             $gte: dateStart,
             $lte: dateEnd,
           };
         }
       } else {
         // Text search (regex)
-        query[searchField] = { $regex: search, $options: 'i' };
+        query[resolvedSearchField] = { $regex: search, $options: 'i' };
       }
     }
 

@@ -43,6 +43,14 @@ import { TransactionModule } from './payment-service/transaction/transaction.mod
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      connectionName: 'BLOG_DB',
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('BLOG_MONGO_URL'),
+      }),
+      inject: [ConfigService],
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
@@ -51,8 +59,8 @@ import { TransactionModule } from './payment-service/transaction/transaction.mod
     AuthModule,
     ProfileModule,
     GameModule,
-    BlogModule,
     CommentModule,
+    BlogModule,
     CategoryModule,
     SystemRequirementModule,
     PaymentModule,

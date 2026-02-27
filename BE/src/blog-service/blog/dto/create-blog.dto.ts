@@ -18,19 +18,10 @@ export class CreateBlogDto {
   content: string;
 
   @ApiPropertyOptional({
-    description: 'Blog thumbnail URL',
-    example: 'https://example.com/thumbnail.jpg',
+    description: 'Blog thumbnail URL (set from uploaded image)',
+    example: 'https://res.cloudinary.com/demo/image/upload/v123456/blog.jpg',
   })
-  @IsUrl()
   @IsOptional()
+  @IsString()
   thumbnailUrl?: string;
-
-  @ApiPropertyOptional({
-    description: 'Blog status',
-    enum: BlogStatus,
-    example: BlogStatus.DRAFT,
-  })
-  @IsEnum(BlogStatus)
-  @IsOptional()
-  status?: BlogStatus;
 }

@@ -17,6 +17,7 @@ export type SystemRequirementDocument = HydratedDocument<SystemRequirement>;
 
 @Schema({
   timestamps: false,
+  collection: 'system_requirements',
 })
 export class SystemRequirement {
   @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'Game' })

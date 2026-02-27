@@ -10,7 +10,6 @@ export interface IBlog {
   viewCount: number;
   publishedAt?: Date;
   userId: string;
-  deletedAt?: Date;
 }
 
 export type BlogDocument = HydratedDocument<Blog>;
@@ -31,7 +30,7 @@ export class Blog {
   @Prop({ default: null })
   thumbnailUrl: string;
 
-  @Prop({ enum: BlogStatus, default: BlogStatus.DRAFT })
+  @Prop({ enum: BlogStatus, default: BlogStatus.PENDING_APPROVAL })
   status: BlogStatus;
 
   @Prop({ default: 0 })
@@ -42,9 +41,6 @@ export class Blog {
 
   @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'User' })
   userId: string;
-
-  @Prop({ default: null })
-  deletedAt: Date;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

@@ -29,7 +29,7 @@ export class BlogResponseDto {
   @ApiProperty({
     description: 'Blog status',
     enum: BlogStatus,
-    example: BlogStatus.DRAFT,
+    example: BlogStatus.PENDING_APPROVAL,
   })
   status: BlogStatus;
 

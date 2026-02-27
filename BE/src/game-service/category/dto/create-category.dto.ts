@@ -21,14 +21,7 @@ export class CreateCategoryDto {
     description: 'Parent category ID',
     example: '507f1f77bcf86cd799439011',
   })
-  @IsMongoId()
   @IsOptional()
-  parentCategoryId?: string;
-
-  @ApiProperty({
-    description: 'Game ID',
-    example: '507f1f77bcf86cd799439011',
-  })
   @IsMongoId()
-  gameId: string;
+  parentCategoryId?: string;
 }

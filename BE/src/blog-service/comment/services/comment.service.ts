@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   ForbiddenException,
@@ -9,15 +10,44 @@ import { CommentRepository } from '../repositories/comment.repository';
 import { CommentDocument } from '../entities/comment.entity';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { BlogRepository } from '../../blog/repositories/blog.repository';
+import { BlogStatus } from '../../blog/enum/blog.enum';
 
 @Injectable()
 export class CommentService {
-  constructor(private readonly commentRepository: CommentRepository) {}
+  constructor(
+    private readonly commentRepository: CommentRepository,
+    private readonly blogRepository: BlogRepository,
+  ) {}
 
   async create(
     createCommentDto: CreateCommentDto,
     userId: string,
   ): Promise<CommentDocument> {
+    const blog = await this.blogRepository.findById(
+      createCommentDto.blogId,
+      '_id status',
+    );
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    if (blog.status !== BlogStatus.PUBLISHED) {
+      throw new BadRequestException('Blog is not published');
+    }
+
+    if (createCommentDto.parentCommentId) {
+      const parentComment = await this.commentRepository.findById(
+        createCommentDto.parentCommentId,
+      );
+      if (!parentComment) {
+        throw new NotFoundException('Parent comment not found');
+      }
+      if (parentComment.blogId?.toString() !== createCommentDto.blogId) {
+        throw new BadRequestException('Parent comment does not belong to blog');
+      }
+    }
+
     const commentData = {
       ...createCommentDto,
       userId,
@@ -88,18 +118,22 @@ export class CommentService {
     return comment;
   }
 
-  async findByBlogId(blogId: string): Promise<CommentDocument[]> {
-    return await this.commentRepository.findByBlogId(blogId);
+  async findByBlogId(blogId: string, isDeleted?: string): Promise<CommentDocument[]> {
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
+    return await this.commentRepository.findByBlogId(blogId, isDeletedFilter);
   }
 
-  async findByUserId(userId: string): Promise<CommentDocument[]> {
-    return await this.commentRepository.findByUserId(userId);
+  async findByUserId(userId: string, isDeleted?: string): Promise<CommentDocument[]> {
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
+    return await this.commentRepository.findByUserId(userId, isDeletedFilter);
   }
 
   async findByParentCommentId(
     parentCommentId: string,
+    isDeleted?: string,
   ): Promise<CommentDocument[]> {
-    return await this.commentRepository.findByParentCommentId(parentCommentId);
+    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
+    return await this.commentRepository.findByParentCommentId(parentCommentId, isDeletedFilter);
   }
 
   async update(
@@ -150,7 +184,13 @@ export class CommentService {
 
     // Handle search
     if (search && searchField) {
-      if (searchField === 'updatedAt' || searchField === 'createdAt') {
+      const dateFieldMap: Record<string, string> = {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+      };
+      const resolvedSearchField = dateFieldMap[searchField] || searchField;
+
+      if (resolvedSearchField === 'updated_at' || resolvedSearchField === 'created_at') {
         // Date search
         const dateSearch = new Date(search);
         if (!isNaN(dateSearch.getTime())) {
@@ -158,14 +198,14 @@ export class CommentService {
           dateStart.setHours(0, 0, 0, 0);
           const dateEnd = new Date(dateSearch);
           dateEnd.setHours(23, 59, 59, 999);
-          query[searchField] = {
+          query[resolvedSearchField] = {
             $gte: dateStart,
             $lte: dateEnd,
           };
         }
       } else {
         // Text search (regex)
-        query[searchField] = { $regex: search, $options: 'i' };
+        query[resolvedSearchField] = { $regex: search, $options: 'i' };
       }
     }
 

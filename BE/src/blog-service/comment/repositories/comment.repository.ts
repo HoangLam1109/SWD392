@@ -5,12 +5,13 @@ import { Comment, CommentDocument, IComment } from '../entities/comment.entity';
 
 export interface ICommentRepository {
   findById(id: string, fields?: string): Promise<CommentDocument | null>;
-  findByBlogId(blogId: string): Promise<CommentDocument[]>;
-  findByUserId(userId: string): Promise<CommentDocument[]>;
-  findByParentCommentId(parentCommentId: string): Promise<CommentDocument[]>;
+  findByBlogId(blogId: string, isDeleted?: boolean): Promise<CommentDocument[]>;
+  findByUserId(userId: string, isDeleted?: boolean): Promise<CommentDocument[]>;
+  findByParentCommentId(parentCommentId: string, isDeleted?: boolean): Promise<CommentDocument[]>;
   create(commentData: any): Promise<CommentDocument>;
   updateById(id: string, commentData: any): Promise<CommentDocument | null>;
   softDeleteById(id: string): Promise<CommentDocument | null>;
+  deleteByBlogId(blogId: string): Promise<number>;
   findAll(fields?: string): Promise<CommentDocument[]>;
   findWithQuery(
     query: Record<string, any>,
@@ -22,7 +23,7 @@ export interface ICommentRepository {
 @Injectable()
 export class CommentRepository implements ICommentRepository {
   constructor(
-    @InjectModel(Comment.name, 'GAME_DB')
+    @InjectModel(Comment.name, 'BLOG_DB')
     private commentModel: Model<CommentDocument>,
   ) {}
 
@@ -33,25 +34,38 @@ export class CommentRepository implements ICommentRepository {
     );
   }
 
-  async findByBlogId(blogId: string): Promise<CommentDocument[]> {
+  async findByBlogId(blogId: string, isDeleted?: boolean): Promise<CommentDocument[]> {
+    const query: any = { blogId };
+    if (isDeleted !== undefined) {
+      query.isDeleted = isDeleted;
+    }
     return await this.commentModel
-      .find({ blogId, isDeleted: false })
+      .find(query)
       .sort({ created_at: -1 })
       .lean();
   }
 
-  async findByUserId(userId: string): Promise<CommentDocument[]> {
+  async findByUserId(userId: string, isDeleted?: boolean): Promise<CommentDocument[]> {
+    const query: any = { userId };
+    if (isDeleted !== undefined) {
+      query.isDeleted = isDeleted;
+    }
     return await this.commentModel
-      .find({ userId, isDeleted: false })
+      .find(query)
       .sort({ created_at: -1 })
       .lean();
   }
 
   async findByParentCommentId(
     parentCommentId: string,
+    isDeleted?: boolean,
   ): Promise<CommentDocument[]> {
+    const query: any = { parentCommentId };
+    if (isDeleted !== undefined) {
+      query.isDeleted = isDeleted;
+    }
     return await this.commentModel
-      .find({ parentCommentId, isDeleted: false })
+      .find(query)
       .sort({ created_at: -1 })
       .lean();
   }
@@ -84,6 +98,11 @@ export class CommentRepository implements ICommentRepository {
       .exec();
   }
 
+  async deleteByBlogId(blogId: string): Promise<number> {
+    const result = await this.commentModel.deleteMany({ blogId });
+    return result.deletedCount || 0;
+  }
+
   async findAll(fields?: string): Promise<CommentDocument[]> {
     return await this.commentModel.find({ isDeleted: false }, fields);
   }
@@ -100,9 +119,6 @@ export class CommentRepository implements ICommentRepository {
     const sortDirection = options.sortOrder === 'asc' ? 1 : -1;
     const sortObj: Record<string, 1 | -1> = { [sortField]: sortDirection };
 
-    // Always filter out soft-deleted comments
-    query.isDeleted = false;
-
     return await this.commentModel
       .find(query)
       .sort(sortObj)
@@ -112,8 +128,6 @@ export class CommentRepository implements ICommentRepository {
   }
 
   async countDocument(query: Record<string, any>): Promise<number> {
-    // Always filter out soft-deleted comments
-    query.isDeleted = false;
     return await this.commentModel.countDocuments(query);
   }
 }
