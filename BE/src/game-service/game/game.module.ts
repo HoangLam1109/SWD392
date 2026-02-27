@@ -14,5 +14,6 @@ import { Game, GameSchema } from './entities/game.entity';
   ],
   controllers: [GameController],
   providers: [GameService, GameRepository],
+  exports: [GameService],
 })
 export class GameModule {}

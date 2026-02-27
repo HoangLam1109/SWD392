@@ -118,13 +118,21 @@ export class CommentService {
     return comment;
   }
 
-  async findByBlogId(blogId: string, isDeleted?: string): Promise<CommentDocument[]> {
-    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
+  async findByBlogId(
+    blogId: string,
+    isDeleted?: string,
+  ): Promise<CommentDocument[]> {
+    const isDeletedFilter =
+      isDeleted !== undefined ? isDeleted === 'true' : false;
     return await this.commentRepository.findByBlogId(blogId, isDeletedFilter);
   }
 
-  async findByUserId(userId: string, isDeleted?: string): Promise<CommentDocument[]> {
-    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
+  async findByUserId(
+    userId: string,
+    isDeleted?: string,
+  ): Promise<CommentDocument[]> {
+    const isDeletedFilter =
+      isDeleted !== undefined ? isDeleted === 'true' : false;
     return await this.commentRepository.findByUserId(userId, isDeletedFilter);
   }
 
@@ -132,8 +140,12 @@ export class CommentService {
     parentCommentId: string,
     isDeleted?: string,
   ): Promise<CommentDocument[]> {
-    const isDeletedFilter = isDeleted !== undefined ? isDeleted === 'true' : false;
-    return await this.commentRepository.findByParentCommentId(parentCommentId, isDeletedFilter);
+    const isDeletedFilter =
+      isDeleted !== undefined ? isDeleted === 'true' : false;
+    return await this.commentRepository.findByParentCommentId(
+      parentCommentId,
+      isDeletedFilter,
+    );
   }
 
   async update(
@@ -190,7 +202,10 @@ export class CommentService {
       };
       const resolvedSearchField = dateFieldMap[searchField] || searchField;
 
-      if (resolvedSearchField === 'updated_at' || resolvedSearchField === 'created_at') {
+      if (
+        resolvedSearchField === 'updated_at' ||
+        resolvedSearchField === 'created_at'
+      ) {
         // Date search
         const dateSearch = new Date(search);
         if (!isNaN(dateSearch.getTime())) {

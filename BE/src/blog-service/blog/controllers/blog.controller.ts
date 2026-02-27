@@ -32,7 +32,7 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { AuthGuard } from '../../../auth/guards/auth.guard';
 import { BlogStatus } from '../enum/blog.enum';
-import { CloudinaryInterceptor } from '../../common/interceptors/cloudinary.interceptor';
+import { CloudinaryInterceptor } from '../../../common/interceptors/cloudinary.interceptor';
 
 @ApiBearerAuth()
 @ApiTags('blogs')
@@ -63,9 +63,7 @@ export class BlogController {
     },
   })
   @UseGuards(AuthGuard)
-  @UseInterceptors(
-    FileInterceptor('thumbnail', CloudinaryInterceptor('blogs')),
-  )
+  @UseInterceptors(FileInterceptor('thumbnail', CloudinaryInterceptor('blogs')))
   @Post()
   create(
     @Body() createBlogDto: CreateBlogDto,
@@ -144,7 +142,10 @@ export class BlogController {
     type: [BlogResponseDto],
   })
   @Get('user/:userId')
-  findByUserId(@Param('userId') userId: string, @Query('status') status?: BlogStatus) {
+  findByUserId(
+    @Param('userId') userId: string,
+    @Query('status') status?: BlogStatus,
+  ) {
     return this.blogService.findByUserId(userId, status);
   }
 
@@ -190,9 +191,7 @@ export class BlogController {
     },
   })
   @UseGuards(AuthGuard)
-  @UseInterceptors(
-    FileInterceptor('thumbnail', CloudinaryInterceptor('blogs')),
-  )
+  @UseInterceptors(FileInterceptor('thumbnail', CloudinaryInterceptor('blogs')))
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -241,9 +240,6 @@ export class BlogController {
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateBlogStatusDto,
   ) {
-    return this.blogService.updateStatus(
-      id,
-      updateStatusDto.status,
-    );
+    return this.blogService.updateStatus(id, updateStatusDto.status);
   }
 }

@@ -1,9 +1,13 @@
 import { Controller, Get, Body, Put, Param, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { ProfileService } from '../services/profile.service';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { ProfileResponseDto } from '../dto/profile-response.dto';
-import { AuthGuard } from '../../auth/guards/auth.guard';
 
 @ApiBearerAuth()
 @ApiTags('profiles')
@@ -11,16 +15,50 @@ import { AuthGuard } from '../../auth/guards/auth.guard';
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
+  @ApiOperation({ summary: 'Get profile by user ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile found',
+    type: ProfileResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Profile not found',
+  })
   @Get('user/:userId')
   findByUserId(@Param('userId') userId: string) {
     return this.profileService.getProfileByUserId(userId);
   }
 
+  @ApiOperation({ summary: 'Get profile by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile found',
+    type: ProfileResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Profile not found',
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.profileService.getProfileById(id);
   }
 
+  @ApiOperation({ summary: 'Update my profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile updated successfully',
+    type: ProfileResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Profile not found',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - invalid input data',
+  })
   @Put('me')
   updateMyProfile(@Req() req, @Body() updateProfileDto: UpdateProfileDto) {
     return this.profileService.updateProfile(

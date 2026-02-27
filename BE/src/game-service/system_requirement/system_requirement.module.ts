@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SystemRequirementService } from './services/system_requirement.service';
 import { SystemRequirementController } from './controllers/system_requirement.controller';
+import { SystemRequirementService } from './services/system_requirement.service';
 import {
   SystemRequirement,
   SystemRequirementSchema,
