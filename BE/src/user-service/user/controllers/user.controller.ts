@@ -22,7 +22,9 @@ import { UserResponseDto } from '../dto/user-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { Role } from 'src/auth/decorators/role.decorator';
+import { GetUser } from 'src/common/decorators/info.decorator';
 import { UserRole } from 'src/user-service/user/enum/user.enum';
+import { UserDocument } from '../entities/user.entity';
 
 @ApiBearerAuth()
 @ApiTags('users')
