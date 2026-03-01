@@ -10,7 +10,7 @@ import { LibraryPage, UserManagementPage, StorePage, CartPage } from "@/pages";
 import { RoleRoute } from "./RoleRoute";
 import type { Role } from "@/config/navigation/navigation.types";
 import { useGetCurrentUser } from "@/hooks/auth/useGetCurrentUser";
-
+import { GameManagementPage } from "@/pages/GameManagementPage";
 
 const AppRoutes = () => {
     const { data: currentUser } = useGetCurrentUser();
@@ -43,6 +43,7 @@ const AppRoutes = () => {
                     }
                 >
                     <Route path="user-management" element={<UserManagementPage />} />
+                    <Route path="game-management" element={<GameManagementPage/>}/>
                 </Route>
             </Route>
 

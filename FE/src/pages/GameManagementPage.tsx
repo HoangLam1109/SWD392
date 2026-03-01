@@ -1,0 +1,288 @@
+import { useState, useMemo } from 'react';
+import { gameService } from '@/service/game.service';
+import type { Game, CreateGameDTO, UpdateGameDTO } from '@/types/Game.types';
+import { GameDialog, DeleteGameDialog } from '@/components/game';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Search, Pencil, Trash2, Plus } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+export function GameManagementPage() {
+    const queryClient = useQueryClient();
+    const [search, setSearch] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+
+    const [gameDialogOpen, setGameDialogOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const { data: games = [], isLoading } = useQuery({
+        queryKey: ['games'],
+        queryFn: gameService.getGames,
+    });
+
+    const filteredGames = useMemo(() => {
+        let list = games;
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            list = list.filter(
+                (g) =>
+                    g.title?.toLowerCase().includes(q) ||
+                    g.developer?.toLowerCase().includes(q) ||
+                    g.publisher?.toLowerCase().includes(q)
+            );
+        }
+        if (statusFilter === 'active') list = list.filter((g) => g.isActive);
+        if (statusFilter === 'inactive') list = list.filter((g) => !g.isActive);
+        return list;
+    }, [games, search, statusFilter]);
+
+    const handleCreateGame = async (data: CreateGameDTO | UpdateGameDTO) => {
+        await gameService.createGame(data as CreateGameDTO);
+        queryClient.invalidateQueries({ queryKey: ['games'] });
+        setGameDialogOpen(false);
+    };
+
+    const handleUpdateGame = async (data: CreateGameDTO | UpdateGameDTO) => {
+        if (selectedGame) {
+            await gameService.updateGame(selectedGame.id, data);
+            queryClient.invalidateQueries({ queryKey: ['games'] });
+            setGameDialogOpen(false);
+        }
+    };
+
+    const handleDeleteGame = async () => {
+        if (selectedGame) {
+            setIsDeleting(true);
+            try {
+                await gameService.deleteGame(selectedGame.id);
+                queryClient.invalidateQueries({ queryKey: ['games'] });
+                setDeleteDialogOpen(false);
+            } catch (error) {
+                console.error('Error deleting game:', error);
+            } finally {
+                setIsDeleting(false);
+            }
+        }
+    };
+
+    const handleEditClick = (game: Game) => {
+        setSelectedGame(game);
+        setGameDialogOpen(true);
+    };
+
+    const handleDeleteClick = (game: Game) => {
+        setSelectedGame(game);
+        setDeleteDialogOpen(true);
+    };
+
+    const openCreateDialog = () => {
+        setSelectedGame(null);
+        setGameDialogOpen(true);
+    };
+
+    const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }).format(price);
+    };
+
+    
+
+    return (
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Game Management</h1>
+                    <p className="text-sm text-gray-500 mt-1">Manage games and store visibility</p>
+                </div>
+                <Button onClick={openCreateDialog} className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Game
+                </Button>
+            </div>
+
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1 space-y-2">
+                            <Label htmlFor="search">Search</Label>
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Input
+                                    id="search"
+                                    placeholder="Search by title, developer, publisher..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="pl-10"
+                                />
+                            </div>
+                        </div>
+                        <div className="w-full sm:w-[200px] space-y-2">
+                            <Label htmlFor="status">Status</Label>
+                            <Select
+                                value={statusFilter}
+                                onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}
+                            >
+                                <SelectTrigger id="status">
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All</SelectItem>
+                                    <SelectItem value="active">Active</SelectItem>
+                                    <SelectItem value="inactive">Inactive</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Games ({filteredGames.length})</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[80px]">Image</TableHead>
+                                    <TableHead>Title</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Discount</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Release</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {isLoading ? (
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <TableRow key={i}>
+                                            <TableCell><Skeleton className="h-10 w-10 rounded" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                                            <TableCell><Skeleton className="h-6 w-16" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                                            <TableCell><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : filteredGames.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="text-center py-12">
+                                            <div className="flex flex-col items-center text-gray-500">
+                                                <p className="text-lg font-semibold">No games found</p>
+                                                <p className="text-sm mt-1">
+                                                    {search || statusFilter !== 'all'
+                                                        ? 'Try adjusting your filters'
+                                                        : 'Add your first game with the button above'}
+                                                </p>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    filteredGames.map((game) => (
+                                        <TableRow key={game.id} className="hover:bg-gray-50">
+                                            <TableCell>
+                                                {game.thumbnail ? (
+                                                    <img
+                                                        src={game.thumbnail}
+                                                        alt=""
+                                                        className="h-10 w-10 rounded object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="h-10 w-10 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
+                                                        —
+                                                    </div>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="font-medium max-w-[200px] truncate">
+                                                {game.title}
+                                            </TableCell>
+                                            <TableCell>{formatPrice(game.price)}</TableCell>
+                                            <TableCell>{game.discount ?? 0}%</TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    className={
+                                                        game.isActive
+                                                            ? 'bg-green-100 text-green-700 hover:bg-green-100'
+                                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-100'
+                                                    }
+                                                >
+                                                    {game.isActive ? 'Active' : 'Inactive'}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-gray-600">
+                                                (game.releaseDate)
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEditClick(game)}
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDeleteClick(game)}
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <GameDialog
+                open={gameDialogOpen}
+                onOpenChange={setGameDialogOpen}
+                game={selectedGame}
+                onSave={selectedGame ? handleUpdateGame : handleCreateGame}
+            />
+
+            <DeleteGameDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                game={selectedGame}
+                onConfirm={handleDeleteGame}
+                isLoading={isDeleting}
+            />
+        </div>
+    );
+}

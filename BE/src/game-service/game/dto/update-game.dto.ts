@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/swagger';
 import { CreateGameDto } from './create-game.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNumber, IsBoolean, IsDate, IsUrl } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateGameDto extends PartialType(CreateGameDto) {
   @ApiPropertyOptional({
@@ -61,9 +62,10 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   publisher?: string;
 
   @ApiPropertyOptional({
-    description: 'Release date',
+    description: 'Release date (ISO string)',
     example: '2024-01-01',
   })
+  @Type(() => Date)
   @IsDate()
   releaseDate?: Date;
 

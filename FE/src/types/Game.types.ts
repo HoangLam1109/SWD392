@@ -1,37 +1,31 @@
-/**
- * Game-related TypeScript types and interfaces
- */
-
-export type GameStatus = 'active' | 'inactive';
-
-export type GameGenre =
-    | 'Action'
-    | 'Adventure'
-    | 'RPG'
-    | 'Strategy'
-    | 'Simulation'
-    | 'Sports'
-    | 'Racing'
-    | 'Puzzle'
-    | 'Horror'
-    | 'FPS'
-    | 'MMO'
-    | 'Indie';
-
 export interface Game {
     id: string;
     title: string;
-    genre: GameGenre;
-    releaseDate: string;
-    status: GameStatus;
-    thumbnail: string;
-    developer: string;
-    publisher: string;
+    price: number;
+    isActive: boolean;
     description?: string;
+    discount?: number;
+    thumbnail?: string;
+    coverImage?: string;
+    developer?: string;
+    publisher?: string;
+    releaseDate?: string;
+    url?: string;
 }
 
-export interface GameFilters {
-    genre: GameGenre | 'all';
-    sortBy:  'releaseDate' | 'title';
-    sortOrder: 'asc' | 'desc';
+/** Payload for creating a game. title, price, isActive required; rest optional. */
+export interface CreateGameDTO {
+    title: string;
+    price: number;
+    isActive: boolean;
+    description?: string;
+    discount?: number;
+    thumbnail?: string;
+    coverImage?: string;
+    developer?: string;
+    publisher?: string;
+    releaseDate?: string;
+    url?: string;
 }
+
+export type UpdateGameDTO = Partial<CreateGameDTO>;

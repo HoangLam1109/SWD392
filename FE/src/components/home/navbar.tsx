@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn } from 'lucide-react';
+import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { Button } from '@/components/ui/button';
@@ -90,6 +90,13 @@ export function Navbar({ fixed }: NavbarProps) {
                     >
                       <User className="w-4 h-4 mr-2" />
                       {t('common.profile')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={()=>navigate('/admin')}
+                      className="text-white focus:bg=white/10 focus:text-white cursor-pointer [&_svg]:text-white/90"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      {t('common.gotodashboard')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

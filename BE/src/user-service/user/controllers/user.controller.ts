@@ -105,6 +105,7 @@ export class UserController {
     status: 404,
     description: 'User not found',
   })
+  @Role(UserRole.ADMIN, UserRole.MODERATOR, UserRole.PLAYER)
   @Get('/me')
   getMyInfo(@GetUser() user: Partial<UserDocument>) {
     return this.userService.findUserById(user._id?.toString() || '');
