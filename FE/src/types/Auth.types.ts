@@ -25,3 +25,13 @@ export interface RegisterResponse{
     accessToken: string;
     user: User;
 }
+export interface CurrentUserResponse{
+    id: string;
+    email: string;
+    fullName: string;
+    role: string;
+    status: string;
+    avatar: string;
+    createdAt: string;
+    updatedAt: string;
+}
