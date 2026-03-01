@@ -1,32 +1,39 @@
-import { PartialType } from '@nestjs/swagger';
-import { IsOptional, IsEnum } from 'class-validator';
-import { CreateTransactionDto } from './create-transaction.dto';
+import { IsString, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { TransactionType, TransactionStatus } from '../enum/transaction.enum';
 
-export class UpdateTransactionDto extends PartialType(CreateTransactionDto) {
+export class UpdateTransactionDto {
+  @ApiPropertyOptional({
+    description: 'Transaction amount',
+    example: 100.5,
+  })
   @IsOptional()
-  walletId?: string;
-
-  @IsEnum(TransactionType)
-  @IsOptional()
-  transType?: TransactionType;
-
-  @IsOptional()
+  @IsNumber()
   amount?: number;
 
+  @ApiPropertyOptional({
+    description: 'Transaction type',
+    enum: TransactionType,
+    example: TransactionType.PAYMENT,
+  })
   @IsOptional()
-  balanceBefore?: number;
+  @IsEnum(TransactionType)
+  type?: TransactionType;
 
+  @ApiPropertyOptional({
+    description: 'Transaction description',
+    example: 'Game purchase payment',
+  })
   @IsOptional()
-  balanceAfter?: number;
-
-  @IsOptional()
+  @IsString()
   description?: string;
 
+  @ApiPropertyOptional({
+    description: 'Transaction status',
+    enum: TransactionStatus,
+    example: TransactionStatus.COMPLETED,
+  })
   @IsOptional()
-  refId?: string;
-
   @IsEnum(TransactionStatus)
-  @IsOptional()
   status?: TransactionStatus;
 }

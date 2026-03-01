@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,6 +10,7 @@ async function bootstrap() {
     origin: ['http://localhost:5173'],
     credentials: true,
   });
+  app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
@@ -23,7 +25,10 @@ async function bootstrap() {
     .addTag('comments', 'Comment management service endpoints')
     .addTag('profiles', 'Profile management service endpoints')
     .addTag('blogs', 'Blog management service endpoints')
-    .addTag('system-requirements', 'System requirement management service endpoints')
+    .addTag(
+      'system-requirements',
+      'System requirement management service endpoints',
+    )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);

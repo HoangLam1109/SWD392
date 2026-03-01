@@ -4,7 +4,7 @@ import { UserRole, UserStatus } from '../enum/user.enum';
 
 export interface IUser {
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   fullName: string;
   avatar?: string;
   status?: string;
@@ -23,7 +23,7 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ default: null })
   passwordHash: string;
 
   @Prop({ required: true, minLength: 2, maxLength: 32 })

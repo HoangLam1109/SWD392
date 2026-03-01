@@ -1,29 +1,52 @@
-import { IsString, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  IsMongoId,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TransactionType, TransactionStatus } from '../enum/transaction.enum';
 
 export class CreateTransactionDto {
+  @ApiProperty({
+    description: 'Wallet ID',
+    example: '698175d5c4308f3653af15d4',
+  })
+  @IsMongoId()
   @IsString()
   walletId: string;
 
-  @IsEnum(TransactionType)
-  transType: TransactionType;
-
+  @ApiProperty({
+    description: 'Transaction amount',
+    example: 100.5,
+  })
   @IsNumber()
   amount: number;
 
-  @IsNumber()
-  balanceBefore: number;
+  @ApiProperty({
+    description: 'Transaction type',
+    enum: TransactionType,
+    example: TransactionType.PAYMENT,
+  })
+  @IsEnum(TransactionType)
+  type: TransactionType;
 
-  @IsNumber()
-  balanceAfter: number;
-
-  @IsString()
-  description: string;
-
-  @IsString()
-  refId: string;
-
-  @IsEnum(TransactionStatus)
+  @ApiPropertyOptional({
+    description: 'Transaction description',
+    example: 'Game purchase payment',
+  })
   @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiPropertyOptional({
+    description: 'Transaction status',
+    enum: TransactionStatus,
+    example: TransactionStatus.PENDING,
+    default: TransactionStatus.PENDING,
+  })
+  @IsOptional()
+  @IsEnum(TransactionStatus)
   status?: TransactionStatus = TransactionStatus.PENDING;
 }
