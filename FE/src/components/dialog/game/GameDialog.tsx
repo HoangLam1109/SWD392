@@ -105,7 +105,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                 price: Number(data.price),
                 isActive: data.isActive,
                 ...(data.description?.trim() && { description: data.description.trim() }),
-                ...(data.discount != null && data.discount > 0 && { discount: data.discount }),
+                ...(typeof data.discount === 'number' && data.discount >= 0 && { discount: data.discount }),
                 ...(data.thumbnail?.trim() && { thumbnail: data.thumbnail.trim() }),
                 ...(data.coverImage?.trim() && { coverImage: data.coverImage.trim() }),
                 ...(data.developer?.trim() && { developer: data.developer.trim() }),

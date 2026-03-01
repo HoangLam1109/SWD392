@@ -1,5 +1,5 @@
 export interface Game {
-    id: string;
+    _id: string;
     title: string;
     price: number;
     isActive: boolean;

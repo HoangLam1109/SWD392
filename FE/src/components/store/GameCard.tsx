@@ -1,22 +1,26 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
+import { getImageUrl } from '@/lib/imageUtils';
 import type { Game } from '@/types/Game.types';
-
 
 interface GameCardProps {
   game: Game;
 }
 
-
 export function GameCard({ game }: GameCardProps) {
   const { t } = useTranslation();
+
   return (
-    <div className="group relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all hover:scale-[1.02]">
+    <Link
+      to={`/store/${game._id}`}
+      className="group relative block backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all hover:scale-[1.02]"
+    >
       {/* Cover Image */}
       <div className="relative h-64 overflow-hidden">
         <ImageWithFallback
-          src={game.coverImage || ''}
+          src={getImageUrl(game.thumbnail) || getImageUrl(game.coverImage) || ''}
           alt={game.title}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
@@ -55,6 +59,6 @@ export function GameCard({ game }: GameCardProps) {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

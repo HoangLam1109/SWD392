@@ -18,4 +18,8 @@ export const gameService = {
         const response = await apiClient.delete(`/games/${id}`);
         return response.data as Game;
     },
+    getGameById: async (id: string) => {
+        const response = await apiClient.get(`/games/${id}`);
+        return response.data as Game;
+    },
 }

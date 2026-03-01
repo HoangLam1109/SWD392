@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
-import { gameService } from '@/service/game.service';
 import type { Game, CreateGameDTO, UpdateGameDTO } from '@/types/Game.types';
-import { GameDialog, DeleteGameDialog } from '@/components/game';
+import { GameDialog } from '@/components/dialog/game/GameDialog';
+import { DeleteGameDialog } from '@/components/dialog/game/DeleteGameDialog';
+import { DetailGameDialog } from '@/components/dialog/game/DetailGameDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,23 +24,27 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Pencil, Trash2, Plus } from 'lucide-react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Search, Pencil, Trash2, Plus, Eye } from 'lucide-react';
+import { useGetGames } from '@/hooks/game/useGetGames';
+import { useCreateGame } from '@/hooks/game/useCreateGame';
+import { useUpdateGame } from '@/hooks/game/useUpdateGame';
+import { useDeleteGame } from '@/hooks/game/useDeleteGame';
+import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { getImageUrl } from '@/lib/imageUtils';
 
 export function GameManagementPage() {
-    const queryClient = useQueryClient();
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-
     const [gameDialogOpen, setGameDialogOpen] = useState(false);
+    const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [gameToView, setGameToView] = useState<Game | null>(null);
 
-    const { data: games = [], isLoading } = useQuery({
-        queryKey: ['games'],
-        queryFn: gameService.getGames,
-    });
+    const { data: games = [], isLoading } = useGetGames();
+    const createGameMutation = useCreateGame();
+    const updateGameMutation = useUpdateGame();
+    const deleteGameMutation = useDeleteGame();
 
     const filteredGames = useMemo(() => {
         let list = games;
@@ -57,33 +62,22 @@ export function GameManagementPage() {
         return list;
     }, [games, search, statusFilter]);
 
-    const handleCreateGame = async (data: CreateGameDTO | UpdateGameDTO) => {
-        await gameService.createGame(data as CreateGameDTO);
-        queryClient.invalidateQueries({ queryKey: ['games'] });
-        setGameDialogOpen(false);
+    const handleCreateGame = (data: CreateGameDTO | UpdateGameDTO): Promise<void> => {
+        return createGameMutation
+            .mutateAsync(data as CreateGameDTO)
+            .then(() => { setGameDialogOpen(false); }) as Promise<void>;
     };
 
-    const handleUpdateGame = async (data: CreateGameDTO | UpdateGameDTO) => {
-        if (selectedGame) {
-            await gameService.updateGame(selectedGame.id, data);
-            queryClient.invalidateQueries({ queryKey: ['games'] });
-            setGameDialogOpen(false);
-        }
+    const handleUpdateGame = (data: UpdateGameDTO): Promise<void> => {
+        if (!selectedGame?._id) return Promise.reject(new Error('No game selected'));
+        return updateGameMutation
+            .mutateAsync({ id: selectedGame._id, data })
+            .then(() => { setGameDialogOpen(false); }) as Promise<void>;
     };
 
-    const handleDeleteGame = async () => {
-        if (selectedGame) {
-            setIsDeleting(true);
-            try {
-                await gameService.deleteGame(selectedGame.id);
-                queryClient.invalidateQueries({ queryKey: ['games'] });
-                setDeleteDialogOpen(false);
-            } catch (error) {
-                console.error('Error deleting game:', error);
-            } finally {
-                setIsDeleting(false);
-            }
-        }
+    const handleDeleteGame = (): Promise<void> => {
+        if (!selectedGame?._id) return Promise.reject(new Error('No game selected'));
+        return deleteGameMutation.mutateAsync(selectedGame._id).then(() => undefined);
     };
 
     const handleEditClick = (game: Game) => {
@@ -94,6 +88,11 @@ export function GameManagementPage() {
     const handleDeleteClick = (game: Game) => {
         setSelectedGame(game);
         setDeleteDialogOpen(true);
+    };
+
+    const handleViewClick = (game: Game) => {
+        setGameToView(game);
+        setDetailDialogOpen(true);
     };
 
     const openCreateDialog = () => {
@@ -193,7 +192,7 @@ export function GameManagementPage() {
                                         </TableRow>
                                     ))
                                 ) : filteredGames.length === 0 ? (
-                                    <TableRow>
+                                    <TableRow key="empty">
                                         <TableCell colSpan={7} className="text-center py-12">
                                             <div className="flex flex-col items-center text-gray-500">
                                                 <p className="text-lg font-semibold">No games found</p>
@@ -206,13 +205,15 @@ export function GameManagementPage() {
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    filteredGames.map((game) => (
-                                        <TableRow key={game.id} className="hover:bg-gray-50">
+                                    filteredGames.map((game, index) => {
+                                        const imageUrl = getImageUrl(game.thumbnail) || getImageUrl(game.coverImage) || '';
+                                        return (
+                                        <TableRow key={game._id ?? `game-${index}`} className="hover:bg-gray-50">
                                             <TableCell>
-                                                {game.thumbnail ? (
-                                                    <img
-                                                        src={game.thumbnail}
-                                                        alt=""
+                                                {imageUrl ? (
+                                                    <ImageWithFallback
+                                                        src={imageUrl}
+                                                        alt={game.title}
                                                         className="h-10 w-10 rounded object-cover"
                                                     />
                                                 ) : (
@@ -238,10 +239,19 @@ export function GameManagementPage() {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-gray-600">
-                                                (game.releaseDate)
+                                                {game.releaseDate}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleViewClick(game)}
+                                                        className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                                                        title="View details"
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Button>
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
@@ -261,7 +271,7 @@ export function GameManagementPage() {
                                                 </div>
                                             </TableCell>
                                         </TableRow>
-                                    ))
+                                    ); })
                                 )}
                             </TableBody>
                         </Table>
@@ -276,12 +286,23 @@ export function GameManagementPage() {
                 onSave={selectedGame ? handleUpdateGame : handleCreateGame}
             />
 
+            <DetailGameDialog
+                open={detailDialogOpen}
+                onOpenChange={setDetailDialogOpen}
+                game={gameToView}
+                onEdit={(game) => {
+                    setDetailDialogOpen(false);
+                    setSelectedGame(game);
+                    setGameDialogOpen(true);
+                }}
+            />
+
             <DeleteGameDialog
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
                 game={selectedGame}
                 onConfirm={handleDeleteGame}
-                isLoading={isDeleting}
+                isLoading={deleteGameMutation.isPending}
             />
         </div>
     );
