@@ -1,30 +1,47 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { UserService } from '../user-service/user/services/user.service';
 import bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import { UserRole, UserStatus } from '../user-service/user/enum/user.enum';
 import { UserResponseDto } from '../user-service/user/dto/user-response.dto';
+import { PayloadDto } from './dto/payload.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    @Inject('REFRESH_TOKEN_CONFIG') private refreshTokenConfig: any,
   ) {}
 
   async logIn(
     email: string,
     password: string,
-  ): Promise<{ accessToken: string; user: Partial<UserResponseDto> }> {
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: Partial<UserResponseDto>;
+  }> {
     const user = await this.userService.findUserByEmail(email);
     if (user && user.passwordHash) {
       const isPasswordMatch = await bcrypt.compare(password, user.passwordHash);
       if (isPasswordMatch) {
         const payload = { userId: user.id, email: user.email, role: user.role };
-        const accessToken = await this.jwtService.signAsync(payload);
+        const accessToken = await this.jwtService.signAsync({
+          ...payload,
+          tokenType: 'access',
+        });
+        const refreshToken = await this.jwtService.signAsync(
+          { ...payload, tokenType: 'refresh' },
+          {
+            secret: this.refreshTokenConfig.secret,
+            expiresIn: this.refreshTokenConfig.expiresIn,
+          },
+        );
         return {
           accessToken,
+          refreshToken,
           user: {
             email: user.email,
             fullName: user.fullName,
@@ -37,9 +54,11 @@ export class AuthService {
     throw new UnauthorizedException('User not found');
   }
 
-  async register(
-    registerDto: RegisterDto,
-  ): Promise<{ accessToken: string; user: Partial<UserResponseDto> }> {
+  async register(registerDto: RegisterDto): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: Partial<UserResponseDto>;
+  }> {
     const userData = {
       ...registerDto,
       role: UserRole.PLAYER,
@@ -49,9 +68,20 @@ export class AuthService {
     const user = await this.userService.createUser(userData);
 
     const payload = { userId: user.id, email: user.email, role: user.role };
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync({
+      ...payload,
+      tokenType: 'access',
+    });
+    const refreshToken = await this.jwtService.signAsync(
+      { ...payload, tokenType: 'refresh' },
+      {
+        secret: this.refreshTokenConfig.secret,
+        expiresIn: this.refreshTokenConfig.expiresIn,
+      },
+    );
     return {
       accessToken,
+      refreshToken,
       user: {
         email: user.email,
         fullName: user.fullName,
@@ -62,29 +92,77 @@ export class AuthService {
   }
 
   async refresh(
-    refreshToken: string,
+    payload: PayloadDto,
   ): Promise<
     { accessToken: string; user: Partial<UserResponseDto> } | undefined
   > {
-    const validToken = this.jwtService.verify(refreshToken);
-    if (validToken) {
-      const user = await this.userService.findUserById(
-        validToken.userId as string,
-      );
-      if (user) {
-        const payload = { userId: user.id, email: user.email, role: user.role };
-        const accessToken = await this.jwtService.signAsync(payload);
-        return {
-          accessToken,
-          user: {
-            email: user.email,
-            fullName: user.fullName,
-            avatar: user.avatar,
-            role: user.role,
-          },
-        };
-      }
+    const user = await this.userService.findUserById(payload.userId);
+    if (user) {
+      const newPayload = {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      };
+      const accessToken = await this.jwtService.signAsync(newPayload);
+      return {
+        accessToken,
+        user: {
+          email: user.email,
+          fullName: user.fullName,
+          avatar: user.avatar,
+          role: user.role,
+        },
+      };
     }
     return undefined;
+  }
+
+  async validateGoogleUser(profile: any): Promise<any> {
+    const { emails, name, photos } = profile;
+    const email = emails[0].value;
+
+    let user = await this.userService.findUserByEmail(email as string);
+
+    if (!user) {
+      const newUser = await this.userService.createUser({
+        email,
+        fullName: `${name.givenName} ${name.familyName}`,
+        avatar: photos?.[0]?.value || null,
+        password: '',
+        role: 'Player',
+        status: 'ACTIVE',
+      });
+      user = newUser;
+    }
+
+    return {
+      userId: user._id.toString(),
+      email: user.email,
+      fullName: user.fullName,
+      avatar: user.avatar,
+      role: user.role,
+    };
+  }
+
+  async generateTokens(
+    user: any,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const payload = {
+      userId: user.userId,
+      email: user.email,
+      role: user.role,
+    };
+    const accessToken = await this.jwtService.signAsync({
+      ...payload,
+      tokenType: 'access',
+    });
+    const refreshToken = await this.jwtService.signAsync(
+      { ...payload, tokenType: 'refresh' },
+      {
+        secret: this.refreshTokenConfig.secret,
+        expiresIn: this.refreshTokenConfig.expiresIn,
+      },
+    );
+    return { accessToken, refreshToken };
   }
 }

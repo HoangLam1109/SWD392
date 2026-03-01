@@ -1,5 +1,6 @@
 import { IsUrl, IsString, IsNumber, IsBoolean, IsDate } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class CreateGameDto {
   @ApiProperty({
@@ -62,6 +63,7 @@ export class CreateGameDto {
     description: 'Release date',
     example: '2024-01-01',
   })
+  @Type(() => Date)
   @IsDate()
   releaseDate?: Date;
 

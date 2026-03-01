@@ -12,6 +12,8 @@ import { SystemRequirementModule } from './game-service/system_requirement/syste
 import { PaymentModule } from './payment-service/payment/payment.module';
 import { WebWalletModule } from './payment-service/web-wallet/web-wallet.module';
 import { TransactionModule } from './payment-service/transaction/transaction.module';
+import { CartModule } from './payment-service/cart/cart.module';
+import { CartItemModule } from './payment-service/cart-item/cart-item.module';
 
 @Module({
   imports: [
@@ -66,6 +68,8 @@ import { TransactionModule } from './payment-service/transaction/transaction.mod
     PaymentModule,
     WebWalletModule,
     TransactionModule,
+    CartModule,
+    CartItemModule,
   ],
 })
 export class AppModule {}

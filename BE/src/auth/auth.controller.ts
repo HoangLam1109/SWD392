@@ -1,10 +1,25 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  HttpCode,
+  HttpStatus,
+  Get,
+  UseGuards,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResponseDto } from './dto/response.dto';
 import { Public } from './decorators/public.decorator';
+import { GetUser } from 'src/common/decorators/info.decorator';
+import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { PayloadDto } from './dto/payload.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,8 +45,25 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @Public()
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.logIn(loginDto.email, loginDto.password);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.logIn(
+      loginDto.email,
+      loginDto.password,
+    );
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    return result;
   }
 
   @ApiOperation({ summary: 'User register' })
@@ -52,11 +84,55 @@ export class AuthController {
   })
   @Post('register')
   @Public()
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.register(registerDto);
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    return result;
   }
 
-  @ApiOperation({ summary: 'User refresh token - Currently unavailable' })
+  @Get('oauth')
+  @Public()
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+
+  @Get('oauth/callback')
+  @Public()
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(
+    @GetUser() user: any,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.authService.generateTokens(user);
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    return {
+      message: 'Google OAuth login successful',
+      user,
+      tokens,
+    };
+  }
+
+  @ApiOperation({ summary: 'User refresh token' })
   @ApiResponse({
     status: 200,
     description: 'Refresh successful',
@@ -74,8 +150,19 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  @Public()
-  refresh(@Body() refreshToken: string) {
-    return this.authService.refresh(refreshToken);
+  @UseGuards(RefreshTokenGuard)
+  async refresh(
+    @Req() req: { user: PayloadDto },
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.refresh(req.user);
+    if (result) {
+      res.cookie('accessToken', result.accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+      });
+    }
+    return result;
   }
 }

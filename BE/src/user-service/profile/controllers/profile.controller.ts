@@ -43,7 +43,7 @@ export class ProfileController {
   })
   @Get('me')
   getMyInfo(@GetUser() user: Partial<{ _id: string }>) {
-    return this.profileService.getProfileByUserId(user._id || '');
+    return this.profileService.getProfileByUserId(user._id!);
   }
 
   @ApiOperation({ summary: 'Update my profile' })

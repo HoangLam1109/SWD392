@@ -27,7 +27,6 @@ export class RoleGuard implements CanActivate {
     if (!user) {
       throw new UnauthorizedException('User not authenticated');
     }
-    console.log(user.role);
     const hasRole = requiredRoles
       .map((role) => role.toLowerCase())
       .some((role) => user.role.toLowerCase() === role);
