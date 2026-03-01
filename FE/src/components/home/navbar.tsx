@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut } from 'lucide-react';
+import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { Button } from '@/components/ui/button';
@@ -12,9 +12,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LanguageSwitchButton } from '@/components/common/LanguageSwitchButton';
+import { useLogout } from '@/hooks/auth/useLogout';
 
 interface NavbarProps {
-  /** Navbar cố định ở top khi scroll (dùng cho LibraryPage) */
   fixed?: boolean;
 }
 
@@ -23,7 +23,7 @@ export function Navbar({ fixed }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
+  const { logout } = useLogout();
   return (
     <nav className={`z-50 w-full ${fixed ? 'fixed top-0 left-0 right-0' : 'relative'}`}>
       <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -97,6 +97,10 @@ export function Navbar({ fixed }: NavbarProps) {
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       {t('common.gotodashboard')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout}>
+                      <CirclePower className="w-4 h-4 mr-2" />
+                      {t('common.logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -192,6 +196,14 @@ export function Navbar({ fixed }: NavbarProps) {
                   >
                     <User className="w-4 h-4" />
                     {t('common.profile')}
+                  </Link>
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    {t('common.gotodashboard')}
                   </Link>
                 </div>
               ) : (
