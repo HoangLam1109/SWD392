@@ -47,7 +47,7 @@ export function GameManagementPage() {
     const deleteGameMutation = useDeleteGame();
 
     const filteredGames = useMemo(() => {
-        let list = games;
+        let list = Array.isArray(games) ? games : [];
         if (search.trim()) {
             const q = search.toLowerCase();
             list = list.filter(

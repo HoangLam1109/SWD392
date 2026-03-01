@@ -4,7 +4,8 @@ import type { Game, CreateGameDTO, UpdateGameDTO } from "@/types/Game.types";
 export const gameService = {
     getGames: async () => {
         const response = await apiClient.get('/games');
-        return response.data as Game[];
+        const body = response.data as { data?: Game[] } | Game[];
+        return Array.isArray(body) ? body : (body?.data ?? []);
     },
     createGame: async (data: CreateGameDTO) => {
         const response = await apiClient.post('/games', data);
