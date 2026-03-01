@@ -1,5 +1,3 @@
-export { ProductCard } from './ProductCard';
+export { GameCard } from './GameCard';
 export { StoreFilters } from './StoreFilters';
 export { CategoryNav } from './CategoryNav';
-export { mockProducts, categories } from './mockStoreData';
-export type { Product, Category } from './mockStoreData';
