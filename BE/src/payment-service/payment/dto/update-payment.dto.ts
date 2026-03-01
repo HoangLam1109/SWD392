@@ -1,32 +1,20 @@
-import { IsString } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdatePaymentDto {
   @ApiPropertyOptional({
-    description: 'User ID',
-    example: 'user123',
-  })
-  @IsString()
-  userId: string;
-
-  @ApiPropertyOptional({
-    description: 'Transaction ID',
-    example: 'txn123',
-  })
-  @IsString()
-  transactionId: string;
-
-  @ApiPropertyOptional({
     description: 'Transaction code',
-    example: 'txn123',
+    example: 'TXN-2024-001',
   })
+  @IsOptional()
   @IsString()
-  transactionCode: string;
+  transactionCode?: string;
 
   @ApiPropertyOptional({
     description: 'Payment method',
     example: 'credit_card',
   })
+  @IsOptional()
   @IsString()
-  paymentMethod: string;
+  paymentMethod?: string;
 }

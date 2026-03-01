@@ -1,25 +1,34 @@
-import { IsString, IsNumber, IsEnum, IsOptional } from 'class-validator';
-
-export enum WalletStatus {
-  ACTIVED = 'ACTIVED',
-  INACTIVED = 'INACTIVED',
-}
+import { IsString, IsNumber, IsEnum, IsMongoId } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateWebWalletDto {
+  @ApiProperty({
+    description: 'User ID',
+    example: '698175d5c4308f3653af15d4',
+  })
+  @IsMongoId()
   @IsString()
   userId: string;
 
-  @IsString()
-  walletAddress: string;
-
+  @ApiProperty({
+    description: 'Balance',
+    example: 100.5,
+  })
   @IsNumber()
-  balance: number;
+  amount: number;
 
+  @ApiProperty({
+    description: 'Currency',
+    example: 'USD',
+  })
   @IsString()
-  @IsOptional()
-  currency?: string = 'USD';
+  currency: string;
 
-  @IsEnum(WalletStatus)
-  @IsOptional()
-  status?: WalletStatus = WalletStatus.ACTIVED;
+  @ApiProperty({
+    description: 'Status',
+    example: 'ACTIVED',
+    enum: ['ACTIVED', 'INACTIVED'],
+  })
+  @IsEnum(['ACTIVED', 'INACTIVED'])
+  status: string;
 }

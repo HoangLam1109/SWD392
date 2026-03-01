@@ -1,21 +1,29 @@
-import { PartialType } from '@nestjs/swagger';
-import { IsOptional, IsEnum } from 'class-validator';
-import { CreateWebWalletDto, WalletStatus } from './create-web-wallet.dto';
+import { IsString, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class UpdateWebWalletDto extends PartialType(CreateWebWalletDto) {
+export class UpdateWebWalletDto {
+  @ApiPropertyOptional({
+    description: 'Balance',
+    example: 100.5,
+  })
   @IsOptional()
-  userId?: string;
+  @IsNumber()
+  amount?: number;
 
+  @ApiPropertyOptional({
+    description: 'Currency',
+    example: 'USD',
+  })
   @IsOptional()
-  walletAddress?: string;
-
-  @IsOptional()
-  balance?: number;
-
-  @IsOptional()
+  @IsString()
   currency?: string;
 
-  @IsEnum(WalletStatus)
+  @ApiPropertyOptional({
+    description: 'Status',
+    example: 'ACTIVED',
+    enum: ['ACTIVED', 'INACTIVED'],
+  })
   @IsOptional()
-  status?: WalletStatus;
+  @IsEnum(['ACTIVED', 'INACTIVED'])
+  status?: string;
 }

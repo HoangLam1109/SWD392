@@ -6,17 +6,21 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { GameService } from '../services/game.service';
 import { CreateGameDto } from '../dto/create-game.dto';
 import { UpdateGameDto } from '../dto/update-game.dto';
 import { GameResponseDto } from '../dto/game-response.dto';
+import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
+import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 
 @ApiBearerAuth()
 @ApiTags('games')
@@ -40,14 +44,48 @@ export class GameController {
   }
 
   @ApiOperation({ summary: 'Get all games' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number for pagination',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of items per page',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search term for game titles',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    description: 'Field to sort by',
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    description: 'Sort order (asc/desc)',
+  })
+  @ApiQuery({
+    name: 'cursor',
+    required: false,
+    description: 'Cursor for pagination',
+  })
   @ApiResponse({
     status: 200,
-    description: 'List of all games',
-    type: [GameResponseDto],
+    description: 'Paginated list of games',
+    type: PaginationResponseDto<GameResponseDto>,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin access required',
   })
   @Get()
-  findAll() {
-    return this.gameService.findAll();
+  findAllWithPagination(@Query() query: PaginationOptionsDto) {
+    return this.gameService.findAllWithPagination(query);
   }
 
   @ApiOperation({ summary: 'Get game by ID' })

@@ -21,8 +21,6 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
-import { GetUser } from '../decorator/user.decorator';
-import { UserDocument } from '../entities/user.entity';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { UserRole } from 'src/user-service/user/enum/user.enum';
 

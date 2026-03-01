@@ -4,6 +4,7 @@ import { GameController } from './controllers/game.controller';
 import { GameRepository } from './repositories/game.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Game, GameSchema } from './entities/game.entity';
+import { PaginationService } from '../../common/services/pagination.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { Game, GameSchema } from './entities/game.entity';
     ),
   ],
   controllers: [GameController],
-  providers: [GameService, GameRepository],
+  providers: [GameService, GameRepository, PaginationService],
   exports: [GameService],
 })
 export class GameModule {}

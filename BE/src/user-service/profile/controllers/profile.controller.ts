@@ -8,6 +8,7 @@ import {
 import { ProfileService } from '../services/profile.service';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { ProfileResponseDto } from '../dto/profile-response.dto';
+import { GetUser } from '../../../common/decorators/info.decorator';
 
 @ApiBearerAuth()
 @ApiTags('profiles')
@@ -30,19 +31,19 @@ export class ProfileController {
     return this.profileService.getProfileByUserId(userId);
   }
 
-  @ApiOperation({ summary: 'Get profile by ID' })
+  @ApiOperation({ summary: "Get own user's info" })
   @ApiResponse({
     status: 200,
-    description: 'Profile found',
+    description: 'User found',
     type: ProfileResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Profile not found',
+    description: 'User not found',
   })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.profileService.getProfileById(id);
+  @Get('me')
+  getMyInfo(@GetUser() user: Partial<{ _id: string }>) {
+    return this.profileService.getProfileByUserId(user._id!);
   }
 
   @ApiOperation({ summary: 'Update my profile' })
