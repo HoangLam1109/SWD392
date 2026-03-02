@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Navbar, Footer } from '@/components/home';
 import {
     Settings,
@@ -13,40 +16,34 @@ import {
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 //add comment to check author email
 export default function ProfilePage() {
-    const stats = [
-        { label: 'Games Owned', value: '124', icon: Gamepad2, color: 'text-blue-400' },
-        { label: 'Hours Played', value: '1,240', icon: Clock, color: 'text-purple-400' },
-        { label: 'Achievements', value: '842', icon: Trophy, color: 'text-yellow-400' },
-        { label: 'Friends', value: '42', icon: Users, color: 'text-emerald-400' },
-    ];
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const recentGames = [
-        {
-            title: 'Cyberpunk 2077',
-            lastPlayed: '2 hours ago',
-            progress: 85,
-            image: 'https://images.unsplash.com/photo-1605898960710-9aa877994792?q=80&w=400&auto=format&fit=crop',
-        },
-        {
-            title: 'Elden Ring',
-            lastPlayed: 'Yesterday',
-            progress: 42,
-            image: 'https://images.unsplash.com/photo-1612285329112-0a183e20e89d?q=80&w=400&auto=format&fit=crop',
-        },
-        {
-            title: 'Destiny 2',
-            lastPlayed: '3 days ago',
-            progress: 100,
-            image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400&auto=format&fit=crop',
-        }
-    ];
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const token = localStorage.getItem("token");
 
-    const activities = [
-        { type: 'achievement', title: 'Legendary Finisher', game: 'Elden Ring', time: '5 hours ago' },
-        { type: 'purchase', title: 'Baldur\'s Gate 3', game: 'Store', time: '1 day ago' },
-        { type: 'friend', title: 'New friend added: ShadowRunner', game: 'Network', time: '2 days ago' },
-    ];
+                const res = await fetch(
+                    `http://localhost:3000/api/profiles/user/1`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
 
+                const data = await res.json();
+                setProfile(data);
+            } catch (err) {
+                console.error("Failed to fetch profile:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, []);
     return (
         <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
             {/* Animated background gradient */}
@@ -80,7 +77,7 @@ export default function ProfilePage() {
                                 <div className="flex-1 text-center lg:text-left space-y-4">
                                     <div className="space-y-1">
                                         <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                                            Alex "NexusPrime" Johnson
+                                            {profile?.bio}
                                         </h1>
                                         <div className="flex items-center justify-center lg:justify-start gap-3 text-slate-400">
                                             <span className="flex items-center gap-1.5 text-sm sm:text-base">
@@ -92,8 +89,8 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    <p className="text-slate-400 text-sm sm:text-base max-w-2xl leading-relaxed">
-                                        Passionate gamer and technology enthusiast. Currently tackling Elden Ring and exploring the cyberpunk neon streets. Always looking for new squads to join.
+                                    <p className="text-slate-400">
+                                        {profile?.bio}
                                     </p>
 
                                     <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
