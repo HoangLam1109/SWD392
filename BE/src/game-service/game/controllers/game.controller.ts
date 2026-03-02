@@ -43,7 +43,7 @@ export class GameController {
     return this.gameService.createGame(createGameDto);
   }
 
-  @ApiOperation({ summary: 'Get all games (Admin only)' })
+  @ApiOperation({ summary: 'Get all games' })
   @ApiQuery({
     name: 'page',
     required: false,

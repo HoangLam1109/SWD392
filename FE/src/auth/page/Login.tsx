@@ -39,7 +39,11 @@ export default function SigninPage() {
             localStorage.setItem("token", res.accessToken);
             toast.success(t("auth.login.loginSuccess"));
             setUser(res.user);
-            navigate("/");
+            if (res.user.role === "ADMIN") {
+              navigate("/admin");
+            } else {
+              navigate("/");
+            }
           },
         }
       );

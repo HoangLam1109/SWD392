@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { categories } from './mockStoreData';
 
 const categoryKeyMap: Record<string, string> = {
   all: 'store.categories.allGames',
