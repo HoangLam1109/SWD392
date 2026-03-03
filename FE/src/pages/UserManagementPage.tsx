@@ -118,31 +118,31 @@ export function UserManagementPage() {
     // Get account type badge variant
     const getAccountTypeBadge = (accountType: UserAccountType) => {
         const variants: Record<UserAccountType, string> = {
-            admin: 'bg-blue-100 text-blue-700 hover:bg-blue-100',
-            manager: 'bg-purple-100 text-purple-700 hover:bg-purple-100',
-            player: 'bg-green-100 text-green-700 hover:bg-green-100',
+            admin: 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30',
+            manager: 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30',
+            player: 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30',
         };
-        return variants[accountType] || 'bg-gray-100 text-gray-700';
+        return variants[accountType] || 'bg-slate-700 text-slate-200';
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 text-slate-50">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">User Management</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage user accounts and permissions</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-50">User Management</h1>
+                    <p className="text-sm text-slate-50 mt-1">Manage user accounts and permissions</p>
                 </div>
             </div>
 
             {/* Filters Card */}
-            <Card>
+            <Card className="bg-slate-900/60 border-slate-700">
                 <CardContent className="pt-6">
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 space-y-2">
-                            <Label htmlFor="search">Search</Label>
+                            <Label htmlFor="search" className="text-slate-200">Search</Label>
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input
                                     id="search"
                                     placeholder="Search by name or email..."
@@ -151,12 +151,12 @@ export function UserManagementPage() {
                                         setSearch(e.target.value);
                                         setCurrentPage(1);
                                     }}
-                                    className="pl-10"
+                                    className="pl-10 bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500"
                                 />
                             </div>
                         </div>
                         <div className="w-full sm:w-[200px] space-y-2">
-                            <Label htmlFor="sort">Sort</Label>
+                            <Label htmlFor="sort" className="text-slate-200">Sort</Label>
                             <Select
                                 value={accountTypeFilter}
                                 onValueChange={(value) => {
@@ -164,7 +164,10 @@ export function UserManagementPage() {
                                     setCurrentPage(1);
                                 }}
                             >
-                                <SelectTrigger id="sort">
+                                <SelectTrigger
+                                    id="sort"
+                                    className="bg-slate-900/60 border-slate-700 text-slate-50"
+                                >
                                     <SelectValue placeholder="Filter by type" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -180,9 +183,9 @@ export function UserManagementPage() {
             </Card>
 
             {/* Users Table Card */}
-            <Card>
+            <Card className="bg-slate-900/60 border-slate-700">
                 <CardHeader>
-                    <CardTitle>
+                    <CardTitle className="text-slate-50">
                         User Table ({totalUsers})
                     </CardTitle>
                 </CardHeader>
@@ -191,11 +194,11 @@ export function UserManagementPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Account Type</TableHead>
-                                    <TableHead>Primary Phone</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+                                    <TableHead className="text-slate-50">Name</TableHead>
+                                    <TableHead className="text-slate-50">Email</TableHead>
+                                    <TableHead className="text-slate-50">Account Type</TableHead>
+                                    <TableHead className="text-slate-50">Primary Phone</TableHead>
+                                    <TableHead className="text-right text-slate-50">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -214,7 +217,7 @@ export function UserManagementPage() {
                                     // Empty state
                                     <TableRow>
                                         <TableCell colSpan={5} className="text-center py-12">
-                                            <div className="flex flex-col items-center justify-center text-gray-500">
+                                            <div className="flex flex-col items-center justify-center text-slate-50">
                                                 <p className="text-lg font-semibold">No users found</p>
                                                 <p className="text-sm mt-1">
                                                     {search || accountTypeFilter !== 'all'
@@ -227,17 +230,17 @@ export function UserManagementPage() {
                                 ) : (
                                     // User rows
                                     users.map((user) => (
-                                        <TableRow key={user.id} className="hover:bg-gray-50">
-                                            <TableCell className="font-medium">
+                                        <TableRow key={user.id} className="hover:bg-slate-800/70">
+                                            <TableCell className="font-medium text-slate-50">
                                                 {user.firstName} {user.lastName}
                                             </TableCell>
-                                            <TableCell className="text-gray-600">{user.email}</TableCell>
+                                            <TableCell className="text-slate-50">{user.email}</TableCell>
                                             <TableCell>
                                                 <Badge className={getAccountTypeBadge(user.accountType)}>
                                                     {user.accountType.charAt(0).toUpperCase() + user.accountType.slice(1)}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-gray-600">
+                                            <TableCell className="text-slate-50">
                                                 {user.primaryPhone || '-'}
                                             </TableCell>
                                             <TableCell className="text-right">
@@ -246,7 +249,7 @@ export function UserManagementPage() {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleEditClick(user)}
-                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                        className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
                                                     >
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
@@ -254,7 +257,7 @@ export function UserManagementPage() {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleDeleteClick(user)}
-                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -269,8 +272,8 @@ export function UserManagementPage() {
 
                     {/* Pagination */}
                     {!loading && users.length > 0 && (
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                            <p className="text-sm text-gray-600">
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
+                            <p className="text-sm text-slate-50">
                                 Showing {(currentPage - 1) * pageSize + 1} to{' '}
                                 {Math.min(currentPage * pageSize, totalUsers)} of {totalUsers} users
                             </p>
