@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useSidebarNavigation } from "../hooks/useSidebarNavigation";
-import { ManagerSidebar } from "../components/common/ManagerSidebar";
+import { Sidebar } from "../components/common/Sidebar";
+
 import type { Role } from "../config/navigation/navigation.types";
 
-interface ManagerLayoutProps {
+export interface ManagerLayoutProps {
     currentUser?: {
         id: string;
         name: string;
@@ -15,15 +16,21 @@ interface ManagerLayoutProps {
     onNavigate: (page: string) => void;
 }
 
-export function ManagerLayout({ currentUser, onLogout, currentPage, onNavigate }: ManagerLayoutProps) {
+const ManagerLayoutComponent = ({ currentUser, onLogout, currentPage, onNavigate }: ManagerLayoutProps) => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const navigationItems = useSidebarNavigation(currentUser?.role as Role);
 
+    const isAdmin = currentUser?.role === "ADMIN";
+    const SidebarComponent =  Sidebar;
+
+    const fallbackName = isAdmin ? "Admin" : "Manager";
+    const roleLabel = isAdmin ? "Admin" : "Manager";
+
     return (
-        <div className="flex h-screen bg-slate-900">
-            <ManagerSidebar
-                currentUserName={currentUser?.name || "Manager"}
-                currentUserRole="Manager"
+        <div className={`flex h-screen bg-slate-900`}>
+            <SidebarComponent
+                currentUserName={currentUser?.name || fallbackName}
+                currentUserRole={roleLabel}
                 currentPage={currentPage}
                 sidebarCollapsed={sidebarCollapsed}
                 currentUserAvatar="https://github.com/shadcn.png"
@@ -37,10 +44,13 @@ export function ManagerLayout({ currentUser, onLogout, currentPage, onNavigate }
                     sidebarCollapsed ? "ml-0 md:ml-16 lg:ml-16" : "ml-0 md:ml-64 lg:ml-64"
                 }`}
             >
-                <div className="flex-1 overflow-y-auto bg-slate-900 p-4 sm:p-6 md:p-8 text-slate-50">
+                <div className={`flex-1 overflow-y-auto bg-slate-900 p-4 sm:p-6 md:p-8 text-slate-50`}>
                     <Outlet />
                 </div>
             </div>
         </div>
     );
-}
+};
+
+export const ManagerLayout = ManagerLayoutComponent;
+export default ManagerLayoutComponent;

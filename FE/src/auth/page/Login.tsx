@@ -41,6 +41,8 @@ export default function SigninPage() {
             setUser(res.user);
             if (res.user.role === "ADMIN") {
               navigate("/admin");
+            } else if (res.user.role === "MODERATOR") {
+              navigate("/moderator");
             } else {
               navigate("/");
             }
