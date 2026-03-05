@@ -15,13 +15,13 @@ export const profileService = {
     },
 
     createProfile: async (data: CreateProfileDTO): Promise<Profile> => {
-        const response = await apiClient.post('/profiles', data);
+        const response = await apiClient.put('/profiles/me', data);
         const body = response.data as any;
         return (body?.data ?? body) as Profile;
     },
 
-    updateProfile: async (userId: string, data: UpdateProfileDTO): Promise<Profile> => {
-        const response = await apiClient.patch(`/profiles/user/${userId}`, data);
+    updateProfile: async (data: UpdateProfileDTO): Promise<Profile> => {
+        const response = await apiClient.put('/profiles/me', data);
         const body = response.data as any;
         return (body?.data ?? body) as Profile;
     },

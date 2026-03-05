@@ -15,8 +15,8 @@ export interface Profile {
     dateOfBirth: string;
     sex: string;
     socialLinks?: SocialLinks;
-    created_at?: string;
-    updated_at?: string;
+    createdAt?: string;
+    updatedAt?: string;
     __v?: number;
 }
 

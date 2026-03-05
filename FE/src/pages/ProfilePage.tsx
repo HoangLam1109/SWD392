@@ -52,9 +52,9 @@ export default function ProfilePage() {
 
     const { data: profile, isLoading: profileLoading, isError } = useGetMyProfile();
     const { mutate: createProfile, isPending: isCreating } = useCreateProfile();
-    const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile(user?.id);
+    const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
-    const { register, handleSubmit, reset, control } = useForm<UpdateProfileDTO>();
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm<UpdateProfileDTO>();
 
     useEffect(() => {
         if (profile) {
@@ -65,6 +65,11 @@ export default function ProfilePage() {
                 country: profile.country || '',
                 dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.split('T')[0] : '',
                 sex: profile.sex || '',
+                socialLinks: {
+                    facebook: profile.socialLinks?.facebook || '',
+                    discord: profile.socialLinks?.discord || '',
+                    youtube: profile.socialLinks?.youtube || '',
+                }
             });
         }
     }, [profile, reset]);
@@ -79,12 +84,6 @@ export default function ProfilePage() {
             createProfile({
                 ...data,
                 userId: user.id,
-                bio: data.bio || '',
-                phoneNumber: data.phoneNumber || '',
-                address: data.address || '',
-                country: data.country || '',
-                dateOfBirth: data.dateOfBirth || '',
-                sex: data.sex || '',
             } as CreateProfileDTO, {
                 onSuccess: () => setIsDialogOpen(false),
             });
@@ -92,12 +91,12 @@ export default function ProfilePage() {
     };
 
     // Fake stats nếu backend chưa có
-    const stats = [
-        { label: 'Games Owned', value: '124', icon: Gamepad2, color: 'text-blue-400' },
-        { label: 'Hours Played', value: '1,240', icon: Clock, color: 'text-purple-400' },
-        { label: 'Achievements', value: '842', icon: Trophy, color: 'text-yellow-400' },
-        { label: 'Friends', value: '42', icon: Users, color: 'text-emerald-400' },
-    ];
+    // const stats = [
+    //     { label: 'Games Owned', value: '124', icon: Gamepad2, color: 'text-blue-400' },
+    //     { label: 'Hours Played', value: '1,240', icon: Clock, color: 'text-purple-400' },
+    //     { label: 'Achievements', value: '842', icon: Trophy, color: 'text-yellow-400' },
+    //     { label: 'Friends', value: '42', icon: Users, color: 'text-emerald-400' },
+    // ];
 
     if (profileLoading) {
         return (
@@ -130,7 +129,18 @@ export default function ProfilePage() {
                             We couldn't find a profile for your account. You may need to complete your setup.
                         </p>
                         <button
-                            onClick={() => setIsDialogOpen(true)}
+                            onClick={() => {
+                                reset({
+                                    bio: '',
+                                    phoneNumber: '',
+                                    address: '',
+                                    country: '',
+                                    dateOfBirth: '',
+                                    sex: '',
+                                    socialLinks: { facebook: '', discord: '', youtube: '' }
+                                });
+                                setIsDialogOpen(true);
+                            }}
                             className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 transition-colors"
                         >
                             Create Profile
@@ -296,7 +306,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* STATS SECTION */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                     {stats.map((stat) => (
                         <div
                             key={stat.label}
@@ -317,7 +327,7 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     ))}
-                </div>
+                </div> */}
 
             </main>
 
@@ -328,81 +338,148 @@ export default function ProfilePage() {
     );
 
     function renderProfileDialog() {
+
         return (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[500px] bg-slate-900 text-white border-white/10">
+                <DialogContent className="sm:max-w-[500px] bg-slate-900 text-white border-white/10 max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{profile ? 'Edit Profile' : 'Create Profile'}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="bio">Bio</Label>
+                            <Label htmlFor="bio" className={errors.bio ? 'text-red-400' : ''}>Bio</Label>
                             <Textarea
                                 id="bio"
                                 placeholder="Tell us about yourself..."
-                                className="bg-slate-950 border-white/10"
-                                {...register('bio')}
+                                className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.bio ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
+                                {...register('bio', {
+                                    required: profile ? false : 'Bio is required for new profiles',
+                                    minLength: { value: 10, message: 'Bio must be at least 10 characters' }
+                                })}
                             />
+                            {errors.bio && <span className="text-xs text-red-400 font-medium">{errors.bio.message}</span>}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="phoneNumber">Phone Number</Label>
+                                <Label htmlFor="phoneNumber" className={errors.phoneNumber ? 'text-red-400' : ''}>Phone Number</Label>
                                 <Input
                                     id="phoneNumber"
                                     placeholder="0123456789"
-                                    className="bg-slate-950 border-white/10"
-                                    {...register('phoneNumber')}
+                                    className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.phoneNumber ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
+                                    {...register('phoneNumber', {
+                                        required: 'Phone number is required',
+                                        pattern: {
+                                            value: /^[0-9+]{10,15}$/,
+                                            message: 'Please enter a valid phone number'
+                                        }
+                                    })}
                                 />
+                                {errors.phoneNumber && <span className="text-xs text-red-400 font-medium">{errors.phoneNumber.message}</span>}
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="sex">Sex</Label>
+                                <Label htmlFor="sex" className={errors.sex ? 'text-red-400' : ''}>Sex</Label>
                                 <Controller
                                     name="sex"
                                     control={control}
+                                    rules={{ required: 'Please select your sex' }}
                                     render={({ field }) => (
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <SelectTrigger className="bg-slate-950 border-white/10">
-                                                <SelectValue placeholder="Select sex" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-slate-900 text-white border-white/10">
-                                                <SelectItem value="MALE">Male</SelectItem>
-                                                <SelectItem value="FEMALE">Female</SelectItem>
-                                                <SelectItem value="OTHER">Other</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                        <div className="space-y-1">
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <SelectTrigger className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.sex ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}>
+                                                    <SelectValue placeholder="Select sex" />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-slate-900 text-white border-white/10">
+                                                    <SelectItem value="Male">Male</SelectItem>
+                                                    <SelectItem value="Female">Female</SelectItem>
+                                                    <SelectItem value="Other">Other</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.sex && <span className="text-xs text-red-400 font-medium">{errors.sex.message}</span>}
+                                        </div>
                                     )}
                                 />
                             </div>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="address">Address</Label>
+                            <Label htmlFor="address" className={errors.address ? 'text-red-400' : ''}>Address</Label>
                             <Input
                                 id="address"
                                 placeholder="123 Street Name"
-                                className="bg-slate-950 border-white/10"
-                                {...register('address')}
+                                className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.address ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
+                                {...register('address', { required: 'Address is required' })}
                             />
+                            {errors.address && <span className="text-xs text-red-400 font-medium">{errors.address.message}</span>}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="country">Country</Label>
+                                <Label htmlFor="country" className={errors.country ? 'text-red-400' : ''}>Country</Label>
                                 <Input
                                     id="country"
                                     placeholder="Vietnam"
-                                    className="bg-slate-950 border-white/10"
-                                    {...register('country')}
+                                    className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.country ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
+                                    {...register('country', { required: 'Country is required' })}
                                 />
+                                {errors.country && <span className="text-xs text-red-400 font-medium">{errors.country.message}</span>}
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                                <Label htmlFor="dateOfBirth" className={errors.dateOfBirth ? 'text-red-400' : ''}>Date of Birth</Label>
                                 <Input
                                     id="dateOfBirth"
                                     type="date"
-                                    className="bg-slate-950 border-white/10"
-                                    {...register('dateOfBirth')}
+                                    className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.dateOfBirth ? 'border-red-500/50 focus-visible:ring-red-500' : ''} [color-scheme:dark]`}
+                                    {...register('dateOfBirth', { required: 'Date of birth is required' })}
+                                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
                                 />
+                                {errors.dateOfBirth && <span className="text-xs text-red-400 font-medium">{errors.dateOfBirth.message}</span>}
                             </div>
                         </div>
+
+                        <div className="space-y-4">
+                            <Label className="text-sm font-bold uppercase tracking-wider text-slate-500">Social Links</Label>
+                            <div className="grid gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="facebook" className={errors.socialLinks?.facebook ? 'text-red-400' : ''}>Facebook URL</Label>
+                                    <Input
+                                        id="facebook"
+                                        placeholder="https://facebook.com/..."
+                                        className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.socialLinks?.facebook ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
+                                        {...register('socialLinks.facebook', {
+                                            pattern: {
+                                                value: /^(https?:\/\/)?(www\.)?facebook\.com\/.+/i,
+                                                message: 'Please enter a valid Facebook URL'
+                                            }
+                                        })}
+                                    />
+                                    {errors.socialLinks?.facebook && <span className="text-xs text-red-400 font-medium">{errors.socialLinks.facebook.message}</span>}
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="discord" className={errors.socialLinks?.discord ? 'text-red-400' : ''}>Discord Invite/User</Label>
+                                    <Input
+                                        id="discord"
+                                        placeholder="https://discord.gg/..."
+                                        className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.socialLinks?.discord ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
+                                        {...register('socialLinks.discord')}
+                                    />
+                                    {errors.socialLinks?.discord && <span className="text-xs text-red-400 font-medium">{errors.socialLinks.discord.message}</span>}
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="youtube" className={errors.socialLinks?.youtube ? 'text-red-400' : ''}>YouTube Channel</Label>
+                                    <Input
+                                        id="youtube"
+                                        placeholder="https://youtube.com/@..."
+                                        className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.socialLinks?.youtube ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
+                                        {...register('socialLinks.youtube', {
+                                            pattern: {
+                                                value: /^(https?:\/\/)?(www\.)?youtube\.com\/.+/i,
+                                                message: 'Please enter a valid YouTube URL'
+                                            }
+                                        })}
+                                    />
+                                    {errors.socialLinks?.youtube && <span className="text-xs text-red-400 font-medium">{errors.socialLinks.youtube.message}</span>}
+                                </div>
+                            </div>
+                        </div>
+
                         <DialogFooter className="pt-4">
                             <Button
                                 type="button"

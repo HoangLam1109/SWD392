@@ -8,8 +8,8 @@ export const useCreateProfile = () => {
 
     return useMutation<Profile, Error, CreateProfileDTO>({
         mutationFn: (data: CreateProfileDTO) => profileService.createProfile(data),
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["profile", data.userId] });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["profile"] });
             toast.success("Profile created successfully!");
         },
         onError: (error) => {
