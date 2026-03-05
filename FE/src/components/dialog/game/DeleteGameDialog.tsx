@@ -9,23 +9,23 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
-import type { User } from '@/types/User.types';
+import type { Game } from '@/types/Game.types';
 
-interface DeleteUserDialogProps {
+interface DeleteGameDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    user: User | null;
+    game: Game | null;
     onConfirm: () => Promise<void>;
     isLoading?: boolean;
 }
 
-export function DeleteUserDialog({
+export function DeleteGameDialog({
     open,
     onOpenChange,
-    user,
+    game,
     onConfirm,
     isLoading = false,
-}: DeleteUserDialogProps) {
+}: DeleteGameDialogProps) {
     const handleConfirm = async () => {
         await onConfirm();
         onOpenChange(false);
@@ -35,13 +35,10 @@ export function DeleteUserDialog({
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent className="bg-slate-900 text-slate-50 border border-slate-700">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription className="text-slate-400">
-                        This action cannot be undone. This will permanently delete the user account for{' '}
-                        <span className="font-semibold text-slate-50">
-                            {user?.firstName} {user?.lastName}
-                        </span>{' '}
-                        ({user?.email}).
+                    <AlertDialogTitle>Delete game?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the game{' '}
+                        <span className="font-semibold text-slate-50">{game?.title}</span>.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

@@ -15,7 +15,9 @@
     "developer": "Nhà phát triển",
     "publisher": "Nhà xuất bản",
     "or": "Hoặc",
-    "continueWithGoogle": "Tiếp tục với Google"
+    "continueWithGoogle": "Tiếp tục với Google",
+    "gotodashboard": "Đi đến trang quản lý",
+    "logout": "Đăng xuất"
   },
   "home": {
     "hero": {

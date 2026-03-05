@@ -15,7 +15,9 @@
     "developer": "Developer",
     "publisher": "Publisher",
     "or": "Or",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "gotodashboard": "Go to dashboard",
+    "logout": "Logout"
   },
   "home": {
     "hero": {

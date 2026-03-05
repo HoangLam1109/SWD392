@@ -2,7 +2,10 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, SlidersHorizontal, X, Grid3x3, List } from 'lucide-react';
 import { Navbar } from '@/components/home';
-import { ProductCard, StoreFilters, CategoryNav, mockProducts } from '@/components/store';
+import { StoreFilters } from '@/components/store';
+import type { Game } from '@/types/Game.types';
+import { GameList } from '@/components/store/GameList';
+
 
 export default function StorePage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -17,57 +20,36 @@ export default function StorePage() {
   });
 
   // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let products = [...mockProducts];
-
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      products = products.filter((p) => p.category === selectedCategory);
-    }
-
+  const filteredGames = useMemo(() => {
+    let games: Game[] = [];
     // Filter by search query
     if (searchQuery) {
-      products = products.filter((p) =>
-        p.title.toLowerCase().includes(searchQuery.toLowerCase())
+      games = games.filter((g) =>
+        g.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Filter by selected categories from filters
-    if (filters.categories.length > 0) {
-      products = products.filter((p) => filters.categories.includes(p.category));
-    }
-
-    // Filter by rating
-    if (filters.minRating > 0) {
-      products = products.filter((p) => p.rating >= filters.minRating);
-    }
 
     // Filter by price range
-    products = products.filter(
+    games = games.filter(
       (p) => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
     );
 
     // Sort products
     switch (filters.sortBy) {
-      case 'newest':
-        products.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
-        break;
       case 'price-low':
-        products.sort((a, b) => a.price - b.price);
+        games.sort((a, b) => a.price - b.price);
         break;
       case 'price-high':
-        products.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        products.sort((a, b) => b.rating - a.rating);
+        games.sort((a, b) => b.price - a.price);
         break;
       case 'popular':
       default:
-        products.sort((a, b) => b.reviews - a.reviews);
+        games.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
         break;
     }
 
-    return products;
+    return games;
   }, [selectedCategory, searchQuery, filters]);
 
   return (
@@ -108,7 +90,7 @@ export default function StorePage() {
           </div>
 
           {/* Category Navigation */}
-          <CategoryNav selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+          {/* <CategoryNav selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} /> */}
         </div>
       </section>
 
@@ -129,7 +111,7 @@ export default function StorePage() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <span className="text-slate-400">
-                    {filteredProducts.length} {filteredProducts.length === 1 ? 'game' : 'games'} found
+                    {filteredGames.length} {filteredGames.length === 1 ? 'game' : 'games'} found
                   </span>
                 </div>
 
@@ -169,23 +151,11 @@ export default function StorePage() {
                 </div>
               </div>
 
-              {/* Products */}
-              <div
-                className={`grid gap-6 ${
-                  viewMode === 'grid'
-                    ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
-                    : 'grid-cols-1'
-                }`}
-              >
-                {filteredProducts.map((product) => (
-                  <div key={product.id}>
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
+              {/* Games */}
+              <GameList />
 
               {/* No Results */}
-              {filteredProducts.length === 0 && (
+              {filteredGames.length === 0 && (
                 <div className="text-center py-16">
                   <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-12">
                     <Search className="w-16 h-16 mx-auto mb-4 text-slate-500" />

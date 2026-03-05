@@ -77,7 +77,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   publisher: string;
 
   @ApiPropertyOptional({
-    description: 'Release date',
+    description: 'Release date (ISO string)',
     example: '2024-01-01',
   })
   @Type(() => Date)
