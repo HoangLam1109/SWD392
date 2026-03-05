@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 export interface ICartItemRepository {
   findById(id: string, fields?: string): Promise<CartItemDocument | null>;
+  findByIds(ids: string[]): Promise<CartItemDocument[]>;
   findByCartId(cartId: string): Promise<CartItemDocument[]>;
   create(cartItemData: Partial<ICartItem>): Promise<CartItemDocument>;
   updateById(
@@ -38,12 +39,18 @@ export class CartItemRepository implements ICartItemRepository {
   ): Promise<CartItemDocument | null> {
     return await this.cartItemModel.findById(
       id,
-      fields || 'cartId gameId priceAtPurchase',
+      fields || 'cartId productId priceAtPurchase',
     );
   }
 
+  async findByIds(ids: string[]): Promise<CartItemDocument[]> {
+    return await this.cartItemModel
+      .find({ _id: { $in: ids } })
+      .populate('productId');
+  }
+
   async findByCartId(cartId: string): Promise<CartItemDocument[]> {
-    return await this.cartItemModel.find({ cartId }).populate('gameId');
+    return await this.cartItemModel.find({ cartId }).populate('productId');
   }
 
   async create(cartItemData: Partial<ICartItem>): Promise<CartItemDocument> {
@@ -74,8 +81,8 @@ export class CartItemRepository implements ICartItemRepository {
 
   async findAll(): Promise<CartItemDocument[]> {
     return await this.cartItemModel
-      .find({}, 'cartId gameId priceAtPurchase')
-      .populate('gameId');
+      .find({}, 'cartId productId priceAtPurchase')
+      .populate('productId');
   }
 
   async findWithQuery(
@@ -91,7 +98,7 @@ export class CartItemRepository implements ICartItemRepository {
     const sortObj: Record<string, 1 | -1> = { [sortField]: sortDirection };
     return await this.cartItemModel
       .find(query)
-      .populate('gameId')
+      .populate('productId')
       .sort(sortObj)
       .collation({ locale: 'en', strength: 2 })
       .limit(options?.limit)

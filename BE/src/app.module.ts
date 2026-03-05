@@ -14,6 +14,8 @@ import { WebWalletModule } from './payment-service/web-wallet/web-wallet.module'
 import { TransactionModule } from './payment-service/transaction/transaction.module';
 import { CartModule } from './payment-service/cart/cart.module';
 import { CartItemModule } from './payment-service/cart-item/cart-item.module';
+import { OrderModule } from './payment-service/order/order.module';
+import { OrderDetailModule } from './payment-service/order-detail/order-detail.module';
 
 @Module({
   imports: [
@@ -70,6 +72,8 @@ import { CartItemModule } from './payment-service/cart-item/cart-item.module';
     TransactionModule,
     CartModule,
     CartItemModule,
+    OrderModule,
+    OrderDetailModule,
   ],
 })
 export class AppModule {}

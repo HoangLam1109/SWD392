@@ -20,6 +20,7 @@ import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { UpdateTransactionDto } from '../dto/update-transaction.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { TransactionResponseDto } from '../dto/transaction-response.dto';
 
 @ApiBearerAuth()
 @ApiTags('transactions')
@@ -31,6 +32,7 @@ export class TransactionController {
   @ApiResponse({
     status: 201,
     description: 'Transaction created successfully',
+    type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -81,7 +83,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'List of all transactions with pagination',
-    type: PaginationResponseDto,
+    type: PaginationResponseDto<TransactionResponseDto>,
   })
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
@@ -92,6 +94,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'Transaction found',
+    type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -106,6 +109,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'Transaction found',
+    type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -120,6 +124,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'Transactions found',
+    type: TransactionResponseDto,
   })
   @Get('wallet/:walletId')
   findByWalletId(@Param('walletId') walletId: string) {
@@ -130,6 +135,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'Transaction updated successfully',
+    type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 404,

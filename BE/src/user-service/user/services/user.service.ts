@@ -8,17 +8,25 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import * as bcrypt from 'bcrypt';
 import { PaginationService } from 'src/common/services/pagination.service';
+import { WebWalletService } from 'src/payment-service/web-wallet/services/web-wallet.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly paginationService: PaginationService,
+    private readonly webWalletService: WebWalletService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto) {
     const { data } = await this._passwordCheck('', createUserDto);
-    return await this.userRepository.create(data);
+    const user = await this.userRepository.create(data);
+    await this.webWalletService.create({
+      userId: user._id.toString(),
+      balance: 0,
+      currency: 'VND',
+    });
+    return user;
   }
 
   async findAll() {

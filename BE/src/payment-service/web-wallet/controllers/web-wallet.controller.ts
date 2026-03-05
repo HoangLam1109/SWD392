@@ -21,6 +21,8 @@ import { CreateWebWalletDto } from '../dto/create-web-wallet.dto';
 import { UpdateWebWalletDto } from '../dto/update-web-wallet.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { GetUser } from 'src/common/decorators/info.decorator';
+import { WebWalletResponseDto } from '../dto/web-wallet-response.dto';
 
 @ApiBearerAuth()
 @ApiTags('web-wallets')
@@ -32,6 +34,7 @@ export class WebWalletController {
   @ApiResponse({
     status: 201,
     description: 'Web wallet created successfully',
+    type: WebWalletResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -82,7 +85,7 @@ export class WebWalletController {
   @ApiResponse({
     status: 200,
     description: 'List of all web wallets with pagination',
-    type: PaginationResponseDto,
+    type: PaginationResponseDto<WebWalletResponseDto>,
   })
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
@@ -93,6 +96,7 @@ export class WebWalletController {
   @ApiResponse({
     status: 200,
     description: 'Web wallet found',
+    type: WebWalletResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -103,10 +107,26 @@ export class WebWalletController {
     return this.webWalletService.findWalletById(id);
   }
 
+  @ApiOperation({ summary: 'Get web wallet by user ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Web wallet found',
+    type: WebWalletResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Web wallet not found',
+  })
+  @Get('me')
+  findOneByUserId(@GetUser() user: Partial<{ _id: string }>) {
+    return this.webWalletService.findWalletByUserId(user._id!);
+  }
+
   @ApiOperation({ summary: 'Deposit balance to web wallet' })
   @ApiResponse({
     status: 200,
     description: 'Web wallet found',
+    type: WebWalletResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -124,6 +144,7 @@ export class WebWalletController {
   @ApiResponse({
     status: 200,
     description: 'Web wallet updated successfully',
+    type: WebWalletResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -141,6 +162,7 @@ export class WebWalletController {
   @ApiResponse({
     status: 200,
     description: 'Web wallet deleted successfully',
+    type: WebWalletResponseDto,
   })
   @ApiResponse({
     status: 404,

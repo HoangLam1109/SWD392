@@ -1,7 +1,14 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateGameDto } from './create-game.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsBoolean, IsDate, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsDate,
+  IsUrl,
+  IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateGameDto extends PartialType(CreateGameDto) {
@@ -10,56 +17,64 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
     example: 'Title',
   })
   @IsString()
-  title?: string;
+  @IsOptional()
+  title: string;
 
   @ApiPropertyOptional({
     description: 'Game price',
     example: '100000',
   })
   @IsNumber()
-  price?: number;
+  @IsOptional()
+  price: number;
 
   @ApiPropertyOptional({
     description: 'Game status active',
     example: true,
   })
   @IsBoolean()
-  isActive?: boolean;
+  @IsOptional()
+  isActive: boolean;
 
   @ApiPropertyOptional({
     description: 'Game discount',
     example: '10',
   })
   @IsNumber()
-  discount?: number;
+  @IsOptional()
+  discount: number;
 
   @ApiPropertyOptional({
     description: 'Game thumbnail',
     example: 'https://example.com/thumbnail.jpg',
   })
   @IsUrl()
-  thumbnail?: string;
+  @IsOptional()
+  thumbnail: string;
 
   @ApiPropertyOptional({
     description: 'Cover image',
     example: 'https://example.com/cover.jpg',
   })
   @IsUrl()
-  coverImage?: string;
+  @IsOptional()
+  coverImage: string;
 
   @ApiPropertyOptional({
     description: 'Developer',
     example: 'Developer',
   })
   @IsString()
-  developer?: string;
+  @IsOptional()
+  developer: string;
 
   @ApiPropertyOptional({
     description: 'Publisher',
     example: 'Publisher',
   })
   @IsString()
-  publisher?: string;
+  @IsOptional()
+  publisher: string;
 
   @ApiPropertyOptional({
     description: 'Release date',
@@ -67,12 +82,14 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @Type(() => Date)
   @IsDate()
-  releaseDate?: Date;
+  @IsOptional()
+  releaseDate: Date;
 
   @ApiPropertyOptional({
     description: 'Game url',
     example: 'https://example.com/game',
   })
   @IsUrl()
-  url?: string;
+  @IsOptional()
+  url: string;
 }
