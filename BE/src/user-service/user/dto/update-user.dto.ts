@@ -7,6 +7,7 @@ import {
   IsStrongPassword,
   IsUrl,
   IsString,
+  IsOptional,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -15,6 +16,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     description: 'User email address',
     example: 'user@example.com',
   })
+  @IsOptional()
   @IsEmail()
   email?: string;
 
@@ -22,6 +24,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     description: 'User full name',
     example: 'John Doe',
   })
+  @IsOptional()
   @IsString()
   fullName?: string;
 
@@ -29,6 +32,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     description: 'User password',
     example: 'StrongPass123!',
   })
+  @IsOptional()
   @IsStrongPassword()
   password?: string;
 
@@ -37,6 +41,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     enum: UserRole,
     example: UserRole.PLAYER,
   })
+  @IsOptional()
   @IsEnum(UserRole)
   role?: string;
 
@@ -44,6 +49,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     description: 'User avatar URL',
     example: 'https://example.com/avatar.jpg',
   })
+  @IsOptional()
   @IsUrl()
   avatar?: string;
 
@@ -52,6 +58,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     enum: UserStatus,
     example: UserStatus.ACTIVE,
   })
+  @IsOptional()
   @IsEnum(UserStatus)
   status?: string;
 }

@@ -1,10 +1,11 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Building2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Calendar, Building2, ExternalLink, Cpu, HardDrive } from 'lucide-react';
 import { Navbar } from '@/components/home';
 import { useGetGameById } from '@/hooks/game/useGetGamebyId';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { getImageUrl } from '@/lib/imageUtils';
 import { Button } from '@/components/ui/button';
+import { useGetSystemsByGameId } from '@/hooks/system/useGetSystemsByGameId';
 
 function formatPrice(price: number) {
     return new Intl.NumberFormat('en-US', {
@@ -32,6 +33,11 @@ function formatDate(value: string | undefined): string {
 export default function GameDetailPage() {
     const { gameId } = useParams<{ gameId: string }>();
     const { data: game, isLoading, error } = useGetGameById(gameId);
+    const {
+        data: systemRequirements = [],
+        isLoading: isLoadingSystems,
+        error: systemsError,
+    } = useGetSystemsByGameId(gameId);
 
     if (isLoading) {
         return (
@@ -239,6 +245,69 @@ export default function GameDetailPage() {
                             </Button>
                         </div>
                     </div>
+                </div>
+
+                {/* System requirements */}
+                <div className="mt-10">
+                    <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                        <Cpu className="h-5 w-5 text-slate-400" />
+                        System Requirements
+                    </h2>
+
+                    {isLoadingSystems ? (
+                        <p className="text-sm text-slate-400">Loading system requirements...</p>
+                    ) : systemsError ? (
+                        <p className="text-sm text-red-400">Failed to load system requirements.</p>
+                    ) : Array.isArray(systemRequirements) && systemRequirements.length > 0 ? (
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {systemRequirements.map((sys) => (
+                                <div
+                                    key={(sys as any).id ?? (sys as any)._id ?? `${sys.gameId}-${sys.requirementType}`}
+                                    className="border border-white/10 rounded-xl bg-slate-900/60 p-4 space-y-2"
+                                >
+                                    <div className="flex items-center justify-between gap-2">
+                                        <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-800 text-slate-100">
+                                            {sys.requirementType}
+                                        </span>
+                                        <span className="text-xs text-slate-400 truncate max-w-[60%]">
+                                            {sys.os}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-1 text-xs text-slate-300">
+                                        <div className="flex items-center gap-2">
+                                            <Cpu className="h-3 w-3 text-slate-400" />
+                                            <span className="font-medium">CPU:</span>
+                                            <span className="text-slate-200">{sys.processor}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex h-3 w-3 rounded-full bg-emerald-400/80" />
+                                            <span className="font-medium">RAM:</span>
+                                            <span className="text-slate-200">{sys.memory}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex h-3 w-3 rounded-full bg-indigo-400/80" />
+                                            <span className="font-medium">GPU:</span>
+                                            <span className="text-slate-200">{sys.graphics}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <HardDrive className="h-3 w-3 text-slate-400" />
+                                            <span className="font-medium">Storage:</span>
+                                            <span className="text-slate-200">{sys.storage}</span>
+                                        </div>
+                                        {sys.additionalNotes && (
+                                            <p className="pt-1 text-[11px] text-slate-400">
+                                                {sys.additionalNotes}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-slate-400">
+                            System requirements have not been provided for this game yet.
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

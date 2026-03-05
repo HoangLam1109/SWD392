@@ -43,6 +43,10 @@ export class WebWalletService {
     return await this.webWalletRepository.updateById(id, updateWebWalletDto);
   }
 
+  async updateWalletBalance(id: string, balance: number) {
+    return await this.webWalletRepository.updateById(id, { balance });
+  }
+
   async depositBalance(id: string, balance: number) {
     const wallet = await this.findWalletByUserId(id);
     if (wallet) {

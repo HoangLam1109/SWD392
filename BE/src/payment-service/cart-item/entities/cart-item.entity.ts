@@ -3,8 +3,9 @@ import { HydratedDocument } from 'mongoose';
 
 export interface ICartItem {
   cartId: string;
-  gameId: string;
+  productId: string;
   priceAtPurchase: number;
+  discount: number;
 }
 
 export type CartItemDocument = HydratedDocument<ICartItem>;
@@ -19,11 +20,14 @@ export class CartItem {
   @Prop({ required: true, ref: 'Cart' })
   cartId: string;
 
-  @Prop({ required: true, ref: 'Game' })
-  gameId: string;
+  @Prop({ required: true })
+  productId: string;
 
   @Prop({ required: true })
   priceAtPurchase: number;
+
+  @Prop({ required: true })
+  discount: number;
 }
 
 export const CartItemSchema = SchemaFactory.createForClass(CartItem);

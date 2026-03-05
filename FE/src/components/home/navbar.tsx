@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LanguageSwitchButton } from '@/components/common/LanguageSwitchButton';
 import { useLogout } from '@/hooks/auth/useLogout';
+import type { Role } from '@/config/navigation/navigation.types';
+import { getPathbyRole } from '@/utils/role.utils';
 
 interface NavbarProps {
   fixed?: boolean;
@@ -24,6 +26,7 @@ export function Navbar({ fixed }: NavbarProps) {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { logout } = useLogout();
+  const dashboardPath = user?.role ? getPathbyRole(user.role as Role) : '/';
   return (
     <nav className={`z-50 w-full ${fixed ? 'fixed top-0 left-0 right-0' : 'relative'}`}>
       <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -92,7 +95,7 @@ export function Navbar({ fixed }: NavbarProps) {
                       {t('common.profile')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={()=>navigate('/admin')}
+                      onClick={() => navigate(dashboardPath)}
                       className="text-white focus:bg=white/10 focus:text-white cursor-pointer [&_svg]:text-white/90"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
@@ -197,14 +200,17 @@ export function Navbar({ fixed }: NavbarProps) {
                     <User className="w-4 h-4" />
                     {t('common.profile')}
                   </Link>
-                  <Link
-                    to="/admin"
+                  <button
+                    type="button"
                     className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate(dashboardPath);
+                    }}
                   >
                     <LogOut className="w-4 h-4" />
                     {t('common.gotodashboard')}
-                  </Link>
+                  </button>
                 </div>
               ) : (
                 <Button

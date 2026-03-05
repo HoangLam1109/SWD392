@@ -11,7 +11,7 @@ import { RoleRoute } from "./RoleRoute";
 import type { Role } from "@/config/navigation/navigation.types";
 import { useGetCurrentUser } from "@/hooks/auth/useGetCurrentUser";
 import { GameManagementPage } from "@/pages/GameManagementPage";
-
+import { ManagerLayout } from "@/layouts/ManagerLayout";
 const AppRoutes = () => {
     const { data: currentUser } = useGetCurrentUser();
     
@@ -47,6 +47,25 @@ const AppRoutes = () => {
                 >
                     <Route path="user-management" element={<UserManagementPage />} />
                     <Route path="game-management" element={<GameManagementPage/>}/>
+                </Route>
+            </Route>
+            <Route element={<RoleRoute allowRoles={['MODERATOR']} />}>
+                <Route
+                    path="/moderator"
+                    element={
+                        <ManagerLayout
+                            currentUser={currentUser && {
+                                id: currentUser.id,
+                                name: currentUser.fullName,
+                                role: currentUser.role as Role,
+                            }}
+                            onLogout={() => { }}
+                            currentPage={''}
+                            onNavigate={() => { }}
+                        />
+                    }
+                >
+                    <Route path="game-management" element={<GameManagementPage />} />
                 </Route>
             </Route>
         </Routes>
