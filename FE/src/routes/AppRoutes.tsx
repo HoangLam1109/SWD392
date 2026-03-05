@@ -1,6 +1,7 @@
 import HomePage from "@/pages/HomePage";
 import { Routes, Route } from "react-router-dom";
 import Login from "@/auth/page/Login";
+import GoogleCallback from "@/auth/page/GoogleCallback";
 import Temp from "@/auth/page/Temp";
 import RegisterPage from "@/auth/page/Register";
 import ForgotPasswordPage from "@/auth/page/ForgotPasswordPage";
@@ -20,6 +21,7 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="login" element={<Login />} />
+            <Route path="auth/google/callback" element={<GoogleCallback />} />
             <Route path="temp" element={<Temp />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />

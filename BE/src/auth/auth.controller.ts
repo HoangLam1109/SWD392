@@ -12,6 +12,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import type { Response } from 'express';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -109,27 +110,28 @@ export class AuthController {
 
   @Get('oauth/callback')
   @Public()
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   async googleAuthCallback(
     @GetUser() user: any,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
-    const tokens = await this.authService.generateTokens(user);
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
-    return {
-      message: 'Google OAuth login successful',
-      user,
-      tokens,
-    };
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    try {
+      if (!user) {
+        return res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+      }
+
+      const tokens = await this.authService.generateTokens(user);
+      const params = new URLSearchParams({
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        user: JSON.stringify(user),
+      });
+      res.redirect(`${frontendUrl}/auth/google/callback?${params.toString()}`);
+    } catch {
+      res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+    }
   }
 
   @ApiOperation({ summary: 'User refresh token' })
