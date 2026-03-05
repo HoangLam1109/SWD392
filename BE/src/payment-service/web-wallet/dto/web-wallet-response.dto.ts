@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class PaymentResponseDto {
+export class WebWalletResponseDto {
   @ApiProperty({
-    description: 'Payment unique identifier',
+    description: 'Web wallet unique identifier',
     example: '507f1f77bcf86cd799439011',
   })
   _id: string;
@@ -14,31 +14,32 @@ export class PaymentResponseDto {
   userId: string;
 
   @ApiProperty({
-    description: 'Transaction ID',
-    example: '507f1f77bcf86cd799439011',
+    description: 'Current wallet balance',
+    example: 1000.5,
   })
-  transactionId: string;
+  balance: number;
 
   @ApiProperty({
-    description: 'Transaction code',
-    example: 'TXN123456789',
+    description: 'Wallet currency',
+    example: 'USD',
   })
-  transactionCode: string;
+  currency: string;
 
   @ApiProperty({
-    description: 'Payment method',
-    example: 'VNPay',
+    description: 'Wallet status',
+    example: 'ACTIVED',
+    enum: ['ACTIVED', 'INACTIVED'],
   })
-  paymentMethod: string;
+  status: string;
 
   @ApiProperty({
-    description: 'Payment creation date',
+    description: 'Wallet creation date',
     example: '2024-01-01T00:00:00.000Z',
   })
   createdAt: Date;
 
   @ApiProperty({
-    description: 'Payment last update date',
+    description: 'Wallet last update date',
     example: '2024-01-01T00:00:00.000Z',
   })
   updatedAt: Date;
