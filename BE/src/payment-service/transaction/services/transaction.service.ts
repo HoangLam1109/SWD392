@@ -12,6 +12,7 @@ import { PaginationResponseDto } from '../../../common/dto/pagination-response.d
 import { PaginationService } from '../../../common/services/pagination.service';
 import { WebWalletService } from 'src/payment-service/web-wallet/services/web-wallet.service';
 import { TransactionType, TransactionStatus } from '../enum/transaction.enum';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class TransactionService {
@@ -52,6 +53,40 @@ export class TransactionService {
     );
 
     return transaction;
+  }
+
+  async depositToWalletId(userId: string, amount: number) {
+    if (amount == 0) {
+      throw new BadRequestException('Amount deposit must be larger than 0');
+    }
+
+    const wallet = await this.webWalletService.findWalletByUserId(userId);
+    const refId = 'DEPOSIT_' + new mongoose.Types.ObjectId().toString();
+
+    if (!wallet) {
+      throw new NotFoundException('Wallet not found of user');
+    }
+
+    const transaction = await this.create({
+      walletId: wallet.id,
+      refId,
+      balanceBefore: Math.round(wallet.balance * 100) / 100,
+      balanceAfter: Math.round((wallet.balance + amount) * 100) / 100,
+      amount,
+      type: TransactionType.DEPOSIT,
+      status: TransactionStatus.PENDING,
+      description: 'Deposit to wallet ID' + wallet.id,
+    });
+
+    return {
+      _id: transaction._id,
+      walletId: transaction.walletId,
+      balanceAfter: transaction.balanceAfter,
+      balanceBefore: transaction.balanceBefore,
+      amount: transaction.amount,
+      type: transaction.type,
+      status: transaction.status,
+    } as Partial<TransactionDocument>;
   }
 
   async onPaymentSuccess(transaction: Partial<TransactionDocument>) {

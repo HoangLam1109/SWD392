@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
   Query,
   NotFoundException,
 } from '@nestjs/common';
@@ -97,18 +96,15 @@ export class WebWalletController {
   @ApiResponse({
     status: 200,
     description: 'Web wallet found',
+    type: WebWalletResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Web wallet not found',
   })
-  @Get('user/:userId')
-  async findByUserId(@Param('userId') userId: string) {
-    const wallet = await this.webWalletService.findWalletByUserId(userId);
-    if (!wallet) {
-      throw new NotFoundException('Wallet not found for this user');
-    }
-    return wallet;
+  @Get('me')
+  findOneByUserId(@GetUser() user: Partial<{ _id: string }>) {
+    return this.webWalletService.findWalletByUserId(user._id!);
   }
 
   @ApiOperation({ summary: 'Get web wallet by ID' })
@@ -124,39 +120,6 @@ export class WebWalletController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.webWalletService.findWalletById(id);
-  }
-
-  @ApiOperation({ summary: 'Get web wallet by user ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Web wallet found',
-    type: WebWalletResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Web wallet not found',
-  })
-  @Get('me')
-  findOneByUserId(@GetUser() user: Partial<{ _id: string }>) {
-    return this.webWalletService.findWalletByUserId(user._id!);
-  }
-
-  @ApiOperation({ summary: 'Deposit balance to web wallet' })
-  @ApiResponse({
-    status: 200,
-    description: 'Web wallet found',
-    type: WebWalletResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Web wallet not found',
-  })
-  @Post(':id/deposit')
-  depositBalance(@Req() req, @Body() depositDto: { amount: number }) {
-    return this.webWalletService.depositBalance(
-      req.user.userId as string,
-      depositDto.amount,
-    );
   }
 
   @ApiOperation({ summary: 'Update web wallet' })
