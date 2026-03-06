@@ -8,7 +8,6 @@ import { GameList } from '@/components/store/GameList';
 
 
 export default function StorePage() {
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -45,12 +44,16 @@ export default function StorePage() {
         break;
       case 'popular':
       default:
-        games.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
+        games.sort((a, b) => {
+          const dateA = a.releaseDate ? new Date(a.releaseDate).getTime() : 0;
+          const dateB = b.releaseDate ? new Date(b.releaseDate).getTime() : 0;
+          return dateB - dateA;
+        });
         break;
     }
 
     return games;
-  }, [selectedCategory, searchQuery, filters]);
+  }, [searchQuery, filters]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -120,21 +123,19 @@ export default function StorePage() {
                   <div className="hidden sm:flex items-center gap-1 backdrop-blur-xl bg-white/5 border border-white/10 rounded-lg p-1">
                     <button
                       onClick={() => setViewMode('grid')}
-                      className={`p-2 rounded transition-colors ${
-                        viewMode === 'grid'
+                      className={`p-2 rounded transition-colors ${viewMode === 'grid'
                           ? 'bg-blue-500 text-white'
                           : 'text-slate-400 hover:text-white'
-                      }`}
+                        }`}
                     >
                       <Grid3x3 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setViewMode('list')}
-                      className={`p-2 rounded transition-colors ${
-                        viewMode === 'list'
+                      className={`p-2 rounded transition-colors ${viewMode === 'list'
                           ? 'bg-blue-500 text-white'
                           : 'text-slate-400 hover:text-white'
-                      }`}
+                        }`}
                     >
                       <List className="w-4 h-4" />
                     </button>

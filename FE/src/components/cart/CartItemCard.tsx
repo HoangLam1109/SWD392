@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trash2, Tag } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
-import type { CartItem } from './mockCartData';
+import type { CartUIData } from '@/types/Cart.types';
 import { motion } from 'framer-motion';
 
 interface CartItemCardProps {
-  item: CartItem;
-  onQuantityChange: (id: number, quantity: number) => void;
-  onRemove: (id: number) => void;
+  item: CartUIData;
+  onRemove: (id: string) => void;
 }
 
 export function CartItemCard({ item, onRemove }: CartItemCardProps) {
@@ -18,14 +17,12 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
   const handleRemove = () => {
     setIsRemoving(true);
     setTimeout(() => {
-      onRemove(item.id);
+      onRemove(item.gameId);
     }, 300);
   };
 
-  
-
-  const itemTotal = item.price * item.quantity;
-  const originalTotal = item.originalPrice ? item.originalPrice * item.quantity : null;
+  const itemTotal = item.price;
+  const originalTotal = item.originalPrice ? item.originalPrice : null;
 
   return (
     <motion.div
@@ -64,10 +61,10 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
                 </h3>
                 <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
                   <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10">
-                    {item.category}
+                    {item.category || 'Game'}
                   </span>
                   <span>•</span>
-                  <span>{item.developer}</span>
+                  <span>{item.developer || 'Unknown'}</span>
                 </div>
               </div>
               <button
@@ -81,7 +78,7 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-4">
-  
+
 
             {/* Price */}
             <div className="flex items-center gap-3">

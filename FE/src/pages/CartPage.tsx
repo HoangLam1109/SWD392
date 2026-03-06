@@ -1,22 +1,66 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, ArrowLeft, ShoppingBag, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/home';
-import { CartItemCard, CartSummary, mockCartItems, type CartItem } from '@/components/cart';
+import { CartItemCard, CartSummary } from '@/components/cart';
+import type { CartUIData } from '@/types/Cart.types';
+import { cartService } from '@/service/cart.service';
+import { gameService } from '@/service/game.service';
 
 export default function CartPage() {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState<CartItem[]>(mockCartItems);
+  const [cartItems, setCartItems] = useState<CartUIData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleQuantityChange = (id: number, quantity: number) => {
-    setCartItems((items) =>
-      items.map((item) => (item.id === id ? { ...item, quantity } : item))
-    );
+  useEffect(() => {
+    fetchCartData();
+  }, []);
+
+  const fetchCartData = async () => {
+    try {
+      setLoading(true);
+      const cart = await cartService.getCart();
+      if (!cart || !cart._id) {
+        setCartItems([]);
+        return;
+      }
+      const items = await cartService.getCartItems(cart._id);
+
+      const enrichedItems: CartUIData[] = [];
+      for (const item of items) {
+        try {
+          const game = await gameService.getGameById(item.gameId);
+          enrichedItems.push({
+            id: item._id,
+            gameId: item.gameId,
+            title: game.title,
+            coverImage: game.coverImage || "",
+            price: item.priceAtPurchase,
+            originalPrice: game.price,
+            discount: game.discount,
+            category: "Game",
+            developer: game.developer || "Unknown Developer",
+          });
+        } catch (err) {
+          console.error(`Failed to fetch game details for ${item.gameId}`, err);
+        }
+      }
+      setCartItems(enrichedItems);
+    } catch (err) {
+      console.error('Failed to load cart data', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRemoveItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
+  const handleRemoveItem = async (gameId: string) => {
+    try {
+      await cartService.removeFromCart(gameId);
+      setCartItems((items) => items.filter((item) => item.gameId !== gameId));
+    } catch (err) {
+      console.error('Failed to remove item', err);
+    }
   };
 
   const handleCheckout = () => {
@@ -29,11 +73,11 @@ export default function CartPage() {
   };
 
   // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const itemCount = cartItems.length;
   const totalSavings = cartItems.reduce((sum, item) => {
     if (item.originalPrice) {
-      return sum + (item.originalPrice - item.price) * item.quantity;
+      return sum + (item.originalPrice - item.price);
     }
     return sum;
   }, 0);
@@ -88,8 +132,11 @@ export default function CartPage() {
             </div>
           </div>
 
-          {/* Empty Cart State */}
-          {cartItems.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-16 text-slate-400">
+              Loading cart data...
+            </div>
+          ) : cartItems.length === 0 ? (
             <div className="text-center py-16">
               <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-12 max-w-md mx-auto">
                 <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-linear-to-br from-blue-500/20 to-purple-600/20 flex items-center justify-center">
@@ -118,7 +165,6 @@ export default function CartPage() {
                       <motion.div key={item.id} layout>
                         <CartItemCard
                           item={item}
-                          onQuantityChange={handleQuantityChange}
                           onRemove={handleRemoveItem}
                         />
                       </motion.div>
