@@ -26,7 +26,7 @@ export class Transaction {
 
   @Prop({
     required: true,
-    enum: ['DEPOSIT', 'WITHDRAW', 'TRANSFER', 'PAYMENT'],
+    enum: ['DEPOSIT', 'PAYMENT'],
   })
   type: string;
 
