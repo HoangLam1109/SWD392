@@ -13,7 +13,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     @Inject('REFRESH_TOKEN_CONFIG') private refreshTokenConfig: any,
-  ) {}
+  ) { }
 
   async logIn(
     email: string,
@@ -43,6 +43,7 @@ export class AuthService {
           accessToken,
           refreshToken,
           user: {
+            id: user.id,
             email: user.email,
             fullName: user.fullName,
             avatar: user.avatar,
@@ -83,6 +84,7 @@ export class AuthService {
       accessToken,
       refreshToken,
       user: {
+        id: user.id,
         email: user.email,
         fullName: user.fullName,
         avatar: user.avatar,
@@ -107,6 +109,7 @@ export class AuthService {
       return {
         accessToken,
         user: {
+          id: user.id,
           email: user.email,
           fullName: user.fullName,
           avatar: user.avatar,
