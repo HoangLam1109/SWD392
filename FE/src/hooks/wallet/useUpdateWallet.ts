@@ -10,10 +10,7 @@ export const useUpdateWallet = () => {
         mutationFn: ({ id, payload }) => walletService.updateWallet(id, payload),
         onSuccess: (updatedWallet) => {
             queryClient.invalidateQueries({ queryKey: ['web-wallets'] });
-            queryClient.setQueryData(
-                ['web-wallets', updatedWallet.id || updatedWallet.userId],
-                updatedWallet
-            );
+            queryClient.setQueryData(['web-wallets', 'me'], updatedWallet);
             toast.success('Wallet updated successfully');
         },
         onError: (error) => {

@@ -4,6 +4,7 @@ import {useGetWalletByUserId} from "@/hooks/wallet/useGetWalletByUserId";
 import { useCreateWallet } from "@/hooks/wallet/useCreateWallet";
 import { useUpdateWallet } from "@/hooks/wallet/useUpdateWallet";
 import type { CreateWalletDTO, UpdateWalletDTO } from "@/types/Wallet.types";
+import { useTranslation } from "react-i18next";
 
 const defaultForm: CreateWalletDTO = {
     userId: "",
@@ -15,10 +16,10 @@ const defaultForm: CreateWalletDTO = {
 export default function WalletPage() {
     const { data: currentUser, isLoading: isLoadingUser } = useGetCurrentUser();
     const userId = currentUser?._id;
-    const { data: wallet, isLoading: isLoadingWallet } = useGetWalletByUserId(userId);
+    const { data: wallet, isLoading: isLoadingWallet } = useGetWalletByUserId();
     const createMutation = useCreateWallet();
     const updateMutation = useUpdateWallet();
-
+    const {t}= useTranslation();
     const [form, setForm] = useState<CreateWalletDTO>(defaultForm);
 
     useEffect(() => {
@@ -123,7 +124,7 @@ export default function WalletPage() {
                 </h2>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-medium">Amount</label>
+                    <label className="text-sm font-medium">Balance</label>
                     <input
                         type="number"
                         min={0}
