@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -90,6 +91,24 @@ export class WebWalletController {
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
     return this.webWalletService.findAllWithPagination(query);
+  }
+
+  @ApiOperation({ summary: 'Get web wallet by user ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Web wallet found',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Web wallet not found',
+  })
+  @Get('user/:userId')
+  async findByUserId(@Param('userId') userId: string) {
+    const wallet = await this.webWalletService.findWalletByUserId(userId);
+    if (!wallet) {
+      throw new NotFoundException('Wallet not found for this user');
+    }
+    return wallet;
   }
 
   @ApiOperation({ summary: 'Get web wallet by ID' })
