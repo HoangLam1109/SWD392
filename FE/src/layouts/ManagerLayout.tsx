@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useSidebarNavigation } from "../hooks/useSidebarNavigation";
 import { Sidebar } from "../components/common/Sidebar";
-
 import type { Role } from "../config/navigation/navigation.types";
 
 export interface ManagerLayoutProps {

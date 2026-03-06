@@ -4,8 +4,8 @@ export const getPathbyRole = (role: Role): string => {
     switch (role) {
         case "ADMIN":
             return "/admin";
-        case "MODERATOR":
-            return "/moderator";
+        case "MANAGER":
+            return "/manager";
         case "PLAYER":
             return "/";
         default:
