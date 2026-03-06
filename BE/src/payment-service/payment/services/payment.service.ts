@@ -51,15 +51,15 @@ export class PaymentService {
   }
 
   async createDepositVnpayUrl(
-    walletId: string,
+    transactionId: string,
     totalPrice: number,
     ipAddr: string,
   ): Promise<{ redirectUrl: string }> {
     const paymentUrl = vnpay.buildPaymentUrl({
       vnp_Amount: totalPrice || 0,
       vnp_IpAddr: ipAddr || '',
-      vnp_TxnRef: walletId || '',
-      vnp_OrderInfo: `Payment for deposit to ${walletId}`,
+      vnp_TxnRef: transactionId || '',
+      vnp_OrderInfo: `Payment for deposit for transaction ${transactionId}`,
       vnp_OrderType: ProductCode.Other,
       vnp_ReturnUrl: process.env.VNPAY_RETURN_URL!,
       vnp_Locale: VnpLocale.VN,
@@ -90,8 +90,10 @@ export class PaymentService {
     const verify = vnpay.verifyReturnUrl(query);
 
     try {
-      const order = await this.orderService.findOrderById(verify.vnp_TxnRef);
-      if (order) {
+      const order = await this.orderService.findOrderByIdWithoutError(
+        verify.vnp_TxnRef,
+      );
+      if (order && order !== null) {
         if (verify.isSuccess) {
           await this.orderService.onPaymentSuccess(order);
           return { success: true, orderId: order._id };
@@ -100,10 +102,10 @@ export class PaymentService {
           return { success: false, orderId: order._id };
         }
       } else {
-        const transaction = await this.transactionService.findByRefId(
+        const transaction = await this.transactionService.findTransactionById(
           verify.vnp_TxnRef,
         );
-        if (transaction) {
+        if (transaction && transaction !== null) {
           if (verify.isSuccess) {
             await this.transactionService.onPaymentSuccess(transaction);
             return { success: true, walletId: transaction.walletId };

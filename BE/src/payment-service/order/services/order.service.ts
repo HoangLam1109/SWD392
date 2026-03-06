@@ -80,6 +80,11 @@ export class OrderService {
     return order;
   }
 
+  async findOrderByIdWithoutError(id: string): Promise<OrderDocument | null> {
+    const order = await this.orderRepository.findById(id);
+    return order || null;
+  }
+
   async findOrdersByUserId(userId: string): Promise<OrderDocument[]> {
     const orders = await this.orderRepository.findByUserId(userId);
     if (!orders) {
