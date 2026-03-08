@@ -7,7 +7,6 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { PaginationService } from '../../../common/services/pagination.service';
 import { ProductValidationService } from '../../../common/services/productValidation.service';
-import { GameService } from '../../../game-service/game/services/game.service';
 
 @Injectable()
 export class CartItemService {
@@ -15,7 +14,6 @@ export class CartItemService {
     private readonly cartItemRepository: CartItemRepository,
     private readonly paginationService: PaginationService,
     private readonly productValidationService: ProductValidationService,
-    private readonly gameService: GameService,
   ) {}
 
   async createCartItem(
@@ -44,7 +42,7 @@ export class CartItemService {
     cartId: string,
     productId: string,
   ): Promise<CartItemDocument | null> {
-    const product =
+    const { product } =
       await this.productValidationService.validateProductExists(productId);
 
     return await this.cartItemRepository.create({
@@ -55,24 +53,24 @@ export class CartItemService {
     });
   }
 
-  async updateGamePriceById(id: string): Promise<CartItemDocument | null> {
+  async updateProductPriceById(id: string): Promise<CartItemDocument | null> {
     const cartItem = await this.cartItemRepository.findById(id);
     if (!cartItem) {
       throw new NotFoundException('Cart item not found');
     }
-    const game = await this.gameService.findGameById(cartItem.productId);
 
-    if (!game) {
-      throw new NotFoundException('Game not found');
-    }
+    const { product } =
+      await this.productValidationService.validateProductExists(
+        cartItem.productId,
+      );
 
     if (
-      game.price !== cartItem.priceAtPurchase ||
-      game.discount !== cartItem.discount
+      product.price !== cartItem.priceAtPurchase ||
+      product.discount !== cartItem.discount
     ) {
       return await this.cartItemRepository.updateById(id, {
-        priceAtPurchase: game.price,
-        discount: game.discount,
+        priceAtPurchase: product.price,
+        discount: product.discount,
       });
     }
     return cartItem;

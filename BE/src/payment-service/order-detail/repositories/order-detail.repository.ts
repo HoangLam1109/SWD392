@@ -39,7 +39,7 @@ export class OrderDetailRepository implements IOrderDetailRepository {
   ): Promise<OrderDetailDocument | null> {
     return await this.orderDetailModel.findById(
       id,
-      fields || 'orderId productId totalPrice discount orderType',
+      fields || 'orderId productId priceAtPurchase discount orderType',
     );
   }
 
@@ -87,7 +87,7 @@ export class OrderDetailRepository implements IOrderDetailRepository {
 
   async findAll(): Promise<OrderDetailDocument[]> {
     return await this.orderDetailModel
-      .find({}, 'orderId productId totalPrice discount orderType')
+      .find({}, 'orderId productId priceAtPurchase discount orderType')
       .populate('orderId')
       .populate('productId');
   }

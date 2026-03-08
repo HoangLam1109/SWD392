@@ -19,11 +19,11 @@ export class CreateOrderDetailDto {
   productId: string;
 
   @ApiProperty({
-    description: 'Total price',
+    description: 'Price at purchase',
     example: 59.99,
   })
   @IsNumber()
-  totalPrice: number;
+  priceAtPurchase: number;
 
   @ApiProperty({
     description: 'Discount',
