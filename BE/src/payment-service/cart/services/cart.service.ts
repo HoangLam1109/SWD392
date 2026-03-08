@@ -77,7 +77,7 @@ export class CartService {
       throw new NotFoundException('Cart item not found');
     }
     return await this.updateCart(cart._id.toString(), {
-      itemId: [cartItem._id.toString()],
+      itemId: [...cart.itemId, cartItem._id.toString()],
     });
   }
 
@@ -91,13 +91,13 @@ export class CartService {
     const cartItems = await this.cartItemService.findCartItemsByCartId(
       cart._id.toString(),
     );
-    const itemToRemove = cartItems.find((item) => item.productId === productId);
-
-    if (itemToRemove) {
-      await this.cartItemService.deleteCartItem(itemToRemove._id.toString());
-      cart.itemId = cart.itemId.filter(
-        (id) => id !== itemToRemove._id.toString(),
-      );
+    for (const cartItem of cartItems) {
+      if (cartItem.productId === productId) {
+        await this.cartItemService.deleteCartItem(cartItem._id.toString());
+        cart.itemId = cart.itemId.filter(
+          (id) => id !== cartItem._id.toString(),
+        );
+      }
     }
 
     return await this.cartRepository.updateById(cart._id.toString(), {
@@ -163,7 +163,9 @@ export class CartService {
     }
 
     const results = await Promise.allSettled(
-      validIds.map((id) => this.cartItemService.updateGamePriceById(id)),
+      validIds.map((id) =>
+        this.cartItemService.updateProductPriceById(id.toString()),
+      ),
     );
 
     const priceChanged = results.length > 0;

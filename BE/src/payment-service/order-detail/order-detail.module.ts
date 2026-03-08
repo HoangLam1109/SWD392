@@ -9,6 +9,7 @@ import { ProductValidationService } from '../../common/services/productValidatio
 import { GameModule } from 'src/game-service/game/game.module';
 import { CartModule } from 'src/payment-service/cart/cart.module';
 import { CartItemModule } from 'src/payment-service/cart-item/cart-item.module';
+import { GameItemModule } from 'src/game-service/game-item/game-item.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CartItemModule } from 'src/payment-service/cart-item/cart-item.module';
     CartModule,
     CartItemModule,
     GameModule,
+    GameItemModule,
   ],
   controllers: [OrderDetailController],
   providers: [

@@ -4,7 +4,7 @@ import { HydratedDocument } from 'mongoose';
 export interface IOrderDetail {
   orderId?: string;
   productId: string;
-  totalPrice: number;
+  priceAtPurchase: number;
   discount: number;
   orderType: string;
 }
@@ -25,7 +25,7 @@ export class OrderDetail {
   productId: string;
 
   @Prop({ required: true })
-  totalPrice: number;
+  priceAtPurchase: number;
 
   @Prop({ required: true })
   discount: number;

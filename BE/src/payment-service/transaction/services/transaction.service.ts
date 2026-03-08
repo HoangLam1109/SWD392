@@ -10,7 +10,7 @@ import { TransactionDocument } from '../entities/transaction.entity';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { PaginationService } from '../../../common/services/pagination.service';
-import { WebWalletService } from 'src/payment-service/web-wallet/services/web-wallet.service';
+import { WebWalletService } from '../../web-wallet/services/web-wallet.service';
 import { TransactionType, TransactionStatus } from '../enum/transaction.enum';
 import mongoose from 'mongoose';
 
@@ -89,7 +89,9 @@ export class TransactionService {
     } as Partial<TransactionDocument>;
   }
 
-  async onPaymentSuccess(transaction: Partial<TransactionDocument>) {
+  async onPaymentSuccess(
+    transaction: Partial<TransactionDocument>,
+  ): Promise<string> {
     if (!transaction._id) {
       throw new BadRequestException('Transaction ID is required');
     }
@@ -106,6 +108,8 @@ export class TransactionService {
     await this.updateTransaction(transaction._id.toString(), {
       status: TransactionStatus.COMPLETED,
     });
+
+    return wallet.userId;
   }
 
   async onPaymentFail(transaction: Partial<TransactionDocument>) {

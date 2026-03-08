@@ -7,8 +7,8 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { PaginationService } from '../../../common/services/pagination.service';
 import { ProductValidationService } from '../../../common/services/productValidation.service';
-import { CartService } from 'src/payment-service/cart/services/cart.service';
-import { CartItemService } from 'src/payment-service/cart-item/services/cart-item.service';
+import { CartService } from '../../cart/services/cart.service';
+import { CartItemService } from '../../cart-item/services/cart-item.service';
 
 @Injectable()
 export class OrderDetailService {
@@ -31,7 +31,6 @@ export class OrderDetailService {
   ): Promise<{ orderDetails: OrderDetailDocument[]; totalPrice: number }> {
     const cartItems = await this.cartService.getAllCartItemsFromUserId(userId);
     if (!cartItems || !cartItems.itemId.length) {
-      console.log(cartItems);
       throw new NotFoundException('Cart items not found');
     }
 
@@ -42,16 +41,17 @@ export class OrderDetailService {
     );
 
     for (const cartItem of cartItemDocuments) {
-      await this.productValidationService.validateProductExists(
-        cartItem.productId,
-      );
+      const { type } =
+        await this.productValidationService.validateProductExists(
+          cartItem.productId,
+        );
 
       const orderDetailData = {
         orderId: '',
         productId: cartItem.productId,
-        totalPrice: cartItem.priceAtPurchase,
+        priceAtPurchase: cartItem.priceAtPurchase,
         discount: cartItem.discount,
-        orderType: 'Game',
+        orderType: type === 'game' ? 'Game' : 'DLC',
       };
 
       const orderDetail =

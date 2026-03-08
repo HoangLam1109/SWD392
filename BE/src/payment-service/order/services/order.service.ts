@@ -10,10 +10,10 @@ import { OrderDocument } from '../entities/order.entity';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { PaginationService } from '../../../common/services/pagination.service';
-import { TransactionService } from 'src/payment-service/transaction/services/transaction.service';
-import { OrderDetailService } from 'src/payment-service/order-detail/services/order-detail.service';
-import { CartService } from 'src/payment-service/cart/services/cart.service';
-import { TransactionStatus } from 'src/payment-service/transaction/enum/transaction.enum';
+import { TransactionService } from '../../transaction/services/transaction.service';
+import { OrderDetailService } from '../../order-detail/services/order-detail.service';
+import { CartService } from '../../cart/services/cart.service';
+import { TransactionStatus } from '../../transaction/enum/transaction.enum';
 import { PaymentStatus } from '../enum/status.enum';
 
 @Injectable()
@@ -80,7 +80,7 @@ export class OrderService {
     return order;
   }
 
-  async findOrderByIdWithoutError(id: string): Promise<OrderDocument | null> {
+  async interalFindOrderById(id: string): Promise<OrderDocument | null> {
     const order = await this.orderRepository.findById(id);
     return order || null;
   }

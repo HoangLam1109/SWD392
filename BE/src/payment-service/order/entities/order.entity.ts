@@ -34,6 +34,7 @@ export class Order {
 
   @Prop({
     required: true,
+    type: String,
     enum: PaymentStatus,
   })
   paymentStatus: PaymentStatus;
