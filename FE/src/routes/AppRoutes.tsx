@@ -6,7 +6,7 @@ import RegisterPage from "@/auth/page/Register";
 import ForgotPasswordPage from "@/auth/page/ForgotPasswordPage";
 import ProfilePage from "@/pages/ProfilePage";
 import { AdminLayout } from "@/layouts/AdminLayout";
-import { LibraryPage, UserManagementPage, StorePage, GameDetailPage, CartPage } from "@/pages";
+import { LibraryPage, UserManagementPage, StorePage, GameDetailPage, CartPage, WalletPage } from "@/pages";
 import { RoleRoute } from "./RoleRoute";
 import type { Role } from "@/config/navigation/navigation.types";
 import { useGetCurrentUser } from "@/hooks/auth/useGetCurrentUser";
@@ -28,17 +28,18 @@ const AppRoutes = () => {
             <Route path="/store/:gameId" element={<GameDetailPage />} />
             <Route path="/library" element={<LibraryPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/wallet" element={<WalletPage />} />
             {/* ADMIN routes */}
             <Route element={<RoleRoute allowRoles={['ADMIN']} />}>
                 <Route
                     path="/admin"
                     element={
                         <AdminLayout
-                            currentUser={currentUser && {
-                                id: currentUser.id,
+                            currentUser={currentUser && currentUser._id ? {
+                                id: currentUser._id,
                                 name: currentUser.fullName,
                                 role: currentUser.role as Role,
-                            }}
+                            } : undefined}
                             onLogout={() => { }}
                             currentPage={''}
                             onNavigate={() => { }}
@@ -49,16 +50,16 @@ const AppRoutes = () => {
                     <Route path="game-management" element={<GameManagementPage/>}/>
                 </Route>
             </Route>
-            <Route element={<RoleRoute allowRoles={['MODERATOR']} />}>
+            <Route element={<RoleRoute allowRoles={['MANAGER']} />}>
                 <Route
-                    path="/moderator"
+                    path="/manager"
                     element={
                         <ManagerLayout
-                            currentUser={currentUser && {
-                                id: currentUser.id,
+                            currentUser={currentUser && currentUser._id ? {
+                                id: currentUser._id,
                                 name: currentUser.fullName,
                                 role: currentUser.role as Role,
-                            }}
+                            } : undefined}
                             onLogout={() => { }}
                             currentPage={''}
                             onNavigate={() => { }}
