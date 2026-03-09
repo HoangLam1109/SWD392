@@ -1,11 +1,13 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Building2, ExternalLink, Cpu, HardDrive } from 'lucide-react';
+import { ArrowLeft, Calendar, Building2, ExternalLink, Cpu, HardDrive, ShoppingCart, Check } from 'lucide-react';
 import { Navbar } from '@/components/home';
 import { useGetGameById } from '@/hooks/game/useGetGamebyId';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { getImageUrl } from '@/lib/imageUtils';
 import { Button } from '@/components/ui/button';
 import { useGetSystemsByGameId } from '@/hooks/system/useGetSystemsByGameId';
+import { useAddGameToCart } from '@/hooks/cart/useAddGameToCart';
+import { useIsGameInCart } from '@/hooks/cart/useIsGameInCart';
 
 function formatPrice(price: number) {
     return new Intl.NumberFormat('en-US', {
@@ -38,6 +40,20 @@ export default function GameDetailPage() {
         isLoading: isLoadingSystems,
         error: systemsError,
     } = useGetSystemsByGameId(gameId);
+    
+    // Cart functionality
+    const { isInCart } = useIsGameInCart(gameId);
+    const addToCartMutation = useAddGameToCart();
+
+    const handleAddToCart = async () => {
+        if (!gameId) return;
+        
+        try {
+            await addToCartMutation.mutateAsync(gameId);
+        } catch (error) {
+            console.error('Failed to add game to cart:', error);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -239,10 +255,42 @@ export default function GameDetailPage() {
                         <div className="pt-4">
                             <Button
                                 size="lg"
-                                className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-medium"
+                                onClick={handleAddToCart}
+                                disabled={addToCartMutation.isPending || isInCart}
+                                className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Add to Cart
+                                {addToCartMutation.isPending ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                                        Adding...
+                                    </>
+                                ) : isInCart ? (
+                                    <>
+                                        <Check className="w-5 h-5 mr-2" />
+                                        Added to Cart
+                                    </>
+                                ) : (
+                                    <>
+                                        <ShoppingCart className="w-5 h-5 mr-2" />
+                                        Add to Cart
+                                    </>
+                                )}
                             </Button>
+                            {addToCartMutation.isError && (
+                                <p className="text-red-400 text-sm mt-2">
+                                    {addToCartMutation.error instanceof Error 
+                                        ? addToCartMutation.error.message 
+                                        : 'Failed to add game to cart. Please try again.'}
+                                </p>
+                            )}
+                            {isInCart && (
+                                <Link
+                                    to="/cart"
+                                    className="inline-block mt-3 text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                                >
+                                    View Cart →
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>
