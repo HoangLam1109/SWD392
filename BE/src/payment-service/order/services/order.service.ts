@@ -101,7 +101,7 @@ export class OrderService {
       throw new NotFoundException('Orders not found for this user');
     }
     return orders.filter(
-      (order) => order.paymentStatus !== PaymentStatus.COMPLETED,
+      (order) => order.paymentStatus === PaymentStatus.PENDING,
     );
   }
 
