@@ -116,10 +116,12 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] bg-slate-900 text-slate-50 border border-slate-700">
                 <DialogHeader>
-                    <DialogTitle>{isEditMode ? 'Edit User' : 'Add New User'}</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-slate-50">
+                        {isEditMode ? 'Edit User' : 'Add New User'}
+                    </DialogTitle>
+                    <DialogDescription className="text-slate-400">
                         {isEditMode
                             ? 'Update user information.'
                             : 'Fill in the information to create a new user account.'}
@@ -136,7 +138,9 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                                 id="firstName"
                                 {...register('firstName')}
                                 placeholder="John"
-                                className={errors.firstName ? 'border-red-500' : ''}
+                                className={`bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500 ${
+                                    errors.firstName ? 'border-red-500' : ''
+                                }`}
                             />
                             {errors.firstName && (
                                 <p className="text-sm text-red-500">{errors.firstName.message}</p>
@@ -151,7 +155,9 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                                 id="lastName"
                                 {...register('lastName')}
                                 placeholder="Doe"
-                                className={errors.lastName ? 'border-red-500' : ''}
+                                className={`bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500 ${
+                                    errors.lastName ? 'border-red-500' : ''
+                                }`}
                             />
                             {errors.lastName && (
                                 <p className="text-sm text-red-500">{errors.lastName.message}</p>
@@ -168,7 +174,9 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                             type="email"
                             {...register('email')}
                             placeholder="john.doe@example.com"
-                            className={errors.email ? 'border-red-500' : ''}
+                            className={`bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500 ${
+                                errors.email ? 'border-red-500' : ''
+                            }`}
                         />
                         {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
                     </div>
@@ -181,7 +189,11 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                             value={accountType}
                             onValueChange={(value) => setValue('accountType', value as any)}
                         >
-                            <SelectTrigger className={errors.accountType ? 'border-red-500' : ''}>
+                            <SelectTrigger
+                                className={`bg-slate-900/60 border-slate-700 text-slate-50 ${
+                                    errors.accountType ? 'border-red-500' : ''
+                                }`}
+                            >
                                 <SelectValue placeholder="Select account type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -202,6 +214,7 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                                 id="primaryPhone"
                                 {...register('primaryPhone')}
                                 placeholder="+1234567890"
+                                className="bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500"
                             />
                         </div>
 
@@ -211,6 +224,7 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                                 id="secondaryPhone"
                                 {...register('secondaryPhone')}
                                 placeholder="+1234567891"
+                                className="bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500"
                             />
                         </div>
                     </div>
@@ -221,6 +235,7 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                             variant="outline"
                             onClick={() => onOpenChange(false)}
                             disabled={isLoading}
+                            className="border-slate-600 text-slate-200 hover:bg-slate-800"
                         >
                             Cancel
                         </Button>

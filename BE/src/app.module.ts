@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ProfileModule } from './user-service/profile/profile.module';
 import { GameModule } from './game-service/game/game.module';
+import { GameItemModule } from './game-service/game-item/game-item.module';
 import { BlogModule } from './blog-service/blog/blog.module';
 import { CommentModule } from './blog-service/comment/comment.module';
 import { CategoryModule } from './game-service/category/category.module';
@@ -14,6 +15,8 @@ import { WebWalletModule } from './payment-service/web-wallet/web-wallet.module'
 import { TransactionModule } from './payment-service/transaction/transaction.module';
 import { CartModule } from './payment-service/cart/cart.module';
 import { CartItemModule } from './payment-service/cart-item/cart-item.module';
+import { OrderModule } from './payment-service/order/order.module';
+import { OrderDetailModule } from './payment-service/order-detail/order-detail.module';
 
 @Module({
   imports: [
@@ -61,6 +64,7 @@ import { CartItemModule } from './payment-service/cart-item/cart-item.module';
     AuthModule,
     ProfileModule,
     GameModule,
+    GameItemModule,
     CommentModule,
     BlogModule,
     CategoryModule,
@@ -70,6 +74,8 @@ import { CartItemModule } from './payment-service/cart-item/cart-item.module';
     TransactionModule,
     CartModule,
     CartItemModule,
+    OrderModule,
+    OrderDetailModule,
   ],
 })
 export class AppModule {}

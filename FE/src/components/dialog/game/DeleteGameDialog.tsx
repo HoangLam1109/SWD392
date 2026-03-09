@@ -33,16 +33,21 @@ export function DeleteGameDialog({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent>
+            <AlertDialogContent className="bg-slate-900 text-slate-50 border border-slate-700">
                 <AlertDialogHeader>
                     <AlertDialogTitle>Delete game?</AlertDialogTitle>
                     <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete the game{' '}
-                        <span className="font-semibold text-gray-900">{game?.title}</span>.
+                        <span className="font-semibold text-slate-50">{game?.title}</span>.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel
+                        disabled={isLoading}
+                        className="bg-slate-800 text-slate-50 border-slate-600 hover:bg-slate-700"
+                    >
+                        Cancel
+                    </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleConfirm}
                         disabled={isLoading}

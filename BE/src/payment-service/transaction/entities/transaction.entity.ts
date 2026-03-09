@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export interface ITransaction {
   walletId: string;
-  transType: string;
+  type: string;
   amount: number;
   balanceBefore: number;
   balanceAfter: number;
@@ -26,9 +26,9 @@ export class Transaction {
 
   @Prop({
     required: true,
-    enum: ['DEPOSIT', 'WITHDRAW', 'TRANSFER', 'PAYMENT'],
+    enum: ['DEPOSIT', 'PAYMENT'],
   })
-  transType: string;
+  type: string;
 
   @Prop({ required: true })
   amount: number;

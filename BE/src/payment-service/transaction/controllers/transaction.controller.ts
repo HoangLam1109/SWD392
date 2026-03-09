@@ -20,6 +20,9 @@ import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { UpdateTransactionDto } from '../dto/update-transaction.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { TransactionResponseDto } from '../dto/transaction-response.dto';
+import { CreateDepositDto } from '../dto/create-deposit.dto';
+import { GetUser } from 'src/common/decorators/info.decorator';
 
 @ApiBearerAuth()
 @ApiTags('transactions')
@@ -31,6 +34,7 @@ export class TransactionController {
   @ApiResponse({
     status: 201,
     description: 'Transaction created successfully',
+    type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -81,7 +85,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'List of all transactions with pagination',
-    type: PaginationResponseDto,
+    type: PaginationResponseDto<TransactionResponseDto>,
   })
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
@@ -92,6 +96,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'Transaction found',
+    type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -106,6 +111,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'Transaction found',
+    type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -120,6 +126,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'Transactions found',
+    type: TransactionResponseDto,
   })
   @Get('wallet/:walletId')
   findByWalletId(@Param('walletId') walletId: string) {
@@ -130,6 +137,7 @@ export class TransactionController {
   @ApiResponse({
     status: 200,
     description: 'Transaction updated successfully',
+    type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 404,
@@ -155,5 +163,26 @@ export class TransactionController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.transactionService.deleteTransaction(id);
+  }
+
+  @ApiOperation({ summary: 'Deposit to wallet ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction created successfully',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Wallet not found',
+  })
+  @Post('deposit')
+  deposit(
+    @GetUser() user: Partial<{ _id: string }>,
+    @Body() createDepositDto: CreateDepositDto,
+  ) {
+    return this.transactionService.depositToWalletId(
+      user._id!,
+      createDepositDto.amount,
+    );
   }
 }

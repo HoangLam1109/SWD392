@@ -26,6 +26,10 @@ export class GameService {
     return await this.gameRepository.findById(id);
   }
 
+  async findGamesByIds(ids: string[]) {
+    return await this.gameRepository.findByIds(ids);
+  }
+
   async findByPrice(price: number) {
     return await this.gameRepository.findByPrice(price);
   }

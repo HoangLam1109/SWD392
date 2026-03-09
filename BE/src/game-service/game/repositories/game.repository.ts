@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 export interface IGameRepository {
   findById(id: string, fields?: string): Promise<GameDocument | null>;
+  findByIds(ids: string[]): Promise<GameDocument[]>;
   getGameBasicInfo(
     id: string,
   ): Promise<{ title: string; price: number; isActive: boolean } | null>;
@@ -38,6 +39,10 @@ export class GameRepository implements IGameRepository {
       fields ||
         '_id title price discount isActive description developer publisher thumbnail coverImage releaseDate url',
     );
+  }
+
+  async findByIds(ids: string[]): Promise<GameDocument[]> {
+    return await this.gameModel.find({ _id: { $in: ids } });
   }
 
   async getGameBasicInfo(

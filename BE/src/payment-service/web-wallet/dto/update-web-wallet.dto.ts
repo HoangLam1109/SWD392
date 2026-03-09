@@ -8,7 +8,7 @@ export class UpdateWebWalletDto {
   })
   @IsOptional()
   @IsNumber()
-  amount?: number;
+  balance?: number;
 
   @ApiPropertyOptional({
     description: 'Currency',
