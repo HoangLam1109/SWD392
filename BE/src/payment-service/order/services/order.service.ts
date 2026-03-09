@@ -15,6 +15,7 @@ import { OrderDetailService } from '../../order-detail/services/order-detail.ser
 import { CartService } from '../../cart/services/cart.service';
 import { TransactionStatus } from '../../transaction/enum/transaction.enum';
 import { PaymentStatus } from '../enum/status.enum';
+import { UserGameItemService } from '../../../game-service/user-game-item/services/user-game-item.service';
 
 @Injectable()
 export class OrderService {
@@ -24,6 +25,7 @@ export class OrderService {
     private readonly transactionService: TransactionService,
     private readonly orderDetailService: OrderDetailService,
     private readonly cartService: CartService,
+    private readonly userGameItemService: UserGameItemService,
   ) {}
 
   async createOrder(
@@ -160,6 +162,20 @@ export class OrderService {
       paymentStatus: PaymentStatus.COMPLETED,
       completedAt: new Date(),
     });
+
+    const orderDetails =
+      await this.orderDetailService.findOrderDetailsByOrderId(foundOrder.id);
+
+    for (const orderDetail of orderDetails) {
+      if (orderDetail.orderType === 'DLC') {
+        await this.userGameItemService.create({
+          userId: foundOrder.userId,
+          itemId: orderDetail.productId,
+          isEquipped: false,
+          quantity: 1,
+        });
+      }
+    }
 
     const cart = await this.cartService.findCartByUserId(
       order.userId as string,
