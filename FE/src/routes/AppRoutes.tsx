@@ -6,7 +6,7 @@ import RegisterPage from "@/auth/page/Register";
 import ForgotPasswordPage from "@/auth/page/ForgotPasswordPage";
 import ProfilePage from "@/pages/ProfilePage";
 import { AdminLayout } from "@/layouts/AdminLayout";
-import { LibraryPage, UserManagementPage, StorePage, GameDetailPage, CartPage, WalletPage, PaymentCheckoutPage } from "@/pages";
+import { LibraryPage, UserManagementPage, StorePage, GameDetailPage, CartPage, WalletPage, PaymentCheckoutPage, PaymentSuccessPage } from "@/pages";
 import { RoleRoute } from "./RoleRoute";
 import type { Role } from "@/config/navigation/navigation.types";
 import { useGetCurrentUser } from "@/hooks/auth/useGetCurrentUser";
@@ -30,6 +30,7 @@ const AppRoutes = () => {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/wallet" element={<WalletPage />} />
             <Route path="/payment/checkout/:orderId" element={<PaymentCheckoutPage />} />
+            <Route path="/payment/success" element={<PaymentSuccessPage />} />
             {/* ADMIN routes */}
             <Route element={<RoleRoute allowRoles={['ADMIN']} />}>
                 <Route
