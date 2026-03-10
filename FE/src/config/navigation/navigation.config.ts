@@ -1,5 +1,5 @@
 import type { NavigationItem } from "./navigation.types";
-import { Users, Gamepad2, Monitor } from "lucide-react";
+import { Users, Gamepad2, FileText } from "lucide-react";
 
 
 
@@ -21,6 +21,14 @@ export const navigationConfig: NavigationItem[] = [
         roles: ["ADMIN"],
         path: "/admin/game-management",
     },
+    {
+        id: "blog-moderation",
+        label: "Blog Moderation",
+        path: "/admin/blogs",
+        icon: FileText,
+        roles: ["ADMIN"]
+    },
+
     // Manager / Moderator navigation
     {
         id: "game-management-moderator",
@@ -29,5 +37,5 @@ export const navigationConfig: NavigationItem[] = [
         roles: ["MODERATOR"],
         path: "/moderator/game-management",
     },
-    
+
 ];

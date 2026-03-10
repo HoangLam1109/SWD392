@@ -4,9 +4,9 @@ import { Gamepad2, ShoppingBag, Library, Users, HelpCircle, Facebook, Twitter, I
 export function Footer() {
   const { t } = useTranslation();
   const quickLinks = [
-    { nameKey: 'home.footer.store', icon: ShoppingBag, href: '#' },
-    { nameKey: 'home.footer.library', icon: Library, href: '#' },
-    { nameKey: 'home.footer.community', icon: Users, href: '#' },
+    { nameKey: 'home.footer.store', icon: ShoppingBag, href: '/store' },
+    { nameKey: 'home.footer.library', icon: Library, href: '/library' },
+    { nameKey: 'home.footer.community', icon: Users, href: '/community' },
     { nameKey: 'home.footer.support', icon: HelpCircle, href: '#' },
   ];
 
