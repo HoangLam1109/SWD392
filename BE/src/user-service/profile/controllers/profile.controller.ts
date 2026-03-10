@@ -1,4 +1,12 @@
-import { Controller, Get, Body, Put, Param, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Put,
+  Param,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -12,11 +20,11 @@ import { GetUser } from '../../../common/decorators/info.decorator';
 import { AuthGuard } from '../../../auth/guards/auth.guard';
 
 @ApiBearerAuth()
-@ApiTags('profiles')
+@ApiTags('Profiles')
 @UseGuards(AuthGuard)
 @Controller('profiles')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) { }
+  constructor(private readonly profileService: ProfileService) {}
 
   @ApiOperation({ summary: 'Get profile by user ID' })
   @ApiResponse({

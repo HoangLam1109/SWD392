@@ -1,6 +1,6 @@
 export const UserRole = {
     PLAYER: 'Player',
-    MANAGER: 'Manager',
+    MANAGER: 'Moderator',
     ADMIN: 'Admin',
 } as const;
 

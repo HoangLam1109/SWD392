@@ -23,7 +23,7 @@ import { OrderResponseDto } from '../dto/order-response.dto';
 import { GetUser } from 'src/common/decorators/info.decorator';
 
 @ApiBearerAuth()
-@ApiTags('orders')
+@ApiTags('Orders')
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}

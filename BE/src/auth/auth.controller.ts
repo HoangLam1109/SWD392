@@ -21,7 +21,7 @@ import { GetUser } from 'src/common/decorators/info.decorator';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { PayloadDto } from './dto/payload.dto';
 
-@ApiTags('auth')
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

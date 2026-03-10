@@ -8,7 +8,6 @@ import { PaginationService } from 'src/common/services/pagination.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionModule } from '../transaction/transaction.module';
 import { CartModule } from '../cart/cart.module';
-import { UserGameItemModule } from '../../game-service/user-game-item/user-game-item.module';
 
 @Module({
   imports: [
@@ -19,7 +18,6 @@ import { UserGameItemModule } from '../../game-service/user-game-item/user-game-
     OrderDetailModule,
     TransactionModule,
     CartModule,
-    UserGameItemModule,
   ],
   controllers: [OrderController],
   providers: [OrderService, OrderRepository, PaginationService],

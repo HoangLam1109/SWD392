@@ -5,7 +5,6 @@ export interface IGame {
   title: string;
   price: number;
   isActive: boolean;
-  gameKey: string;
   description?: string;
   thumbnail?: string;
   coverImage?: string;
@@ -33,9 +32,6 @@ export class Game {
 
   @Prop({ default: true })
   isActive: boolean;
-
-  @Prop({ required: true })
-  gameKey: string;
 
   @Prop()
   description?: string;
