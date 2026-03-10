@@ -36,10 +36,10 @@ export class OrderService {
   }
 
   async checkout(userId: string): Promise<Partial<OrderDocument>> {
-    const existing = await this.findNotCompletedOrdersByUserId(userId);
+    const existing = await this.findPendingOrdersByUserId(userId);
     if (existing && existing.length > 0) {
       throw new BadRequestException(
-        'Order already exists. Please complete the existing order first.',
+        'Pending order still exists. Please complete the existing order first.',
       );
     }
 
@@ -95,7 +95,7 @@ export class OrderService {
     return orders;
   }
 
-  async findNotCompletedOrdersByUserId(
+  async findPendingOrdersByUserId(
     userId: string,
   ): Promise<OrderDocument[]> {
     const orders = await this.orderRepository.findByUserId(userId);
