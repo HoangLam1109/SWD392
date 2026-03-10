@@ -18,6 +18,7 @@ import { CartModule } from './payment-service/cart/cart.module';
 import { CartItemModule } from './payment-service/cart-item/cart-item.module';
 import { OrderModule } from './payment-service/order/order.module';
 import { OrderDetailModule } from './payment-service/order-detail/order-detail.module';
+import { GameKeyModule } from './game-service/game-key/game-key.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { OrderDetailModule } from './payment-service/order-detail/order-detail.m
     AuthModule,
     ProfileModule,
     GameModule,
+    GameKeyModule,
     UserGameItemModule,
     GameItemModule,
     CommentModule,

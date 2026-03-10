@@ -10,6 +10,7 @@ import { GameModule } from 'src/game-service/game/game.module';
 import { CartModule } from 'src/payment-service/cart/cart.module';
 import { CartItemModule } from 'src/payment-service/cart-item/cart-item.module';
 import { GameItemModule } from 'src/game-service/game-item/game-item.module';
+import { UserGameItemModule } from 'src/game-service/user-game-item/user-game-item.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { GameItemModule } from 'src/game-service/game-item/game-item.module';
     CartItemModule,
     GameModule,
     GameItemModule,
+    UserGameItemModule,
   ],
   controllers: [OrderDetailController],
   providers: [

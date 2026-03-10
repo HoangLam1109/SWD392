@@ -6,16 +6,20 @@ import { GameDocument } from '../entities/game.entity';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { PaginationService } from '../../../common/services/pagination.service';
+import { GameKeyService } from '../../game-key/services/game-key.service';
 
 @Injectable()
 export class GameService {
   constructor(
     private readonly gameRepository: GameRepository,
     private readonly paginationService: PaginationService,
+    private readonly gameKeyService: GameKeyService,
   ) {}
 
   async createGame(createGameDto: CreateGameDto) {
-    return await this.gameRepository.create(createGameDto);
+    const game = await this.gameRepository.create(createGameDto);
+    await this.gameKeyService.generateKeys(game._id.toString(), 10);
+    return game;
   }
 
   async findGameByReleaseDate(releaseDate: Date) {

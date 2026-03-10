@@ -22,7 +22,7 @@ import { PaginationResponseDto } from '../../../common/dto/pagination-response.d
 import { GetUser } from '../../../common/decorators/info.decorator';
 
 @ApiBearerAuth()
-@ApiTags('carts')
+@ApiTags('Carts')
 @Controller('carts')
 export class CartController {
   constructor(private readonly cartService: CartService) {}

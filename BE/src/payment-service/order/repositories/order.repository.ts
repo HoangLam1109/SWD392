@@ -12,6 +12,10 @@ export interface IOrderRepository {
     id: string,
     orderData: Partial<IOrder>,
   ): Promise<OrderDocument | null>;
+  updateManyById(
+    ids: string[],
+    orderData: Partial<IOrder>,
+  ): Promise<OrderDocument[]>;
   deleteById(id: string): Promise<OrderDocument | null>;
   deleteManyByUserId(userId: string): Promise<void>;
   findAll(): Promise<OrderDocument[]>;
@@ -66,6 +70,18 @@ export class OrderRepository implements IOrderRepository {
       .findByIdAndUpdate(id, orderData, { new: true })
       .orFail(new NotFoundException('Order not found'))
       .exec();
+  }
+
+  async updateManyById(
+    ids: string[],
+    orderData: Partial<IOrder>,
+  ): Promise<OrderDocument[]> {
+    await this.orderModel.updateMany(
+      { _id: { $in: ids } },
+      { $set: orderData },
+    );
+
+    return await this.orderModel.find({ _id: { $in: ids } });
   }
 
   async deleteById(id: string): Promise<OrderDocument | null> {

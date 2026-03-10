@@ -27,7 +27,7 @@ import { UserRole } from 'src/user-service/user/enum/user.enum';
 import { UserDocument } from '../entities/user.entity';
 
 @ApiBearerAuth()
-@ApiTags('users')
+@ApiTags('Users')
 @Role(UserRole.ADMIN)
 @Controller('users')
 export class UserController {

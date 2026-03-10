@@ -15,17 +15,15 @@ import { OrderDetailService } from '../../order-detail/services/order-detail.ser
 import { CartService } from '../../cart/services/cart.service';
 import { TransactionStatus } from '../../transaction/enum/transaction.enum';
 import { PaymentStatus } from '../enum/status.enum';
-import { UserGameItemService } from '../../../game-service/user-game-item/services/user-game-item.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly paginationService: PaginationService,
+    private readonly cartService: CartService,
     private readonly transactionService: TransactionService,
     private readonly orderDetailService: OrderDetailService,
-    private readonly cartService: CartService,
-    private readonly userGameItemService: UserGameItemService,
   ) {}
 
   async createOrder(
@@ -35,13 +33,8 @@ export class OrderService {
     return await this.orderRepository.create({ ...createOrderDto, userId });
   }
 
-  async checkout(userId: string): Promise<Partial<OrderDocument>> {
-    const existing = await this.findNotCompletedOrdersByUserId(userId);
-    if (existing && existing.length > 0) {
-      throw new BadRequestException(
-        'Order already exists. Please complete the existing order first.',
-      );
-    }
+  async checkout(userId: string): Promise<Partial<OrderDocument> | null> {
+    await this.findAndCancelPendingOrdersByUserId(userId);
 
     const { orderDetails, totalPrice } =
       await this.orderDetailService.convertItemsToOrderDetails(userId);
@@ -60,6 +53,25 @@ export class OrderService {
     for (const orderDetail of orderDetails) {
       await this.orderDetailService.updateOrderDetail(orderDetail.id, {
         orderId: order.id,
+      });
+    }
+
+    if (await this.transactionService.checkUserBalance(userId, totalPrice)) {
+      const transaction = await this.transactionService.purchaseWithUserId(
+        userId,
+        order.id,
+        totalPrice,
+      );
+
+      await this.orderDetailService.convertOrderDetailsToGameItems(
+        order.id,
+        userId,
+      );
+
+      return await this.updateOrder(order.id, {
+        walletTransactionId: transaction.id,
+        paymentStatus: PaymentStatus.COMPLETED,
+        completedAt: new Date(),
       });
     }
 
@@ -95,15 +107,21 @@ export class OrderService {
     return orders;
   }
 
-  async findNotCompletedOrdersByUserId(
+  async findAndCancelPendingOrdersByUserId(
     userId: string,
   ): Promise<OrderDocument[]> {
     const orders = await this.orderRepository.findByUserId(userId);
     if (!orders) {
       throw new NotFoundException('Orders not found for this user');
     }
-    return orders.filter(
+    const pending = orders.filter(
       (order) => order.paymentStatus === PaymentStatus.PENDING,
+    );
+    return this.orderRepository.updateManyById(
+      pending.map((order) => order._id.toString()),
+      {
+        paymentStatus: PaymentStatus.CANCELLED,
+      },
     );
   }
 
@@ -147,11 +165,13 @@ export class OrderService {
       throw new NotFoundException('Order not found for current transaction');
     }
 
-    const transaction = await this.transactionService.purchaseWithUserId(
-      foundOrder.userId,
+    const transaction = await this.transactionService.findByRefId(
       foundOrder.id,
-      foundOrder.totalPrice,
     );
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found for current order');
+    }
 
     await this.transactionService.updateTransaction(transaction.id, {
       status: TransactionStatus.COMPLETED,
@@ -163,20 +183,10 @@ export class OrderService {
       completedAt: new Date(),
     });
 
-    const orderDetails =
-      await this.orderDetailService.findOrderDetailsByOrderId(foundOrder.id);
-
-    for (const orderDetail of orderDetails) {
-      if (orderDetail.orderType === 'DLC') {
-        await this.userGameItemService.create({
-          userId: foundOrder.userId,
-          itemId: orderDetail.productId,
-          isEquipped: false,
-          quantity: 1,
-        });
-      }
-    }
-
+    await this.orderDetailService.convertOrderDetailsToGameItems(
+      foundOrder.id,
+      order.userId as string,
+    );
     const cart = await this.cartService.findCartByUserId(
       order.userId as string,
     );

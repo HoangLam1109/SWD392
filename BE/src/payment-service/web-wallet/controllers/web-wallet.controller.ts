@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   Query,
-  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -25,7 +24,7 @@ import { GetUser } from 'src/common/decorators/info.decorator';
 import { WebWalletResponseDto } from '../dto/web-wallet-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('web-wallets')
+@ApiTags('Web Wallets')
 @Controller('web-wallets')
 export class WebWalletController {
   constructor(private readonly webWalletService: WebWalletService) {}
