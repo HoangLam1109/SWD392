@@ -5,12 +5,14 @@ import { Navbar } from '@/components/home';
 import { CartItemCard, CartSummary } from '@/components/cart';
 import { useGetMyCartWithItems } from '@/hooks/cart/useGetMyCartWithItems';
 import { useRemoveGameFromCart } from '@/hooks/cart/useRemoveGameFromCart';
+import { useCheckoutOrder } from '@/hooks/order/useCheckoutOrder';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CartPage() {
   const navigate = useNavigate();
   const { data, isLoading, error } = useGetMyCartWithItems();
   const removeGameMutation = useRemoveGameFromCart();
+  const checkoutOrderMutation = useCheckoutOrder();
 
   const cartItems = data?.items || [];
 
@@ -23,8 +25,12 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    // Navigate to checkout page (to be implemented)
-    alert('Proceeding to checkout...');
+    checkoutOrderMutation.mutate(undefined, {
+      onSuccess: (order: any) => {
+        console.log('order', order);
+        navigate(`/payment/checkout/${order._id}`, { state: { order } });
+      },
+    });
   };
 
   const handleContinueShopping = () => {
