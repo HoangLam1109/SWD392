@@ -45,7 +45,7 @@ export function Sidebar({
                                 <Gamepad2 className="h-5 w-5 sm:h-6 sm:w-6 text-violet-400" />
                             </div>
                             <span className="font-bold text-sm sm:text-base text-slate-50">
-                                Manager
+                                {currentUserRole === "ADMIN" ? "Admin" : "Manager"}
                             </span>
                         </div>
                     )}

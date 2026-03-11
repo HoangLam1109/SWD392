@@ -22,8 +22,8 @@ const ManagerLayoutComponent = ({ currentUser, onLogout, currentPage, onNavigate
     const isAdmin = currentUser?.role === "ADMIN";
     const SidebarComponent =  Sidebar;
 
-    const fallbackName = isAdmin ? "Admin" : "Manager";
-    const roleLabel = isAdmin ? "Admin" : "Manager";
+    const fallbackName = isAdmin ? "ADMIN" : "MANAGER";
+    const roleLabel = isAdmin ? "ADMIN" : "MANAGER";
 
     return (
         <div className={`flex h-screen bg-slate-900`}>

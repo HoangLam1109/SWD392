@@ -51,6 +51,7 @@ const AppRoutes = () => {
                 >
                     <Route path="user-management" element={<UserManagementPage />} />
                     <Route path="game-management" element={<GameManagementPage/>}/>
+                    <Route path="order-management" element={<OrderManagementPage />} />
                 </Route>
             </Route>
             <Route element={<RoleRoute allowRoles={['MANAGER']} />}>
