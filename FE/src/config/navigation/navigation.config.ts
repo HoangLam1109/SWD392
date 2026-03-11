@@ -29,5 +29,12 @@ export const navigationConfig: NavigationItem[] = [
         roles: ["MANAGER"],
         path: "/manager/game-management",
     },
+    {
+        id: "order-management-manager",
+        label: "Order Management",
+        icon: Users,
+        roles: ["MANAGER"],
+        path: "/manager/order-management",
+    },
     
 ];
