@@ -32,14 +32,14 @@ export const blogService = {
     },
 
     async approveBlog(id: string): Promise<Blog> {
-        const res = await apiClient.patch(`/blogs/${id}`, {
+        const res = await apiClient.patch(`/blogs/${id}/status`, {
             status: "APPROVED"
         });
         return res.data;
     },
 
     async rejectBlog(id: string): Promise<Blog> {
-        const res = await apiClient.patch(`/blogs/${id}`, {
+        const res = await apiClient.patch(`/blogs/${id}/status`, {
             status: "REJECTED"
         });
         return res.data;

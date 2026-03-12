@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
     Trophy,
@@ -43,6 +44,19 @@ const mockGroups = [
 export default function CommunityPage() {
     const { blogs, isLoading, error } = useBlogs();
     const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Filter blogs by name/title based on search term
+    const filteredBlogs = useMemo(() => {
+        const approvedBlogs = blogs.filter((blog) => blog.status === "APPROVED");
+        if (!searchTerm.trim()) {
+            return approvedBlogs;
+        }
+        const searchLower = searchTerm.toLowerCase();
+        return approvedBlogs.filter((blog) =>
+            blog.title.toLowerCase().includes(searchLower)
+        );
+    }, [blogs, searchTerm]);
 
     return (
         <div className="min-h-screen bg-slate-950 text-white selection:bg-blue-500/30">
@@ -84,7 +98,9 @@ export default function CommunityPage() {
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                 <input
                                     type="text"
-                                    placeholder="Search discussions..."
+                                    placeholder="Search blogs by name..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                     className="w-full bg-slate-900/50 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-hidden focus:ring-2 ring-blue-500/50"
                                 />
                             </div>
@@ -120,12 +136,16 @@ export default function CommunityPage() {
                                 <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 text-center">
                                     <p className="text-red-400">{error}</p>
                                 </div>
-                            ) : blogs.length === 0 ? (
+                            ) : filteredBlogs.length === 0 ? (
                                 <div className="bg-white/5 border border-white/10 rounded-2xl p-12 text-center">
-                                    <p className="text-slate-400">No blogs found.</p>
+                                    <p className="text-slate-400">
+                                        {searchTerm.trim() 
+                                            ? `No blogs found matching "${searchTerm}"`
+                                            : "No blogs found."}
+                                    </p>
                                 </div>
                             ) : (
-                                blogs.filter((blog) => blog.status === "APPROVED").map((blog, idx) => (
+                                filteredBlogs.map((blog, idx) => (
                                     <motion.div
                                         key={blog._id}
                                         onClick={() => navigate(`/blogs/${blog._id}`)}
