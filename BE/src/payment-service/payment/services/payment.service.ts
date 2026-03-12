@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
-import { UpdatePaymentDto } from '../dto/update-payment.dto';
+import { OrderService } from '../../order/services/order.service';
+import { PaymentStatus } from '../../order/enum/status.enum';
+import { vnpay } from '../../../config/vnpay.config';
+import { ProductCode, VnpLocale, ReturnQueryFromVNPay } from 'vnpay';
+import { TransactionService } from '../../transaction/services/transaction.service';
 import { PaymentRepository } from '../repositories/payment.repository';
-import { PaymentDocument } from '../entities/payment.entity';
+import { PaginationService } from '../../../common/services/pagination.service';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
-import { PaginationService } from '../../../common/services/pagination.service';
-import { OrderService } from 'src/payment-service/order/services/order.service';
-import { PaymentStatus } from 'src/payment-service/order/enum/status.enum';
-import { vnpay } from 'src/config/vnpay.config';
-import { ProductCode, VnpLocale, ReturnQueryFromVNPay } from 'vnpay';
-import { TransactionService } from 'src/payment-service/transaction/services/transaction.service';
+import { PaymentDocument } from '../entities/payment.entity';
+import { UpdatePaymentDto } from '../dto/update-payment.dto';
 
 @Injectable()
 export class PaymentService {
@@ -21,19 +21,21 @@ export class PaymentService {
     private readonly transactionService: TransactionService,
   ) {}
 
-  async createPayment(createPaymentDto: CreatePaymentDto) {
+  async createPayment(
+    createPaymentDto: CreatePaymentDto,
+  ): Promise<PaymentDocument> {
     return await this.paymentRepository.create(createPaymentDto);
   }
 
-  async findByCode(code: string) {
+  async findByCode(code: string): Promise<PaymentDocument | null> {
     return await this.paymentRepository.findByCode(code);
   }
 
-  async findPaymentById(id: string) {
+  async findPaymentById(id: string): Promise<PaymentDocument | null> {
     return await this.paymentRepository.findById(id);
   }
 
-  async findAll() {
+  async findAll(): Promise<PaymentDocument[]> {
     return await this.paymentRepository.findAll();
   }
 
@@ -51,15 +53,15 @@ export class PaymentService {
   }
 
   async createDepositVnpayUrl(
-    walletId: string,
+    transactionId: string,
     totalPrice: number,
     ipAddr: string,
   ): Promise<{ redirectUrl: string }> {
     const paymentUrl = vnpay.buildPaymentUrl({
       vnp_Amount: totalPrice || 0,
       vnp_IpAddr: ipAddr || '',
-      vnp_TxnRef: walletId || '',
-      vnp_OrderInfo: `Payment for deposit to ${walletId}`,
+      vnp_TxnRef: transactionId || '',
+      vnp_OrderInfo: `Payment for deposit for transaction ${transactionId}`,
       vnp_OrderType: ProductCode.Other,
       vnp_ReturnUrl: process.env.VNPAY_RETURN_URL!,
       vnp_Locale: VnpLocale.VN,
@@ -90,22 +92,37 @@ export class PaymentService {
     const verify = vnpay.verifyReturnUrl(query);
 
     try {
-      const order = await this.orderService.findOrderById(verify.vnp_TxnRef);
-      if (order) {
+      const order = await this.orderService.interalFindOrderById(
+        verify.vnp_TxnRef,
+      );
+      if (order && order !== null) {
         if (verify.isSuccess) {
           await this.orderService.onPaymentSuccess(order);
+          await this.paymentRepository.create({
+            userId: order.userId,
+            transactionId: verify.vnp_TransactionNo,
+            transactionCode: verify.vnp_TxnRef,
+            paymentMethod: 'VNPAY',
+          });
           return { success: true, orderId: order._id };
         } else {
           await this.orderService.onPaymentFail(order);
           return { success: false, orderId: order._id };
         }
       } else {
-        const transaction = await this.transactionService.findByRefId(
+        const transaction = await this.transactionService.findTransactionById(
           verify.vnp_TxnRef,
         );
-        if (transaction) {
+        if (transaction && transaction !== null) {
           if (verify.isSuccess) {
-            await this.transactionService.onPaymentSuccess(transaction);
+            const userId =
+              await this.transactionService.onPaymentSuccess(transaction);
+            await this.paymentRepository.create({
+              userId,
+              transactionId: verify.vnp_TransactionNo,
+              transactionCode: verify.vnp_TxnRef,
+              paymentMethod: 'VNPAY',
+            });
             return { success: true, walletId: transaction.walletId };
           } else {
             await this.transactionService.onPaymentFail(transaction);

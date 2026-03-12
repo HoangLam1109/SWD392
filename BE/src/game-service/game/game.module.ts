@@ -5,6 +5,7 @@ import { GameRepository } from './repositories/game.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Game, GameSchema } from './entities/game.entity';
 import { PaginationService } from '../../common/services/pagination.service';
+import { GameKeyModule } from '../game-key/game-key.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PaginationService } from '../../common/services/pagination.service';
       [{ name: Game.name, schema: GameSchema }],
       'GAME_DB',
     ),
+    GameKeyModule,
   ],
   controllers: [GameController],
   providers: [GameService, GameRepository, PaginationService],

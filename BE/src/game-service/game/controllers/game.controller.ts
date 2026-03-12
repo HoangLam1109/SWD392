@@ -23,7 +23,7 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('games')
+@ApiTags('Games')
 @Controller('games')
 export class GameController {
   constructor(private readonly gameService: GameService) {}

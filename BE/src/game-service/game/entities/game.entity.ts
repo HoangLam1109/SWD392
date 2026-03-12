@@ -27,7 +27,7 @@ export class Game {
   @Prop({ required: true, unique: true })
   title: string;
 
-  @Prop()
+  @Prop({ required: true })
   price: number;
 
   @Prop({ default: true })

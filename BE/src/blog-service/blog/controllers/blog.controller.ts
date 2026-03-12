@@ -35,7 +35,7 @@ import { BlogStatus } from '../enum/blog.enum';
 import { CloudinaryInterceptor } from '../../../common/interceptors/cloudinary.interceptor';
 
 @ApiBearerAuth()
-@ApiTags('blogs')
+@ApiTags('Blogs')
 @Controller('blogs')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}

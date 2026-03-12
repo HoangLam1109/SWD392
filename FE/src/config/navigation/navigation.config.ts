@@ -31,11 +31,11 @@ export const navigationConfig: NavigationItem[] = [
 
     // Manager / Moderator navigation
     {
-        id: "game-management-moderator",
+        id: "game-management-manager",
         label: "Game Management",
         icon: Gamepad2,
-        roles: ["MODERATOR"],
-        path: "/moderator/game-management",
+        roles: ["MANAGER"],
+        path: "/manager/game-management",
     },
 
 ];

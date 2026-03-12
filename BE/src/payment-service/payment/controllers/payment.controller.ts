@@ -27,9 +27,10 @@ import { PaginationResponseDto } from '../../../common/dto/pagination-response.d
 import type { Request, Response } from 'express';
 import type { ReturnQueryFromVNPay } from 'vnpay';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { CreateDepositUrlDto } from '../dto/create-deposit-url.dto';
 
 @ApiBearerAuth()
-@ApiTags('payments')
+@ApiTags('Payments')
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
@@ -164,6 +165,32 @@ export class PaymentController {
     status: 400,
     description: 'Bad request',
   })
+  @Post('/vnpay/create-deposit-url')
+  async createDepositUrl(
+    @Body() createDepositUrlDto: CreateDepositUrlDto,
+    @Req() req: Request,
+  ) {
+    const ipAddr =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.socket.remoteAddress ||
+      '127.0.0.1';
+    return await this.paymentService.createVnpayUrl(
+      createDepositUrlDto.transactionId,
+      createDepositUrlDto.amount,
+      ipAddr,
+    );
+  }
+
+  @ApiOperation({ summary: 'Create VNPay payment URL' })
+  @ApiResponse({
+    status: 201,
+    description: 'Payment URL created successfully',
+    type: 'redirectUrl',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request',
+  })
   @Post('/vnpay/create-url')
   async createPaymentUrl(
     @Body() createPaymentUrlDto: CreatePaymentUrlDto,
@@ -213,13 +240,19 @@ export class PaymentController {
     const result = await this.paymentService.handleReturn(query);
 
     if (result.success) {
-      res.redirect(
-        `${process.env.FRONTEND_URL}/payment/success?orderId=${result.orderId?.toString() || 'unknown'}`,
-      );
+      const redirectUrl = result.orderId
+        ? `${process.env.FRONTEND_URL}/payment/success?orderId=${result.orderId.toString()}`
+        : result.walletId
+          ? `${process.env.FRONTEND_URL}/payment/success?walletId=${result.walletId}`
+          : `${process.env.FRONTEND_URL}/payment/success?orderId=unknown`;
+      res.redirect(redirectUrl);
     } else {
-      res.redirect(
-        `${process.env.FRONTEND_URL}/payment/failed?orderId=${result.orderId?.toString() || 'unknown'}`,
-      );
+      const redirectUrl = result.orderId
+        ? `${process.env.FRONTEND_URL}/payment/failed?orderId=${result.orderId.toString()}`
+        : result.walletId
+          ? `${process.env.FRONTEND_URL}/payment/failed?walletId=${result.walletId}`
+          : `${process.env.FRONTEND_URL}/payment/failed?orderId=unknown`;
+      res.redirect(redirectUrl);
     }
   }
 }

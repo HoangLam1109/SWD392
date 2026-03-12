@@ -20,18 +20,18 @@ export class BlogService {
   ) {}
 
   async create(
-  createBlogDto: CreateBlogDto,
-  userId: string,
-): Promise<BlogDocument> {
-  return this.blogRepository.create({
-    title: createBlogDto.title,
-    content: createBlogDto.content,
-    thumbnailUrl: createBlogDto.thumbnailUrl,
-    userId,
-    status: BlogStatus.PENDING_APPROVAL,
-    publishedAt: null,
-  });
-}
+    createBlogDto: CreateBlogDto,
+    userId: string,
+  ): Promise<BlogDocument> {
+    return this.blogRepository.create({
+      title: createBlogDto.title,
+      content: createBlogDto.content,
+      thumbnailUrl: createBlogDto.thumbnailUrl,
+      userId,
+      status: BlogStatus.PENDING_APPROVAL,
+      publishedAt: null,
+    });
+  }
   async findAllWithPagination(
     options: PaginationOptionsDto,
   ): Promise<PaginationResponseDto<BlogDocument>> {
@@ -93,63 +93,68 @@ export class BlogService {
     return blog;
   }
 
-  async findByUserId(userId: string, status?: BlogStatus): Promise<BlogDocument[]> {
+  async findByUserId(
+    userId: string,
+    status?: BlogStatus,
+  ): Promise<BlogDocument[]> {
     return await this.blogRepository.findByUserId(userId, status);
   }
 
   async update(
-  id: string,
-  updateBlogDto: UpdateBlogDto,
-  userId: string,
-): Promise<BlogDocument> {
-  const blog = await this.blogRepository.findById(id);
-  if (!blog) {
-    throw new NotFoundException('Blog not found');
+    id: string,
+    updateBlogDto: UpdateBlogDto,
+    userId: string,
+  ): Promise<BlogDocument> {
+    const blog = await this.blogRepository.findById(id);
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    if (blog.userId.toString() !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to update this blog',
+      );
+    }
+
+    const { status, publishedAt, removeThumbnail, ...safeUpdateData } =
+      updateBlogDto as any;
+
+    const shouldRemoveThumbnail =
+      removeThumbnail === true ||
+      removeThumbnail === 'true' ||
+      removeThumbnail === '1';
+
+    if (shouldRemoveThumbnail && !safeUpdateData.thumbnailUrl) {
+      safeUpdateData.thumbnailUrl = null;
+    }
+
+    return this.blogRepository.updateById(id, safeUpdateData);
   }
-
-  if (blog.userId.toString() !== userId) {
-    throw new ForbiddenException('You do not have permission to update this blog');
-  }
-
-  const { status, publishedAt, removeThumbnail, ...safeUpdateData } =
-    updateBlogDto as any;
-
-  const shouldRemoveThumbnail =
-    removeThumbnail === true || removeThumbnail === 'true' || removeThumbnail === '1';
-
-  if (shouldRemoveThumbnail && !safeUpdateData.thumbnailUrl) {
-    safeUpdateData.thumbnailUrl = null;
-  }
-
-  return this.blogRepository.updateById(id, safeUpdateData);
-}
-
 
   async remove(id: string, userId: string): Promise<{ message: string }> {
-  const blog = await this.blogRepository.findById(id);
-  if (!blog) {
-    throw new NotFoundException('Blog not found');
+    const blog = await this.blogRepository.findById(id);
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+
+    if (blog.userId.toString() !== userId) {
+      throw new ForbiddenException(
+        'You do not have permission to delete this blog',
+      );
+    }
+
+    await this.commentRepository.deleteByBlogId(id);
+    await this.blogRepository.deleteById(id);
+    return { message: 'Blog deleted successfully' };
   }
 
-  if (blog.userId.toString() !== userId) {
-    throw new ForbiddenException('You do not have permission to delete this blog');
-  }
+  async updateStatus(id: string, status: BlogStatus): Promise<BlogDocument> {
+    const blog = await this.blogRepository.findById(id);
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
 
-  await this.commentRepository.deleteByBlogId(id);
-  await this.blogRepository.deleteById(id);
-  return { message: 'Blog deleted successfully' };
-}
-
-async updateStatus(
-  id: string,
-  status: BlogStatus,
-): Promise<BlogDocument> {
-  const blog = await this.blogRepository.findById(id);
-  if (!blog) {
-    throw new NotFoundException('Blog not found');
-  }
-
-  const updateData: any = { status };
+    const updateData: any = { status };
 
   if (status === BlogStatus.APPROVED && blog.status !== BlogStatus.APPROVED) {
     updateData.publishedAt = new Date();
@@ -159,9 +164,8 @@ async updateStatus(
     updateData.publishedAt = null;
   }
 
-  return this.blogRepository.updateById(id, updateData);
-}
-
+    return this.blogRepository.updateById(id, updateData);
+  }
 
   private buildQuery(
     filters: Record<string, any>,
@@ -181,7 +185,10 @@ async updateStatus(
       };
       const resolvedSearchField = dateFieldMap[searchField] || searchField;
 
-      if (resolvedSearchField === 'updated_at' || resolvedSearchField === 'created_at') {
+      if (
+        resolvedSearchField === 'updated_at' ||
+        resolvedSearchField === 'created_at'
+      ) {
         // Date search
         const dateSearch = new Date(search);
         if (!isNaN(dateSearch.getTime())) {

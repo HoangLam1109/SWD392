@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ProfileModule } from './user-service/profile/profile.module';
 import { GameModule } from './game-service/game/game.module';
+import { UserGameItemModule } from './game-service/user-game-item/user-game-item.module';
+import { GameItemModule } from './game-service/game-item/game-item.module';
 import { BlogModule } from './blog-service/blog/blog.module';
 import { CommentModule } from './blog-service/comment/comment.module';
 import { CategoryModule } from './game-service/category/category.module';
@@ -16,6 +18,7 @@ import { CartModule } from './payment-service/cart/cart.module';
 import { CartItemModule } from './payment-service/cart-item/cart-item.module';
 import { OrderModule } from './payment-service/order/order.module';
 import { OrderDetailModule } from './payment-service/order-detail/order-detail.module';
+import { GameKeyModule } from './game-service/game-key/game-key.module';
 
 @Module({
   imports: [
@@ -63,6 +66,9 @@ import { OrderDetailModule } from './payment-service/order-detail/order-detail.m
     AuthModule,
     ProfileModule,
     GameModule,
+    GameKeyModule,
+    UserGameItemModule,
+    GameItemModule,
     CommentModule,
     BlogModule,
     CategoryModule,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower } from 'lucide-react';
+import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower, Wallet } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { Button } from '@/components/ui/button';
@@ -104,6 +104,10 @@ export function Navbar({ fixed }: NavbarProps) {
                     <DropdownMenuItem onClick={logout}>
                       <CirclePower className="w-4 h-4 mr-2" />
                       {t('common.logout')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/wallet')}>
+                      <Wallet className="w-4 h-4 mr-2" />
+                      {t('common.wallet')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -210,6 +214,22 @@ export function Navbar({ fixed }: NavbarProps) {
                   >
                     <LogOut className="w-4 h-4" />
                     {t('common.gotodashboard')}
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
+                    onClick={logout}
+                  >
+                    <CirclePower className="w-4 h-4" />
+                    {t('common.logout')}
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
+                    onClick={() => navigate('/wallet')}
+                  >
+                    <Wallet className="w-4 h-4" />
+                    {t('common.wallet')}
                   </button>
                 </div>
               ) : (

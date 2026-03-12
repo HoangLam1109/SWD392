@@ -8,6 +8,7 @@ interface RoleRouteProps {
 
 export function RoleRoute({ allowRoles }: RoleRouteProps) {
   const { data: currentUser, isLoading } = useGetCurrentUser();
+  console.log(currentUser);
 
   if (isLoading) {
     return <div>Loading...</div>;

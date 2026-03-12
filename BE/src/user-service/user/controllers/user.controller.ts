@@ -27,7 +27,7 @@ import { UserRole } from 'src/user-service/user/enum/user.enum';
 import { UserDocument } from '../entities/user.entity';
 
 @ApiBearerAuth()
-@ApiTags('users')
+@ApiTags('Users')
 @Role(UserRole.ADMIN)
 @Controller('users')
 export class UserController {
@@ -105,7 +105,7 @@ export class UserController {
     status: 404,
     description: 'User not found',
   })
-  @Role(UserRole.ADMIN, UserRole.MODERATOR, UserRole.PLAYER)
+  @Role(UserRole.ADMIN, UserRole.MANAGER, UserRole.PLAYER)
   @Get('/me')
   getMyInfo(@GetUser() user: Partial<UserDocument>) {
     return this.userService.findUserById(user._id?.toString() || '');

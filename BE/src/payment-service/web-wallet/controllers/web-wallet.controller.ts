@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
   Query,
 } from '@nestjs/common';
 import {
@@ -25,7 +24,7 @@ import { GetUser } from 'src/common/decorators/info.decorator';
 import { WebWalletResponseDto } from '../dto/web-wallet-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('web-wallets')
+@ApiTags('Web Wallets')
 @Controller('web-wallets')
 export class WebWalletController {
   constructor(private readonly webWalletService: WebWalletService) {}
@@ -92,21 +91,6 @@ export class WebWalletController {
     return this.webWalletService.findAllWithPagination(query);
   }
 
-  @ApiOperation({ summary: 'Get web wallet by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Web wallet found',
-    type: WebWalletResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Web wallet not found',
-  })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.webWalletService.findWalletById(id);
-  }
-
   @ApiOperation({ summary: 'Get web wallet by user ID' })
   @ApiResponse({
     status: 200,
@@ -122,7 +106,7 @@ export class WebWalletController {
     return this.webWalletService.findWalletByUserId(user._id!);
   }
 
-  @ApiOperation({ summary: 'Deposit balance to web wallet' })
+  @ApiOperation({ summary: 'Get web wallet by ID' })
   @ApiResponse({
     status: 200,
     description: 'Web wallet found',
@@ -132,12 +116,9 @@ export class WebWalletController {
     status: 404,
     description: 'Web wallet not found',
   })
-  @Post(':id/deposit')
-  depositBalance(@Req() req, @Body() depositDto: { amount: number }) {
-    return this.webWalletService.depositBalance(
-      req.user.userId as string,
-      depositDto.amount,
-    );
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.webWalletService.findWalletById(id);
   }
 
   @ApiOperation({ summary: 'Update web wallet' })

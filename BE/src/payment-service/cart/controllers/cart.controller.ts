@@ -22,7 +22,7 @@ import { PaginationResponseDto } from '../../../common/dto/pagination-response.d
 import { GetUser } from '../../../common/decorators/info.decorator';
 
 @ApiBearerAuth()
-@ApiTags('carts')
+@ApiTags('Carts')
 @Controller('carts')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
@@ -89,12 +89,12 @@ export class CartController {
     status: 404,
     description: 'Cart not found',
   })
-  @Patch('me/add/:gameId')
+  @Patch('me/add/:productId')
   addGameToCart(
     @GetUser() user: Partial<{ _id: string }>,
-    @Param('gameId') gameId: string,
+    @Param('productId') productId: string,
   ) {
-    return this.cartService.addItemToCart(user._id!, gameId);
+    return this.cartService.addItemToCart(user._id!, productId);
   }
 
   @ApiOperation({ summary: 'Remove game from cart' })
@@ -107,12 +107,12 @@ export class CartController {
     status: 404,
     description: 'Cart not found',
   })
-  @Patch('me/remove/:gameId')
+  @Patch('me/remove/:productId')
   removeGameFromCart(
     @GetUser() user: Partial<{ _id: string }>,
-    @Param('gameId') gameId: string,
+    @Param('productId') productId: string,
   ) {
-    return this.cartService.removeItemFromCart(user._id!, gameId);
+    return this.cartService.removeItemFromCart(user._id!, productId);
   }
 
   @ApiOperation({ summary: 'Clear all items from cart' })

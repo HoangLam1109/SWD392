@@ -21,9 +21,11 @@ import { UpdateTransactionDto } from '../dto/update-transaction.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { TransactionResponseDto } from '../dto/transaction-response.dto';
+import { CreateDepositDto } from '../dto/create-deposit.dto';
+import { GetUser } from 'src/common/decorators/info.decorator';
 
 @ApiBearerAuth()
-@ApiTags('transactions')
+@ApiTags('Transactions')
 @Controller('transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
@@ -161,5 +163,26 @@ export class TransactionController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.transactionService.deleteTransaction(id);
+  }
+
+  @ApiOperation({ summary: 'Deposit to wallet ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction created successfully',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Wallet not found',
+  })
+  @Post('deposit')
+  deposit(
+    @GetUser() user: Partial<{ _id: string }>,
+    @Body() createDepositDto: CreateDepositDto,
+  ) {
+    return this.transactionService.depositToWalletId(
+      user._id!,
+      createDepositDto.amount,
+    );
   }
 }

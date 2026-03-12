@@ -26,7 +26,7 @@ import { PaginationResponseDto } from '../../../common/dto/pagination-response.d
 import { AuthGuard } from '../../../auth/guards/auth.guard';
 
 @ApiBearerAuth()
-@ApiTags('comments')
+@ApiTags('Comments')
 @Controller('comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}

@@ -23,7 +23,7 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('system-requirements')
+@ApiTags('System Requirements')
 @Controller('system-requirements')
 export class SystemRequirementController {
   constructor(
@@ -133,10 +133,7 @@ export class SystemRequirementController {
     @Param('id') id: string,
     @Body() updateSystemRequirementDto: UpdateSystemRequirementDto,
   ) {
-    return this.systemRequirementService.update(
-      id,
-      updateSystemRequirementDto,
-    );
+    return this.systemRequirementService.update(id, updateSystemRequirementDto);
   }
 
   @ApiOperation({ summary: 'Delete system requirement' })
