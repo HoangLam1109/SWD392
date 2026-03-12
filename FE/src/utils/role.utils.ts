@@ -2,11 +2,11 @@ import type { Role } from "@/config/navigation/navigation.types";
 
 export const getPathbyRole = (role: Role): string => {
     switch (role) {
-        case "ADMIN":
+    case "Admin":
             return "/admin";
-        case "MANAGER":
+        case "Manager":
             return "/manager";
-        case "PLAYER":
+        case "Player":
             return "/";
         default:
             return "";

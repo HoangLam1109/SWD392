@@ -33,7 +33,7 @@ const AppRoutes = () => {
             <Route path="/payment/checkout/:orderId" element={<PaymentCheckoutPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             {/* ADMIN routes */}
-            <Route element={<RoleRoute allowRoles={['ADMIN']} />}>
+            <Route element={<RoleRoute allowRoles={['Admin']} />}>
                 <Route
                     path="/admin"
                     element={
@@ -54,7 +54,7 @@ const AppRoutes = () => {
                     <Route path="order-management" element={<OrderManagementPage />} />
                 </Route>
             </Route>
-            <Route element={<RoleRoute allowRoles={['MANAGER']} />}>
+            <Route element={<RoleRoute allowRoles={['Manager']} />}>
                 <Route
                     path="/manager"
                     element={
