@@ -212,9 +212,9 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                                     <SelectValue placeholder="Select role" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Player">Player</SelectItem>
-                                    <SelectItem value="Manager">Manager</SelectItem>
-                                    <SelectItem value="Admin">Admin</SelectItem>
+                                    <SelectItem value="PLAYER">Player</SelectItem>
+                                    <SelectItem value="MANAGER">Manager</SelectItem>
+                                    <SelectItem value="ADMIN">Admin</SelectItem>
                                 </SelectContent>
                             </Select>
                             {errors.role && (
