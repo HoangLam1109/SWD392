@@ -106,7 +106,7 @@ export function UpdateOrderStatusDialog({
                     <Button
                         onClick={handleConfirm}
                         disabled={isLoading || selectedStatus === order.paymentStatus}
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="!bg-blue-600 hover:!bg-blue-700"
                     >
                         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Update
