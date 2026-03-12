@@ -92,7 +92,7 @@ export function OrderManagementPage() {
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-    const { data, isLoading } = useGetOrders({ cursor, pageSize });
+    const { data, isLoading } = useGetOrders({ cursor, limit: pageSize });
     const cancelOrderMutation = useCancelOrder();
     const updateOrderMutation = useUpdateOrder();
 

@@ -2,7 +2,7 @@ import apiClient from "@/lib/apiClient";
 import type { UpdateOrderDTO } from "@/types/Orders.types";
 
 export const ordersService = {
-    getOrders: async (params?: { cursor?: string; pageSize?: number; search?: string }) => {
+    getOrders: async (params?: { cursor?: string; limit?: number; search?: string; searchField?: string }) => {
         const response = await apiClient.get('/orders', { params });
         return response.data;
     },
