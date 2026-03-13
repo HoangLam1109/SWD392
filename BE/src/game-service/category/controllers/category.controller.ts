@@ -23,7 +23,7 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('Categories')
+@ApiTags('categories')
 @Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -125,6 +125,16 @@ export class CategoryController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.categoryService.findById(id);
+  }
+
+  @ApiOperation({ summary: 'Index all categories for AI search' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories indexed successfully',
+  })
+  @Get('get/index')
+  indexAllCategories() {
+    return this.categoryService.findAllForIndexing();
   }
 
   @ApiOperation({ summary: 'Update category' })

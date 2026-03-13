@@ -19,6 +19,7 @@ import { CartItemModule } from './payment-service/cart-item/cart-item.module';
 import { OrderModule } from './payment-service/order/order.module';
 import { OrderDetailModule } from './payment-service/order-detail/order-detail.module';
 import { GameKeyModule } from './game-service/game-key/game-key.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -58,6 +59,14 @@ import { GameKeyModule } from './game-service/game-key/game-key.module';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      connectionName: 'AI_DB',
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('AI_MONGO_URL'),
+      }),
+      inject: [ConfigService],
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
@@ -80,6 +89,7 @@ import { GameKeyModule } from './game-service/game-key/game-key.module';
     CartItemModule,
     OrderModule,
     OrderDetailModule,
+    AiModule,
   ],
 })
 export class AppModule {}

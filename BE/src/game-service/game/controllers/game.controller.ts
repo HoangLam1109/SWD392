@@ -23,7 +23,7 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('Games')
+@ApiTags('games')
 @Controller('games')
 export class GameController {
   constructor(private readonly gameService: GameService) {}
@@ -88,26 +88,40 @@ export class GameController {
     return this.gameService.findAllWithPagination(query);
   }
 
-  @ApiOperation({ summary: 'Get game by ID' })
+  @ApiOperation({ summary: 'Get game by category ID' })
   @ApiResponse({
     status: 200,
     description: 'Game found',
-    type: GameResponseDto,
+    type: [GameResponseDto],
   })
   @ApiResponse({
     status: 404,
     description: 'Game not found',
   })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.gameService.findGameById(id);
+  @Get('category/:categoryId')
+  findByCategoryId(@Param('categoryId') categoryId: string) {
+    return this.gameService.findGameByCategoryId(categoryId);
+  }
+
+  @ApiOperation({ summary: 'Index all games' })
+  @ApiResponse({
+    status: 200,
+    description: 'Games indexed successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game not found',
+  })
+  @Get('index')
+  indexAllGames() {
+    return this.gameService.findAllForIndexing();
   }
 
   @ApiOperation({ summary: 'Get game by release date' })
   @ApiResponse({
     status: 200,
     description: 'Game found',
-    type: GameResponseDto,
+    type: [GameResponseDto],
   })
   @ApiResponse({
     status: 404,
@@ -122,7 +136,7 @@ export class GameController {
   @ApiResponse({
     status: 200,
     description: 'Game found',
-    type: GameResponseDto,
+    type: [GameResponseDto],
   })
   @ApiResponse({
     status: 404,
@@ -131,6 +145,21 @@ export class GameController {
   @Get(':price')
   findByPrice(@Param('price') price: number) {
     return this.gameService.findByPrice(price);
+  }
+
+  @ApiOperation({ summary: 'Get game by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Game found',
+    type: GameResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game not found',
+  })
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.gameService.findGameById(id);
   }
 
   @ApiOperation({ summary: 'Update game' })

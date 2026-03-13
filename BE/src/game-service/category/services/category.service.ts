@@ -1,14 +1,22 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { CategoryRepository } from '../repositories/category.repository';
 import { CategoryDocument } from '../entities/category.entity';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { IndexingService } from '../../../ai/services/indexing.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(
+    private readonly categoryRepository: CategoryRepository,
+    private readonly indexingService: IndexingService,
+  ) {}
 
   async create(
     createCategoryDto: CreateCategoryDto,
@@ -21,7 +29,15 @@ export class CategoryService {
         throw new NotFoundException('Parent category not found');
       }
     }
-    return await this.categoryRepository.create(createCategoryDto);
+    const category = await this.categoryRepository.create(createCategoryDto);
+
+    try {
+      await this.indexingService.indexCategory(category);
+    } catch (error) {
+      console.error('Failed to index category for AI search:', error);
+    }
+
+    return category;
   }
 
   async findAll(): Promise<CategoryDocument[]> {
@@ -140,7 +156,6 @@ export class CategoryService {
   ): Record<string, any> {
     const query: any = { ...filters };
 
-    // Handle search
     if (search && searchField) {
       const dateFieldMap: Record<string, string> = {
         createdAt: 'created_at',
@@ -148,8 +163,10 @@ export class CategoryService {
       };
       const resolvedSearchField = dateFieldMap[searchField] || searchField;
 
-      if (resolvedSearchField === 'created_at' || resolvedSearchField === 'updated_at') {
-        // Date search
+      if (
+        resolvedSearchField === 'created_at' ||
+        resolvedSearchField === 'updated_at'
+      ) {
         const dateSearch = new Date(search);
         if (!isNaN(dateSearch.getTime())) {
           const dateStart = new Date(dateSearch);
@@ -181,5 +198,17 @@ export class CategoryService {
     }
 
     return query as Record<string, any>;
+  }
+
+  async findAllForIndexing() {
+    const categories = await this.categoryRepository.findAll();
+    return await this.indexingService.indexAllCategories(
+      categories.map((category) => ({
+        id: category.id,
+        categoryName: category.categoryName,
+        description: category.description,
+        parentCategoryId: category.parentCategoryId?.toString(),
+      })),
+    );
   }
 }

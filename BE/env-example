@@ -4,12 +4,14 @@ USER_MONGO_URL=mongodb+srv://user:123@cluster0.w5mqesn.mongodb.net/user-service?
 GAME_MONGO_URL=mongodb+srv://user:123@cluster0.w5mqesn.mongodb.net/game-service?appName=Cluster0
 BLOG_MONGO_URL=mongodb+srv://user:123@cluster0.w5mqesn.mongodb.net/blog-service?appName=Cluster0
 PAYMENT_MONGO_URL=mongodb+srv://user:123@cluster0.w5mqesn.mongodb.net/payment-service?appName=Cluster0
+AI_MONGO_URL=mongodb+srv://user:123@cluster0.w5mqesn.mongodb.net/ai-service?appName=Cluster0
 
 JWT_SECRET_KEY=db056018b8c3dcddaefff0c877fb42e5
 JWT_REFRESH_TOKEN_SECRET=c14c3c6bb3d822fac5e208aaa1475209
 
 GOOGLE_CLIENT_ID=920522402319-jpdebim5g5umfq2a7fcjam952rj8d73g.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=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
+GOOGLE_API_KEY=AIzaSyBa6m5YtsYLKhfVw-NTkM6PfmjC1Sp_m80
 
 CLOUDINARY_CLOUD_NAME=dzy776llp
 CLOUDINARY_API_KEY=116113546484793

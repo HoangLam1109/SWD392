@@ -23,7 +23,7 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('System Requirements')
+@ApiTags('system-requirements')
 @Controller('system-requirements')
 export class SystemRequirementController {
   constructor(
