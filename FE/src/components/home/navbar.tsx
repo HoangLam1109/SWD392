@@ -52,7 +52,7 @@ export function Navbar({ fixed }: NavbarProps) {
                 <Library className="w-4 h-4" />
                 <span>{t('common.library')}</span>
               </Link>
-              <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
+              <Link to="/community" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Users className="w-4 h-4" />
                 <span>{t('common.community')}</span>
               </Link>
@@ -158,7 +158,7 @@ export function Navbar({ fixed }: NavbarProps) {
                 Library
               </Link>
               <Link
-                to="/"
+                to="/community"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
                 onClick={() => setIsMenuOpen(false)}
               >

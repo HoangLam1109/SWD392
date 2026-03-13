@@ -156,16 +156,13 @@ export class BlogService {
 
     const updateData: any = { status };
 
-    if (
-      status === BlogStatus.PUBLISHED &&
-      blog.status !== BlogStatus.PUBLISHED
-    ) {
-      updateData.publishedAt = new Date();
-    }
+  if (status === BlogStatus.APPROVED && blog.status !== BlogStatus.APPROVED) {
+    updateData.publishedAt = new Date();
+  }
 
-    if (status !== BlogStatus.PUBLISHED) {
-      updateData.publishedAt = null;
-    }
+  if (status !== BlogStatus.APPROVED) {
+    updateData.publishedAt = null;
+  }
 
     return this.blogRepository.updateById(id, updateData);
   }
