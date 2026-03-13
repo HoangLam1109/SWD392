@@ -50,7 +50,7 @@ export class LibraryGameRepository implements ILibraryGameRepository {
     libraryGameData: Partial<ILibraryGame>,
   ): Promise<LibraryGameDocument | null> {
     return await this.libraryGameModel
-      .findByIdAndUpdate(id, libraryGameData, { new: true })
+      .findByIdAndUpdate(id, libraryGameData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Library game not found'))
       .exec();
   }

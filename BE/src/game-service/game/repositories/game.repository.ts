@@ -78,7 +78,7 @@ export class GameRepository implements IGameRepository {
     userData: Partial<IGame>,
   ): Promise<GameDocument | null> {
     return await this.gameModel
-      .findByIdAndUpdate(id, userData, { new: true })
+      .findByIdAndUpdate(id, userData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Game not found'))
       .exec();
   }

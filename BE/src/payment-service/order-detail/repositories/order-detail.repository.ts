@@ -69,7 +69,7 @@ export class OrderDetailRepository implements IOrderDetailRepository {
     orderDetailData: Partial<IOrderDetail>,
   ): Promise<OrderDetailDocument | null> {
     return await this.orderDetailModel
-      .findByIdAndUpdate(id, orderDetailData, { new: true })
+      .findByIdAndUpdate(id, orderDetailData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Order detail not found'))
       .exec();
   }

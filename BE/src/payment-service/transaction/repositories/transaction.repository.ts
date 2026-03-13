@@ -54,7 +54,7 @@ export class TransactionRepository implements ITransactionRepository {
     transactionData: Partial<ITransaction>,
   ): Promise<TransactionDocument | null> {
     return await this.transactionModel
-      .findByIdAndUpdate(id, transactionData, { new: true })
+      .findByIdAndUpdate(id, transactionData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Transaction not found'))
       .exec();
   }
