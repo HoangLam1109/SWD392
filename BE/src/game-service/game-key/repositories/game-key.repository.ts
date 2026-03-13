@@ -95,7 +95,7 @@ export class GameKeyRepository implements IGameKeyRepository {
     gameKeyData: Partial<IGameKey>,
   ): Promise<GameKeyDocument | null> {
     return await this.gameKeyModel
-      .findOneAndUpdate({ keyCode }, gameKeyData, { new: true })
+      .findOneAndUpdate({ keyCode }, gameKeyData, { returnDocument: 'after' })
       .exec();
   }
 

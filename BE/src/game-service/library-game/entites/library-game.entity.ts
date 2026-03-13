@@ -5,7 +5,7 @@ import { LibraryGameStatus } from '../enum/library-game-status.enum';
 export interface ILibraryGame {
   user_id: string;
   game_id: string;
-  key_id: string;
+  key_id?: string;
   highest_score: number;
   total_playtime: number;
   last_played_at?: Date;
@@ -28,8 +28,8 @@ export class LibraryGame {
   @Prop({ required: true, index: true, ref: 'Game' })
   game_id: string;
 
-  @Prop({ required: true, ref: 'GameKey' })
-  key_id: string;
+  @Prop({ ref: 'GameKey' })
+  key_id?: string;
 
   @Prop({ required: true, default: 0 })
   highest_score: number;

@@ -104,7 +104,6 @@ export class LibraryGameService {
     const libraryGame = await this.create({
       user_id: userId,
       game_id: gameId,
-      key_id: 'TEMP_KEY_ID',
     });
     await this.assignKeyToLibraryGame(libraryGame._id.toString());
     return libraryGame;
@@ -134,12 +133,14 @@ export class LibraryGameService {
   private async validateReferencedIds(input: {
     user_id: string;
     game_id: string;
-    key_id: string;
+    key_id?: string;
   }): Promise<void> {
     const [user, game, gameKey] = await Promise.all([
       this.userService.findUserById(input.user_id),
       this.gameService.findGameById(input.game_id),
-      this.gameKeyService.findById(input.key_id),
+      input.key_id
+        ? this.gameKeyService.findById(input.key_id)
+        : Promise.resolve(null),
     ]);
 
     if (!user) {
@@ -150,7 +151,7 @@ export class LibraryGameService {
       throw new NotFoundException('Game not found');
     }
 
-    if (gameKey.gameId !== input.game_id) {
+    if (gameKey && gameKey.gameId !== input.game_id) {
       throw new BadRequestException(
         'Game key does not belong to the provided game',
       );

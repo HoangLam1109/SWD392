@@ -26,12 +26,13 @@ export class CreateLibraryGameDto {
   @IsMongoId()
   game_id: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Key id (FK)',
     example: '67d0f5ca8fa4f25a819f2a97',
   })
+  @IsOptional()
   @IsMongoId()
-  key_id: string;
+  key_id?: string;
 
   @ApiPropertyOptional({
     description: 'Highest score of this user in this game',
