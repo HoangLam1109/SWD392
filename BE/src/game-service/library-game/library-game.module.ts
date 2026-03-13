@@ -10,18 +10,17 @@ import { LibraryGameRepository } from './repositories/library-game.repository';
 import { LibraryGameService } from './services/library-game.service';
 
 @Module({
-	imports: [
-		MongooseModule.forFeature(
-			[{ name: LibraryGame.name, schema: LibraryGameSchema }],
-			'GAME_DB',
-		),
-		UserModule,
-		GameModule,
-		GameKeyModule,
-	],
-	controllers: [LibraryGameController],
-	providers: [LibraryGameService, LibraryGameRepository, PaginationService],
-	exports: [LibraryGameService],
+  imports: [
+    MongooseModule.forFeature(
+      [{ name: LibraryGame.name, schema: LibraryGameSchema }],
+      'GAME_DB',
+    ),
+    UserModule,
+    GameModule,
+    GameKeyModule,
+  ],
+  controllers: [LibraryGameController],
+  providers: [LibraryGameService, LibraryGameRepository, PaginationService],
+  exports: [LibraryGameService],
 })
 export class LibraryGameModule {}
-

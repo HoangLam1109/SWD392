@@ -36,13 +36,13 @@ export class CreateGameKeyDto {
   status: string;
 
   @ApiProperty({
-    description: 'Order detail ID this key is associated with',
+    description: 'Library game ID this key is associated with',
     example: '507f1f77bcf86cd799439012',
   })
   @IsMongoId()
   @IsOptional()
   @IsString()
-  orderDetailId?: string;
+  libraryGameId?: string;
 
   @ApiProperty({
     description: 'When the key was assigned',

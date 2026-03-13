@@ -6,7 +6,7 @@ export interface IGameKey {
   gameId: string;
   keyCode: string;
   status: string;
-  orderDetailId?: string;
+  libraryGameId?: string;
   assignedAt?: Date;
   activatedAt?: Date;
 }
@@ -30,7 +30,7 @@ export class GameKey {
   status: string;
 
   @Prop()
-  orderDetailId?: string;
+  libraryGameId?: string;
 
   @Prop()
   assignedAt?: Date;

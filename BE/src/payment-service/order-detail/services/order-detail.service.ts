@@ -10,6 +10,7 @@ import { ProductValidationService } from '../../../common/services/productValida
 import { CartService } from '../../cart/services/cart.service';
 import { CartItemService } from '../../cart-item/services/cart-item.service';
 import { UserGameItemService } from '../../../game-service/user-game-item/services/user-game-item.service';
+import { LibraryGameService } from '../../../game-service/library-game/services/library-game.service';
 
 @Injectable()
 export class OrderDetailService {
@@ -20,6 +21,7 @@ export class OrderDetailService {
     private readonly cartService: CartService,
     private readonly cartItemService: CartItemService,
     private readonly userGameItemService: UserGameItemService,
+    private readonly libraryGameService: LibraryGameService,
   ) {}
 
   async createOrderDetail(
@@ -81,6 +83,11 @@ export class OrderDetailService {
           isEquipped: false,
           quantity: 1,
         });
+      } else if (orderDetail.orderType === 'Game') {
+        await this.libraryGameService.createWithKey(
+          userId,
+          orderDetail.productId,
+        );
       }
     }
   }
