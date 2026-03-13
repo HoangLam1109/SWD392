@@ -115,6 +115,7 @@ export class AuthController {
     @GetUser() user: any,
     @Res() res: Response,
   ) {
+<<<<<<< Updated upstream
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
     try {
@@ -132,6 +133,23 @@ export class AuthController {
     } catch {
       res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
     }
+=======
+    const tokens = await this.authService.generateTokens(user);
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
+    const userData = encodeURIComponent(JSON.stringify(user));
+    res.redirect(
+      `http://localhost:5173/oauth/callback?accessToken=${tokens.accessToken}&user=${userData}`,
+    );
+>>>>>>> Stashed changes
   }
 
   @ApiOperation({ summary: 'User refresh token' })

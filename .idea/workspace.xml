@@ -6,6 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="ca6d4dcc-1c29-47df-8186-da5771c34691" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/BE/src/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/BE/src/auth/auth.controller.ts" afterDir="false" />
+<<<<<<< Updated upstream
+=======
+      <change beforePath="$PROJECT_DIR$/BE/src/auth/strategy/google.strategy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/BE/src/auth/strategy/google.strategy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FE/src/auth/page/Login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/auth/page/Login.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FE/src/auth/page/Register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/auth/page/Register.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FE/src/routes/AppRoutes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/routes/AppRoutes.tsx" afterDir="false" />
+>>>>>>> Stashed changes
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,6 +22,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+<<<<<<< Updated upstream
   <component name="GitHubPullRequestSearchHistory"><![CDATA[{
   "lastFilter": {
     "state": "OPEN",
@@ -27,6 +35,20 @@
     "accountId": "1d3079be-de48-496d-8e82-3c1c25779520"
   }
 }]]></component>
+=======
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;HoangPhatIsCoding&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/HoangLam1109/SWD392&quot;,
+    &quot;accountId&quot;: &quot;1d3079be-de48-496d-8e82-3c1c25779520&quot;
+  }
+}</component>
+>>>>>>> Stashed changes
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 6
@@ -72,6 +94,12 @@
       <updated>1772507603297</updated>
       <workItem from="1772507605468" duration="746000" />
       <workItem from="1772697016388" duration="1210000" />
+<<<<<<< Updated upstream
+=======
+      <workItem from="1773371519510" duration="1920000" />
+      <workItem from="1773373505250" duration="1230000" />
+      <workItem from="1773374757965" duration="900000" />
+>>>>>>> Stashed changes
     </task>
     <servers />
   </component>
