@@ -45,7 +45,7 @@ export class CartRepository implements ICartRepository {
     cartData: Partial<ICart>,
   ): Promise<CartDocument | null> {
     return await this.cartModel
-      .findByIdAndUpdate(id, cartData, { new: true })
+      .findByIdAndUpdate(id, cartData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Cart not found'))
       .exec();
   }

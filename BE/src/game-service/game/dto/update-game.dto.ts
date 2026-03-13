@@ -8,6 +8,7 @@ import {
   IsDate,
   IsUrl,
   IsOptional,
+  IsMongoId,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -18,7 +19,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsString()
   @IsOptional()
-  title: string;
+  title?: string;
 
   @ApiPropertyOptional({
     description: 'Game price',
@@ -26,7 +27,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsNumber()
   @IsOptional()
-  price: number;
+  price?: number;
 
   @ApiPropertyOptional({
     description: 'Game status active',
@@ -34,7 +35,16 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsBoolean()
   @IsOptional()
-  isActive: boolean;
+  isActive?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Game category ID',
+    example: 'category-id',
+  })
+  @IsMongoId()
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
 
   @ApiPropertyOptional({
     description: 'Game discount',
@@ -42,7 +52,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsNumber()
   @IsOptional()
-  discount: number;
+  discount?: number;
 
   @ApiPropertyOptional({
     description: 'Game thumbnail',
@@ -50,7 +60,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsUrl()
   @IsOptional()
-  thumbnail: string;
+  thumbnail?: string;
 
   @ApiPropertyOptional({
     description: 'Cover image',
@@ -58,7 +68,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsUrl()
   @IsOptional()
-  coverImage: string;
+  coverImage?: string;
 
   @ApiPropertyOptional({
     description: 'Developer',
@@ -66,7 +76,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsString()
   @IsOptional()
-  developer: string;
+  developer?: string;
 
   @ApiPropertyOptional({
     description: 'Publisher',
@@ -74,7 +84,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsString()
   @IsOptional()
-  publisher: string;
+  publisher?: string;
 
   @ApiPropertyOptional({
     description: 'Release date (ISO string)',
@@ -83,7 +93,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   @Type(() => Date)
   @IsDate()
   @IsOptional()
-  releaseDate: Date;
+  releaseDate?: Date;
 
   @ApiPropertyOptional({
     description: 'Game url',
@@ -91,5 +101,5 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
   })
   @IsUrl()
   @IsOptional()
-  url: string;
+  url?: string;
 }

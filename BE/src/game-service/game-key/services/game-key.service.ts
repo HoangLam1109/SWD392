@@ -51,8 +51,8 @@ export class GameKeyService {
     return await this.gameKeyRepository.findAvailableKeys(gameId);
   }
 
-  async findByOrderDetailId(orderDetailId: string): Promise<GameKeyDocument[]> {
-    return await this.gameKeyRepository.findByOrderDetailId(orderDetailId);
+  async findByLibraryGameId(libraryGameId: string): Promise<GameKeyDocument[]> {
+    return await this.gameKeyRepository.findByLibraryGameId(libraryGameId);
   }
 
   async findByStatus(status: KeyStatus): Promise<GameKeyDocument[]> {
@@ -130,56 +130,31 @@ export class GameKeyService {
   }
 
   async assignKey(
-    keyCode: string,
-    orderDetailId: string,
+    gameId: string,
+    libraryGameId: string,
   ): Promise<GameKeyDocument> {
-    const gameKey = await this.gameKeyRepository.findByKeyCode(keyCode);
-    if (!gameKey) {
-      throw new NotFoundException('Game key not found');
+    await this.generateKeys(gameId, 5);
+    const gameKeys = await this.gameKeyRepository.findByGameId(gameId);
+    if (!gameKeys || gameKeys.length === 0) {
+      throw new NotFoundException('Game keys not found for this game');
     }
 
-    if (gameKey.status !== 'AVAILABLE') {
-      throw new BadRequestException('Game key is not available for assignment');
+    const availableKey = gameKeys.find((key) => key.status === 'AVAILABLE');
+    if (!availableKey) {
+      throw new BadRequestException('No available game keys for this game');
     }
 
-    const updatedGameKey = await this.gameKeyRepository.updateByKeyCode(
-      keyCode,
+    const updatedGameKey = await this.gameKeyRepository.updateById(
+      availableKey._id.toString(),
       {
         status: KeyStatus.ASSIGNED,
-        orderDetailId,
+        libraryGameId,
         assignedAt: new Date(),
       },
     );
 
     if (!updatedGameKey) {
       throw new NotFoundException('Failed to assign game key');
-    }
-
-    return updatedGameKey;
-  }
-
-  async activateKey(keyCode: string): Promise<GameKeyDocument> {
-    const gameKey = await this.gameKeyRepository.findByKeyCode(keyCode);
-    if (!gameKey) {
-      throw new NotFoundException('Game key not found');
-    }
-
-    if (gameKey.status !== 'ASSIGNED') {
-      throw new BadRequestException(
-        'Game key is not assigned and cannot be activated',
-      );
-    }
-
-    const updatedGameKey = await this.gameKeyRepository.updateByKeyCode(
-      keyCode,
-      {
-        status: KeyStatus.EXPIRED,
-        activatedAt: new Date(),
-      },
-    );
-
-    if (!updatedGameKey) {
-      throw new NotFoundException('Failed to activate game key');
     }
 
     return updatedGameKey;

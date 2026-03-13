@@ -164,22 +164,6 @@ export class GameKeyController {
     return this.gameKeyService.assignKey(keyCode, orderDetailId);
   }
 
-  @ApiOperation({ summary: 'Activate a game key (mark as used)' })
-  @ApiParam({ name: 'keyCode', description: 'Game Key Code' })
-  @ApiResponse({
-    status: 200,
-    description: 'Game key activated successfully',
-    type: GameKeyResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Game key not found or not assigned',
-  })
-  @Patch('/activate/:keyCode')
-  activateKey(@Param('keyCode') keyCode: string) {
-    return this.gameKeyService.activateKey(keyCode);
-  }
-
   @ApiOperation({ summary: 'Delete a game key' })
   @ApiParam({ name: 'id', description: 'Game Key ID' })
   @ApiResponse({

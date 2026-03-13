@@ -7,9 +7,9 @@ export interface ITransaction {
   amount: number;
   balanceBefore: number;
   balanceAfter: number;
-  description: string;
   refId: string;
-  status: string;
+  description?: string;
+  status?: string;
 }
 
 export type TransactionDocument = HydratedDocument<ITransaction>;
@@ -39,17 +39,17 @@ export class Transaction {
   @Prop({ required: true })
   balanceAfter: number;
 
-  @Prop({ required: true })
-  description: string;
+  @Prop()
+  description?: string;
 
   @Prop({ required: true })
   refId: string;
 
   @Prop({
-    required: true,
     enum: ['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED'],
+    default: 'PENDING',
   })
-  status: string;
+  status?: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

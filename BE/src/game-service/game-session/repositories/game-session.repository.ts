@@ -59,7 +59,7 @@ export class GameSessionRepository implements IGameSessionRepository {
 		gameSessionData: Partial<IGameSession>,
 	): Promise<GameSessionDocument | null> {
 		return await this.gameSessionModel
-			.findByIdAndUpdate(id, gameSessionData, { new: true })
+			.findByIdAndUpdate(id, gameSessionData, { returnDocument: 'after' })
 			.orFail(new NotFoundException('Game session not found'))
 			.exec();
 	}

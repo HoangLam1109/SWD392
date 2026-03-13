@@ -32,9 +32,25 @@ export class TransactionService {
       throw new NotFoundException('User wallet not found');
     }
     if (wallet.balance < amount) {
-      throw new BadRequestException('Insufficient balance');
+      return false;
     }
     return true;
+  }
+
+  async createForExternalPayment(
+    userId: string,
+    data: Partial<CreateTransactionDto>,
+  ) {
+    const wallet = await this.webWalletService.findWalletByUserId(userId);
+    if (!wallet) {
+      throw new NotFoundException('User wallet not found');
+    }
+    return await this.transactionRepository.create({
+      walletId: wallet.id,
+      balanceBefore: wallet.balance,
+      balanceAfter: wallet.balance,
+      ...data,
+    });
   }
 
   async purchaseWithUserId(

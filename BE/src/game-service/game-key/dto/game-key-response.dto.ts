@@ -21,10 +21,10 @@ export class GameKeyResponseDto {
   keyCode: string;
 
   @ApiProperty({
-    description: 'Order detail ID this key is associated with',
+    description: 'Library game ID this key is associated with',
     example: '698175d5c4308f3653af15d6',
   })
-  orderDetailId: string;
+  libraryGameId: string;
 
   @ApiProperty({
     description: 'Status of the game key',
