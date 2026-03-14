@@ -164,7 +164,7 @@ export function UserManagementPage() {
     const getRoleBadge = (role: UserRole) => {
         const variants: Record<UserRole, string> = {
             Admin: 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30',
-            Moderator: 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 border border-purple-500/30',
+            Manager: 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 border border-purple-500/30',
             Player: 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30',
         };
         return variants[role] || 'bg-slate-500/20 text-slate-400 border border-slate-500/30';
@@ -235,7 +235,7 @@ export function UserManagementPage() {
                                     <SelectContent className="bg-slate-900 border-white/10">
                                         <SelectItem value="all">All Roles</SelectItem>
                                         <SelectItem value="Admin">Admin</SelectItem>
-                                        <SelectItem value="Moderator">Moderator</SelectItem>
+                                        <SelectItem value="Manager">Manager</SelectItem>
                                         <SelectItem value="Player">Player</SelectItem>
                                     </SelectContent>
                                 </Select>

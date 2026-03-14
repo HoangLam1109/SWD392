@@ -7,9 +7,38 @@ import { useGetMyCartWithItems } from '@/hooks/cart/useGetMyCartWithItems';
 import { useRemoveGameFromCart } from '@/hooks/cart/useRemoveGameFromCart';
 import { useCheckoutOrder } from '@/hooks/order/useCheckoutOrder';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { ordersService } from '@/service/orders.service';
+import type { Order } from '@/types/Orders.types';
+import type { AxiosError } from 'axios';
+import { toast } from 'sonner';
+
+type ApiErrorData = {
+  message?: string | string[];
+};
+
+function parseApiMessage(error: unknown): string {
+  const axiosError = error as AxiosError<ApiErrorData>;
+  const message = axiosError?.response?.data?.message;
+
+  if (Array.isArray(message) && message.length > 0) {
+    return message[0];
+  }
+
+  if (typeof message === 'string' && message.trim().length > 0) {
+    return message;
+  }
+
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  return 'Checkout failed';
+}
 
 export default function CartPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { data, isLoading, error } = useGetMyCartWithItems();
   const removeGameMutation = useRemoveGameFromCart();
   const checkoutOrderMutation = useCheckoutOrder();
@@ -24,11 +53,40 @@ export default function CartPage() {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     checkoutOrderMutation.mutate(undefined, {
-      onSuccess: (order: any) => {
+      onSuccess: (order: Order) => {
         console.log('order', order);
         navigate(`/payment/checkout/${order._id}`, { state: { order } });
+      },
+      onError: async (err: unknown) => {
+        if (!user?.id) {
+          return;
+        }
+
+        const message = parseApiMessage(err);
+        const isRecoverableCheckoutError =
+          message === 'Insufficient balance' ||
+          message === 'Order details not found' ||
+          message === 'Cart items not found';
+
+        if (!isRecoverableCheckoutError) {
+          return;
+        }
+
+        try {
+          const orders = (await ordersService.getOrdersByUserId(user.id)) as Order[];
+          const pendingOrder = orders.find((item) => item.paymentStatus === 'PENDING');
+
+          if (pendingOrder?._id) {
+            toast.info('A pending order already exists. Redirecting to payment checkout.');
+            navigate(`/payment/checkout/${pendingOrder._id}`, {
+              state: { order: pendingOrder },
+            });
+          }
+        } catch {
+          // Let the default toast from the mutation hook remain the source of truth.
+        }
       },
     });
   };

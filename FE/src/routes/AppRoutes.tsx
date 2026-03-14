@@ -12,6 +12,7 @@ import type { Role } from "@/config/navigation/navigation.types";
 import { useGetCurrentUser } from "@/hooks/auth/useGetCurrentUser";
 import { GameManagementPage } from "@/pages/GameManagementPage";
 import { ManagerLayout } from "@/layouts/ManagerLayout";
+import OrderManagementPage from "@/pages/OrderManagementPage";
 import BlogDetailPage from "@/pages/BlogDetailPage";
 import NewPostPage from "@/pages/NewPostPage";
 import BlogModerationPage from "@/pages/admin/BlogModerationPage";
@@ -82,6 +83,7 @@ const AppRoutes = () => {
                     }
                 >
                     <Route path="game-management" element={<GameManagementPage />} />
+                    <Route path="order-management" element={<OrderManagementPage />} />
                 </Route>
             </Route>
         </Routes>
