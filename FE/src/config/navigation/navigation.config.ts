@@ -11,14 +11,14 @@ export const navigationConfig: NavigationItem[] = [
         id: "user-management",
         label: "User Management",
         icon: Users,
-        roles: ["ADMIN"],
+        roles: ["Admin"],
         path: "/admin/user-management",
     },
     {
         id: "game-management-admin",
         label: "Game Management",
         icon: Gamepad2,
-        roles: ["ADMIN"],
+        roles: ["Admin"],
         path: "/admin/game-management",
     },
     {
@@ -26,7 +26,7 @@ export const navigationConfig: NavigationItem[] = [
         label: "Blog Moderation",
         path: "/admin/blogs",
         icon: FileText,
-        roles: ["ADMIN"]
+        roles: ["Admin"]
     },
 
     // Manager / Moderator navigation
@@ -34,7 +34,7 @@ export const navigationConfig: NavigationItem[] = [
         id: "game-management-manager",
         label: "Game Management",
         icon: Gamepad2,
-        roles: ["MANAGER"],
+        roles: ["Manager"],
         path: "/manager/game-management",
     },
 

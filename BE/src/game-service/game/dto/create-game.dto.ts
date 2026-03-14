@@ -87,6 +87,10 @@ export class CreateGameDto {
     description: 'Game url',
     example: 'https://example.com/game',
   })
-  @IsUrl()
+  @IsUrl({
+    require_protocol: true,
+    require_tld: false,
+    protocols: ['http', 'https'],
+  })
   url?: string;
 }
