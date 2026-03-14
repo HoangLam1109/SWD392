@@ -15,6 +15,8 @@ import { ManagerLayout } from "@/layouts/ManagerLayout";
 import BlogDetailPage from "@/pages/BlogDetailPage";
 import NewPostPage from "@/pages/NewPostPage";
 import BlogModerationPage from "@/pages/admin/BlogModerationPage";
+import TransactionHistoryPage from "@/pages/TransactionHistoryPage";
+import FlappyBirdPage from "@/pages/FlappyBirdPage";
 
 const AppRoutes = () => {
     const { data: currentUser } = useGetCurrentUser();
@@ -33,14 +35,16 @@ const AppRoutes = () => {
             <Route path="/library" element={<LibraryPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/transaction-history" element={<TransactionHistoryPage />} />
             <Route path="/payment/checkout/:orderId" element={<PaymentCheckoutPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/blogs/:id" element={<BlogDetailPage />} />
             <Route path="/new-post" element={<NewPostPage />} />
+            <Route path="/flappy-bird" element={<FlappyBirdPage />} />
 
             {/* ADMIN routes */}
-            <Route element={<RoleRoute allowRoles={['ADMIN']} />}>
+            <Route element={<RoleRoute allowRoles={['Admin']} />}>
                 <Route
                     path="/admin"
                     element={
@@ -61,7 +65,7 @@ const AppRoutes = () => {
                     <Route path="blogs" element={<BlogModerationPage />} />
                 </Route>
             </Route>
-            <Route element={<RoleRoute allowRoles={['MANAGER']} />}>
+            <Route element={<RoleRoute allowRoles={['Manager']} />}>
                 <Route
                     path="/manager"
                     element={

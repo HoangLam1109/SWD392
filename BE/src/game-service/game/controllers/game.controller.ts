@@ -103,6 +103,21 @@ export class GameController {
     return this.gameService.findGameByCategoryId(categoryId);
   }
 
+  @ApiOperation({ summary: 'Get game by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Game found',
+    type: GameResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game not found',
+  })
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.gameService.findGameById(id);
+  }
+
   @ApiOperation({ summary: 'Index all games' })
   @ApiResponse({
     status: 200,
@@ -127,7 +142,7 @@ export class GameController {
     status: 404,
     description: 'Game not found',
   })
-  @Get(':releaseDate')
+  @Get('release-date/:releaseDate')
   findByReleaseDate(@Param('releaseDate') releaseDate: Date) {
     return this.gameService.findGameByReleaseDate(releaseDate);
   }
@@ -142,24 +157,9 @@ export class GameController {
     status: 404,
     description: 'Game not found',
   })
-  @Get(':price')
+  @Get('price/:price')
   findByPrice(@Param('price') price: number) {
     return this.gameService.findByPrice(price);
-  }
-
-  @ApiOperation({ summary: 'Get game by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Game found',
-    type: GameResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Game not found',
-  })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.gameService.findGameById(id);
   }
 
   @ApiOperation({ summary: 'Update game' })

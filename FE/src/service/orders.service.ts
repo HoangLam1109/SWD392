@@ -10,6 +10,10 @@ export const ordersService = {
         const response = await apiClient.get(`/orders/${id}`);
         return response.data;
     },
+    getOrderbyUserId: async (userId: string) => {
+        const response = await apiClient.get(`/orders/user/${userId}`);
+        return response.data;
+    },
     createOrder: async (order: Order) => {
         const response = await apiClient.post('/orders', order);
         return response.data;

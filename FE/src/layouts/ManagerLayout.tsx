@@ -19,7 +19,7 @@ const ManagerLayoutComponent = ({ currentUser, onLogout, currentPage, onNavigate
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const navigationItems = useSidebarNavigation(currentUser?.role as Role);
 
-    const isAdmin = currentUser?.role === "ADMIN";
+    const isAdmin = currentUser?.role === "Admin";
     const SidebarComponent =  Sidebar;
 
     const fallbackName = isAdmin ? "Admin" : "Manager";

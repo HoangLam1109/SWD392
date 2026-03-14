@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower, Wallet } from 'lucide-react';
+import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower, Wallet, History } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { Button } from '@/components/ui/button';
@@ -99,6 +99,13 @@ export function Navbar({ fixed }: NavbarProps) {
                     >
                       <User className="w-4 h-4 mr-2" />
                       {t('common.profile')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => navigate('/transaction-history')}
+                      className="text-white focus:bg-white/10 focus:text-white cursor-pointer [&_svg]:text-white/90"
+                    >
+                      <History className="w-4 h-4 mr-2" />
+                      Transaction history
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => navigate(dashboardPath)}
@@ -211,6 +218,17 @@ export function Navbar({ fixed }: NavbarProps) {
                     <User className="w-4 h-4" />
                     {t('common.profile')}
                   </Link>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate('/transaction-history');
+                    }}
+                  >
+                    <History className="w-4 h-4" />
+                    Transaction history
+                  </button>
                   <button
                     type="button"
                     className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"

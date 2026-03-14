@@ -45,7 +45,7 @@ export default function StorePage() {
         break;
       case 'popular':
       default:
-        games.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
+        games.sort((a, b) => new Date(b.releaseDate ?? '').getTime() - new Date(a.releaseDate ?? '').getTime());
         break;
     }
 
