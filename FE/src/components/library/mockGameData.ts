@@ -2,9 +2,19 @@
  * Mock game data for GameManagementPage
  * Steam-inspired game collection
  */
-import type { Game } from '@/types/Game.types';
+interface MockLibraryGame {
+    id: string;
+    title: string;
+    genre: string;
+    releaseDate: string;
+    status: string;
+    thumbnail?: string;
+    developer?: string;
+    publisher?: string;
+    description?: string;
+}
 
-export const mockGames: Game[] = [
+export const mockGames: MockLibraryGame[] = [
     {
         id: '1',
         title: 'Cyberpunk Legends',

@@ -13,7 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import type { Game, GameGenre } from '@/types/Game.types';
+import type { LibraryGameView } from '@/types/LibraryGame.types';
 
 interface LibrarySidebarProps {
     className?: string;
@@ -22,17 +22,17 @@ interface LibrarySidebarProps {
     /** Callback khi đổi search */
     onSearchChange: (value: string) => void;
     /** Genre đang chọn (hoặc 'all') */
-    genreFilter: GameGenre | 'all';
+    genreFilter: string | 'all';
     /** Callback khi đổi genre */
-    onGenreFilterChange: (value: GameGenre | 'all') => void;
+    onGenreFilterChange: (value: string | 'all') => void;
     /** Danh sách genre cho dropdown */
     genres: string[];
     /** Danh sách game để hiển thị tên (thường là danh sách đã filter) */
-    games: Game[];
+    games: LibraryGameView[];
     /** ID game đang được chọn (highlight trong list) */
     selectedGameId?: string;
     /** Callback khi click vào một game trong list */
-    onSelectGame?: (game: Game) => void;
+    onSelectGame?: (game: LibraryGameView) => void;
 }
 
 export function LibrarySidebar({
@@ -78,7 +78,7 @@ export function LibrarySidebar({
                 <Select
                     value={genreFilter}
                     onValueChange={(value) =>
-                        onGenreFilterChange(value as GameGenre | 'all')
+                        onGenreFilterChange(value as string | 'all')
                     }
                 >
                     <SelectTrigger className="w-full h-9 bg-slate-800/50 border-slate-600 text-white text-sm focus:border-blue-400">
@@ -117,9 +117,9 @@ export function LibrarySidebar({
                             </li>
                         ) : (
                             games.map((game) => {
-                                const isSelected = selectedGameId === game.id;
+                                const isSelected = selectedGameId === game.gameId;
                                 return (
-                                    <li key={game.id}>
+                                    <li key={game.libraryGameId}>
                                         <button
                                             type="button"
                                             onClick={() => onSelectGame?.(game)}

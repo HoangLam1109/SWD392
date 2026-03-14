@@ -67,7 +67,7 @@ export class OrderRepository implements IOrderRepository {
     orderData: Partial<IOrder>,
   ): Promise<OrderDocument | null> {
     return await this.orderModel
-      .findByIdAndUpdate(id, orderData, { new: true })
+      .findByIdAndUpdate(id, orderData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Order not found'))
       .exec();
   }

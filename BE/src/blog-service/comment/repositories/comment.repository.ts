@@ -82,7 +82,7 @@ export class CommentRepository implements ICommentRepository {
   ): Promise<CommentDocument | null> {
     return await this.commentModel
       .findOneAndUpdate({ _id: id, isDeleted: false }, commentData, {
-        new: true,
+        returnDocument: 'after',
       })
       .orFail(new NotFoundException('Comment not found'))
       .exec();
@@ -93,7 +93,7 @@ export class CommentRepository implements ICommentRepository {
       .findOneAndUpdate(
         { _id: id, isDeleted: false },
         { isDeleted: true },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .orFail(new NotFoundException('Comment not found'))
       .exec();

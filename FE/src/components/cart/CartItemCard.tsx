@@ -85,11 +85,11 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
             <div className="flex items-center gap-3">
               {originalPrice && (
                 <span className="text-slate-500 line-through text-sm">
-                  ${originalPrice.toFixed(2)}
+                  VNĐ{originalPrice.toFixed(2)}
                 </span>
               )}
               <span className="text-2xl font-bold text-white">
-                ${finalPrice.toFixed(2)}
+                VNĐ{finalPrice.toFixed(2)}
               </span>
             </div>
           </div>
@@ -102,7 +102,7 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-500/20 border border-green-500/30 backdrop-blur-sm">
             <Tag className="w-3.5 h-3.5 text-green-400" />
             <span className="text-xs font-medium text-green-400">
-              Save ${(originalPrice - finalPrice).toFixed(2)}
+              Save VNĐ{(originalPrice - finalPrice).toFixed(2)}
             </span>
           </div>
         </div>

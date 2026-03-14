@@ -13,7 +13,10 @@ import { PaginationService } from '../../../common/services/pagination.service';
 import { TransactionService } from '../../transaction/services/transaction.service';
 import { OrderDetailService } from '../../order-detail/services/order-detail.service';
 import { CartService } from '../../cart/services/cart.service';
-import { TransactionStatus } from '../../transaction/enum/transaction.enum';
+import {
+  TransactionStatus,
+  TransactionType,
+} from '../../transaction/enum/transaction.enum';
 import { PaymentStatus } from '../enum/status.enum';
 
 @Injectable()
@@ -74,6 +77,12 @@ export class OrderService {
         completedAt: new Date(),
       });
     }
+
+    await this.transactionService.createForExternalPayment(userId, {
+      refId: order.id,
+      amount: totalPrice,
+      type: TransactionType.PAYMENT,
+    });
 
     return {
       _id: order._id,

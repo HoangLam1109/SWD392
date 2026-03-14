@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Body,
-  Put,
-  Param,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Body, Put, Param, Req } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -17,11 +9,9 @@ import { ProfileService } from '../services/profile.service';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { ProfileResponseDto } from '../dto/profile-response.dto';
 import { GetUser } from '../../../common/decorators/info.decorator';
-import { AuthGuard } from '../../../auth/guards/auth.guard';
 
 @ApiBearerAuth()
-@ApiTags('Profiles')
-@UseGuards(AuthGuard)
+@ApiTags('profiles')
 @Controller('profiles')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}

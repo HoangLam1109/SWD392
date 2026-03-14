@@ -14,7 +14,7 @@ export interface IGameKeyRepository {
   findByKeyCode(keyCode: string): Promise<GameKeyDocument | null>;
   findByGameId(gameId: string): Promise<GameKeyDocument[]>;
   findAvailableKeys(gameId: string): Promise<GameKeyDocument[]>;
-  findByOrderDetailId(orderDetailId: string): Promise<GameKeyDocument[]>;
+  findByLibraryGameId(libraryGameId: string): Promise<GameKeyDocument[]>;
   findByStatus(status: KeyStatus): Promise<GameKeyDocument[]>;
   create(gameKeyData: Partial<IGameKey>): Promise<GameKeyDocument>;
   createMany(gameKeyData: CreateGameKeyInput[]): Promise<GameKeyDocument[]>;
@@ -60,9 +60,9 @@ export class GameKeyRepository implements IGameKeyRepository {
     return await this.gameKeyModel.findOne({ keyCode });
   }
 
-  async findByOrderDetailId(orderDetailId: string): Promise<GameKeyDocument[]> {
+  async findByLibraryGameId(libraryGameId: string): Promise<GameKeyDocument[]> {
     return await this.gameKeyModel
-      .find({ orderDetailId })
+      .find({ libraryGameId })
       .sort({ created_at: -1 });
   }
 
@@ -86,7 +86,7 @@ export class GameKeyRepository implements IGameKeyRepository {
     gameKeyData: Partial<IGameKey>,
   ): Promise<GameKeyDocument | null> {
     return await this.gameKeyModel
-      .findByIdAndUpdate(id, gameKeyData, { new: true })
+      .findByIdAndUpdate(id, gameKeyData, { returnDocument: 'after' })
       .exec();
   }
 
@@ -95,7 +95,7 @@ export class GameKeyRepository implements IGameKeyRepository {
     gameKeyData: Partial<IGameKey>,
   ): Promise<GameKeyDocument | null> {
     return await this.gameKeyModel
-      .findOneAndUpdate({ keyCode }, gameKeyData, { new: true })
+      .findOneAndUpdate({ keyCode }, gameKeyData, { returnDocument: 'after' })
       .exec();
   }
 

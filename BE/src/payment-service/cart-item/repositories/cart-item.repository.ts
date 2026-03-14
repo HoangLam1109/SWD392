@@ -63,7 +63,7 @@ export class CartItemRepository implements ICartItemRepository {
     cartItemData: Partial<ICartItem>,
   ): Promise<CartItemDocument | null> {
     return await this.cartItemModel
-      .findByIdAndUpdate(id, cartItemData, { new: true })
+      .findByIdAndUpdate(id, cartItemData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Cart item not found'))
       .exec();
   }
