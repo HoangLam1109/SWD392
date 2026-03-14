@@ -238,13 +238,13 @@ export function OrderManagementPage() {
                     >
                         <CardContent className="pt-4 pb-4">
                             <p className="text-xs text-slate-400 uppercase tracking-wide">{label}</p>
-                            <p className={`text-2xl font-bold mt-1 ${color}`}>
+                            <div className={`text-2xl font-bold mt-1 ${color}`}>
                                 {isLoading ? (
                                     <Skeleton className="h-7 w-8 bg-white/10" />
                                 ) : (
                                     statusCounts[status]
                                 )}
-                            </p>
+                            </div>
                         </CardContent>
                     </Card>
                 ))}
