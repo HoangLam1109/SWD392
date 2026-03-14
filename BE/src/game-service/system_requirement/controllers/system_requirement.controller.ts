@@ -133,10 +133,7 @@ export class SystemRequirementController {
     @Param('id') id: string,
     @Body() updateSystemRequirementDto: UpdateSystemRequirementDto,
   ) {
-    return this.systemRequirementService.update(
-      id,
-      updateSystemRequirementDto,
-    );
+    return this.systemRequirementService.update(id, updateSystemRequirementDto);
   }
 
   @ApiOperation({ summary: 'Delete system requirement' })

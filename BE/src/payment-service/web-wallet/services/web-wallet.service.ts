@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateWebWalletDto } from '../dto/create-web-wallet.dto';
 import { UpdateWebWalletDto } from '../dto/update-web-wallet.dto';
 import { WebWalletRepository } from '../repositories/web-wallet.repository';
@@ -44,6 +44,9 @@ export class WebWalletService {
   }
 
   async updateWalletBalance(id: string, balance: number) {
+    if (balance < 0) {
+      throw new BadRequestException('Balance cannot be negative');
+    }
     return await this.webWalletRepository.updateById(id, { balance });
   }
 

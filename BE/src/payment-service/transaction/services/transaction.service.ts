@@ -26,6 +26,33 @@ export class TransactionService {
     return await this.transactionRepository.create(createTransactionDto);
   }
 
+  async checkUserBalance(userId: string, amount: number): Promise<boolean> {
+    const wallet = await this.webWalletService.findWalletByUserId(userId);
+    if (!wallet) {
+      throw new NotFoundException('User wallet not found');
+    }
+    if (wallet.balance < amount) {
+      return false;
+    }
+    return true;
+  }
+
+  async createForExternalPayment(
+    userId: string,
+    data: Partial<CreateTransactionDto>,
+  ) {
+    const wallet = await this.webWalletService.findWalletByUserId(userId);
+    if (!wallet) {
+      throw new NotFoundException('User wallet not found');
+    }
+    return await this.transactionRepository.create({
+      walletId: wallet.id,
+      balanceBefore: wallet.balance,
+      balanceAfter: wallet.balance,
+      ...data,
+    });
+  }
+
   async purchaseWithUserId(
     userId: string,
     refId: string,
@@ -36,6 +63,11 @@ export class TransactionService {
       throw new NotFoundException('User wallet not found');
     }
 
+    await this.webWalletService.updateWalletBalance(
+      wallet.id,
+      wallet.balance - amount,
+    );
+
     const transaction = await this.create({
       walletId: wallet.id,
       refId,
@@ -43,14 +75,9 @@ export class TransactionService {
       balanceAfter: wallet.balance - amount,
       amount,
       type: TransactionType.PAYMENT,
-      status: TransactionStatus.PENDING,
+      status: TransactionStatus.COMPLETED,
       description: 'Payment for order ' + refId,
     });
-
-    await this.webWalletService.updateWalletBalance(
-      wallet.id,
-      wallet.balance - amount,
-    );
 
     return transaction;
   }
@@ -103,7 +130,10 @@ export class TransactionService {
       throw new NotFoundException('User wallet not found');
     }
 
-    await this.webWalletService.depositBalance(wallet.id, transaction.amount!);
+    await this.webWalletService.updateWalletBalance(
+      wallet.id,
+      transaction.amount!,
+    );
 
     await this.updateTransaction(transaction._id.toString(), {
       status: TransactionStatus.COMPLETED,

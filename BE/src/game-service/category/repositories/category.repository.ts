@@ -9,16 +9,11 @@ import {
 
 export interface ICategoryRepository {
   findById(id: string, fields?: string): Promise<CategoryDocument | null>;
-  findByParentCategoryId(
-    parentCategoryId: string,
-  ): Promise<CategoryDocument[]>;
+  findByParentCategoryId(parentCategoryId: string): Promise<CategoryDocument[]>;
   hasChildren(parentCategoryId: string): Promise<boolean>;
   findAllParentCategories(): Promise<CategoryDocument[]>;
   create(categoryData: any): Promise<CategoryDocument>;
-  updateById(
-    id: string,
-    categoryData: any,
-  ): Promise<CategoryDocument | null>;
+  updateById(id: string, categoryData: any): Promise<CategoryDocument | null>;
   deleteById(id: string): Promise<CategoryDocument | null>;
   findAll(fields?: string): Promise<CategoryDocument[]>;
   findWithQuery(
@@ -41,8 +36,7 @@ export class CategoryRepository implements ICategoryRepository {
   ): Promise<CategoryDocument | null> {
     return await this.categoryModel.findOne(
       { _id: id },
-      fields ||
-        '_id categoryName description parentCategoryId created_at',
+      fields || '_id categoryName description parentCategoryId created_at',
     );
   }
 
@@ -77,7 +71,7 @@ export class CategoryRepository implements ICategoryRepository {
     categoryData: Partial<ICategory>,
   ): Promise<CategoryDocument | null> {
     return await this.categoryModel
-      .findByIdAndUpdate(id, categoryData, { new: true })
+      .findByIdAndUpdate(id, categoryData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Category not found'))
       .exec();
   }

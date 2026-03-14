@@ -62,7 +62,7 @@ export class UserRepository implements IUserRepository {
     userData: Partial<IUser>,
   ): Promise<UserDocument | null> {
     return await this.userModel
-      .findByIdAndUpdate(id, userData, { new: true })
+      .findByIdAndUpdate(id, userData, { returnDocument: 'after' })
       .orFail(new NotFoundException('User not found'))
       .exec();
   }

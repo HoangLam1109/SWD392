@@ -25,7 +25,7 @@ import { CreateDepositDto } from '../dto/create-deposit.dto';
 import { GetUser } from 'src/common/decorators/info.decorator';
 
 @ApiBearerAuth()
-@ApiTags('transactions')
+@ApiTags('Transactions')
 @Controller('transactions')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}

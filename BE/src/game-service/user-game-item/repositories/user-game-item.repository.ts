@@ -85,7 +85,7 @@ export class UserGameItemRepository implements IUserGameItemRepository {
     userGameItemData: Partial<IUserGameItem>,
   ): Promise<UserGameItemDocument | null> {
     return await this.userGameItemModel
-      .findByIdAndUpdate(id, userGameItemData, { new: true })
+      .findByIdAndUpdate(id, userGameItemData, { returnDocument: 'after' })
       .orFail(new NotFoundException('User game item not found'))
       .exec();
   }

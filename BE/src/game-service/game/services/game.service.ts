@@ -6,16 +6,29 @@ import { GameDocument } from '../entities/game.entity';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { PaginationService } from '../../../common/services/pagination.service';
+import { GameKeyService } from '../../game-key/services/game-key.service';
+import { IndexingService } from '../../../ai/services/indexing.service';
 
 @Injectable()
 export class GameService {
   constructor(
     private readonly gameRepository: GameRepository,
     private readonly paginationService: PaginationService,
+    private readonly gameKeyService: GameKeyService,
+    private readonly indexingService: IndexingService,
   ) {}
 
   async createGame(createGameDto: CreateGameDto) {
-    return await this.gameRepository.create(createGameDto);
+    const game = await this.gameRepository.create(createGameDto);
+    await this.gameKeyService.generateKeys(game._id.toString(), 10);
+
+    try {
+      await this.indexingService.indexGame(game);
+    } catch (error) {
+      console.error('Failed to index game for AI search:', error);
+    }
+
+    return game;
   }
 
   async findGameByReleaseDate(releaseDate: Date) {
@@ -24,6 +37,10 @@ export class GameService {
 
   async findGameById(id: string) {
     return await this.gameRepository.findById(id);
+  }
+
+  async findGameByCategoryId(categoryId: string) {
+    return await this.gameRepository.findByCategoryId(categoryId);
   }
 
   async findGamesByIds(ids: string[]) {
@@ -36,6 +53,23 @@ export class GameService {
 
   async findAll() {
     return await this.gameRepository.findAll();
+  }
+
+  async findAllForIndexing() {
+    const games = await this.gameRepository.findAll();
+    return await this.indexingService.indexAllGames(
+      games.map((game) => ({
+        id: game._id.toString(),
+        title: game.title,
+        description: game.description,
+        price: game.price,
+        releaseDate: game.releaseDate,
+        categoryId: game.categoryId.toString(),
+        developer: game.developer,
+        publisher: game.publisher,
+        isActive: game.isActive,
+      })),
+    );
   }
 
   async findAllWithPagination(

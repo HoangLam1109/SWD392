@@ -9,6 +9,8 @@ import { PaginationService } from '../../../common/services/pagination.service';
 import { ProductValidationService } from '../../../common/services/productValidation.service';
 import { CartService } from '../../cart/services/cart.service';
 import { CartItemService } from '../../cart-item/services/cart-item.service';
+import { UserGameItemService } from '../../../game-service/user-game-item/services/user-game-item.service';
+import { LibraryGameService } from '../../../game-service/library-game/services/library-game.service';
 
 @Injectable()
 export class OrderDetailService {
@@ -18,6 +20,8 @@ export class OrderDetailService {
     private readonly productValidationService: ProductValidationService,
     private readonly cartService: CartService,
     private readonly cartItemService: CartItemService,
+    private readonly userGameItemService: UserGameItemService,
+    private readonly libraryGameService: LibraryGameService,
   ) {}
 
   async createOrderDetail(
@@ -63,6 +67,29 @@ export class OrderDetailService {
       orderDetails.map((orderDetail) => orderDetail.productId),
     );
     return { orderDetails, totalPrice };
+  }
+
+  async convertOrderDetailsToGameItems(
+    orderId: string,
+    userId: string,
+  ): Promise<void> {
+    const orderDetails = await this.findOrderDetailsByOrderId(orderId);
+
+    for (const orderDetail of orderDetails) {
+      if (orderDetail.orderType === 'DLC') {
+        await this.userGameItemService.create({
+          userId: userId,
+          itemId: orderDetail.productId,
+          isEquipped: false,
+          quantity: 1,
+        });
+      } else if (orderDetail.orderType === 'Game') {
+        await this.libraryGameService.createWithKey(
+          userId,
+          orderDetail.productId,
+        );
+      }
+    }
   }
 
   async findOrderDetailById(id: string): Promise<OrderDetailDocument> {

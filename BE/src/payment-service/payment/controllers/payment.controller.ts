@@ -30,7 +30,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { CreateDepositUrlDto } from '../dto/create-deposit-url.dto';
 
 @ApiBearerAuth()
-@ApiTags('payments')
+@ApiTags('Payments')
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}

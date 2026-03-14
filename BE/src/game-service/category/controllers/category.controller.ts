@@ -127,6 +127,16 @@ export class CategoryController {
     return this.categoryService.findById(id);
   }
 
+  @ApiOperation({ summary: 'Index all categories for AI search' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories indexed successfully',
+  })
+  @Get('get/index')
+  indexAllCategories() {
+    return this.categoryService.findAllForIndexing();
+  }
+
   @ApiOperation({ summary: 'Update category' })
   @ApiResponse({
     status: 200,
