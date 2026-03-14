@@ -1,25 +1,28 @@
 import { useEffect, useState } from "react";
 import { useGetCurrentUser } from "@/hooks/auth/useGetCurrentUser";
-import {useGetWalletByUserId} from "@/hooks/wallet/useGetWalletByUserId";
-import { useCreateWallet } from "@/hooks/wallet/useCreateWallet";
-import { useUpdateWallet } from "@/hooks/wallet/useUpdateWallet";
-import type { CreateWalletDTO, UpdateWalletDTO } from "@/types/Wallet.types";
-
+import { useGetWalletByUserId } from "@/hooks/wallet/useGetWalletByUserId";
+import { useDepositToWallet } from "@/hooks/transaction/useDepositToWallet";
+import { useCreateVNpayPaymentTransaction } from "@/hooks/payment/useCreateVNpayPaymentTransaction";
+import type { CreateWalletDTO } from "@/types/Wallet.types";
 const defaultForm: CreateWalletDTO = {
     userId: "",
     balance: 0,
-    currency: "USD",
+    currency: "VND",
     status: "ACTIVED",
 };
+
+const PRESET_AMOUNTS = [50_000, 100_000, 200_000, 500_000, 1_000_000];
 
 export default function WalletPage() {
     const { data: currentUser, isLoading: isLoadingUser } = useGetCurrentUser();
     const userId = currentUser?._id;
-    const { data: wallet, isLoading: isLoadingWallet } = useGetWalletByUserId(userId);
-    const createMutation = useCreateWallet();
-    const updateMutation = useUpdateWallet();
-
+    const { data: wallet, isLoading: isLoadingWallet } = useGetWalletByUserId();
+    const depositToWalletMutation = useDepositToWallet();
+    const createVNpayPaymentTransactionMutation =
+        useCreateVNpayPaymentTransaction();
     const [form, setForm] = useState<CreateWalletDTO>(defaultForm);
+    /** Số tiền chọn để nạp (mệnh giá), dùng khi bấm "Nạp tiền qua VNPay" */
+    const [depositAmount, setDepositAmount] = useState(0);
 
     useEffect(() => {
         if (wallet) {
@@ -33,35 +36,10 @@ export default function WalletPage() {
             setForm({ ...defaultForm, userId });
         }
     }, [wallet, userId]);
-    const handleChange = <K extends keyof CreateWalletDTO>(
-        key: K,
-        value: CreateWalletDTO[K]
-    ) => {
-        setForm((prev) => ({ ...prev, [key]: value }));
-    };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (wallet?.id) {
-            const payload: UpdateWalletDTO = {
-                userId: currentUser?._id,
-                balance: form.balance,
-                currency: form.currency,
-                status: form.status,
-            };
-            updateMutation.mutate({ id: wallet.id, payload: payload });
-        } else {
-            if (!userId) return;
-            const payload = {
-                userId: String(userId),
-                balance: Number(form.balance) ?? 0,
-                currency: form.currency,
-                status: form.status,
-            };
-            createMutation.mutate(payload, {
-                onSuccess: () => setForm({ ...defaultForm, userId: String(userId) }),
-            });
-        }
+    /** Chọn mệnh giá chỉ cập nhật số tiền nạp, chưa gọi API */
+    const handlePresetAmount = (amount: number) => {
+        setDepositAmount(amount);
     };
 
     if (isLoadingUser) {
@@ -87,7 +65,32 @@ export default function WalletPage() {
             </div>
         );
     }
-
+    /** Tạo transaction PENDING, lấy URL VNPay rồi chuyển hướng */
+    const handleVNPayDeposit = async () => {
+        const amount = depositAmount;
+        if (amount <= 0) return;
+        try {
+            const transaction = await depositToWalletMutation.mutateAsync({
+                amount,
+            });
+            const transactionId =
+                (transaction as { _id?: string })._id ?? transaction.id;
+            if (!transactionId) {
+                console.error("No transaction ID returned");
+                return;
+            }
+            const result =
+                await createVNpayPaymentTransactionMutation.mutateAsync({
+                    transactionId,
+                    amount,
+                });
+            if (result?.redirectUrl) {
+                window.location.href = result.redirectUrl;
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
     const currentAmount = wallet?.balance ?? form.balance;
     const currentCurrency = wallet?.currency ?? form.currency;
     const currentStatus = wallet?.status ?? form.status;
@@ -116,58 +119,74 @@ export default function WalletPage() {
                 </p>
             </div>
 
-            {/* Create / Update form */}
-            <form onSubmit={handleSubmit} className="rounded-lg border bg-card p-4 space-y-4">
-                <h2 className="text-lg font-medium">
-                    {wallet?.id ? "Update wallet" : "Create wallet"}
-                </h2>
+            {/* Preset amounts */}
+            <div className="rounded-lg border bg-card p-4 space-y-3">
+                <p className="text-sm font-medium text-muted-foreground">
+                    Chọn mệnh giá nạp nhanh
+                </p>
+                <div className="flex flex-wrap gap-2">
+                    {PRESET_AMOUNTS.map((amount) => (
+                        <button
+                            key={amount}
+                            type="button"
+                            onClick={() => handlePresetAmount(amount)}
+                            disabled={
+                                depositToWalletMutation.isPending ||
+                                createVNpayPaymentTransactionMutation.isPending
+                            }
+                            className="rounded-lg border border-primary/50 bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20 disabled:opacity-50 transition-colors"
+                        >
+                            {amount >= 1_000_000
+                                ? `${amount / 1_000_000}M`
+                                : `${amount / 1_000}k`}{" "}
+                            VND
+                        </button>
+                    ))}
+                </div>
+            </div>
 
+            {/* Create / Update form */}
+            <form className="rounded-lg border bg-card p-4 space-y-4">
                 <div className="space-y-2">
-                    <label className="text-sm font-medium">Amount</label>
+                    <label className="text-sm font-medium">Số tiền nạp (VND)</label>
                     <input
                         type="number"
                         min={0}
                         step="any"
-                        value={form.balance}
+                        value={depositAmount || ""}
                         onChange={(e) =>
-                            handleChange("balance", Number(e.target.value) || 0)
+                            setDepositAmount(Number(e.target.value) || 0)
                         }
+                        placeholder="Chọn mệnh giá hoặc nhập số tiền"
                         className="w-full rounded-md border px-3 py-2 text-sm"
                     />
                 </div>
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium">Currency</label>
-                    <select
-                        value={form.currency}
-                        onChange={(e) => handleChange("currency", e.target.value)}
+                    <div
                         className="w-full rounded-md border px-3 py-2 text-sm"
                     >
-                        <option value="USD">USD</option>
                         <option value="VND">VND</option>
-                        <option value="EUR">EUR</option>
-                    </select>
+                    </div>
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-sm font-medium">Status</label>
-                    <select
-                        value={form.status}
-                        onChange={(e) => handleChange("status", e.target.value)}
-                        className="w-full rounded-md border px-3 py-2 text-sm"
+               
+
+                <div className="flex gap-2">
+                    <button
+                        type="button"
+                        onClick={handleVNPayDeposit}
+                        disabled={
+                            depositAmount <= 0 ||
+                            depositToWalletMutation.isPending ||
+                            createVNpayPaymentTransactionMutation.isPending
+                        }
+                        className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
                     >
-                        <option value="ACTIVED">ACTIVED</option>
-                        <option value="INACTIVED">INACTIVED</option>
-                    </select>
+                        Nạp tiền qua VNPay
+                    </button>
                 </div>
-
-                <button
-                    type="submit"
-                    disabled={createMutation.isPending || updateMutation.isPending}
-                    className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-                >
-                    {wallet?.id ? "Update" : "Transaction"} wallet
-                </button>
             </form>
         </div>
     );

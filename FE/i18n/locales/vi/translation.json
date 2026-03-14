@@ -139,7 +139,7 @@
     "discount": "Giảm giá",
     "tax": "Thuế (10%)",
     "total": "Tổng cộng",
-    "youSave": "Bạn tiết kiệm ${{amount}}",
+    "youSave": "Bạn tiết kiệm VNĐ{{amount}}",
     "proceedToCheckout": "Tiến hành thanh toán",
     "secureCheckout": "Thanh toán an toàn với mã hóa chuẩn công nghiệp",
     "acceptedPaymentMethods": "Phương thức thanh toán được chấp nhận",

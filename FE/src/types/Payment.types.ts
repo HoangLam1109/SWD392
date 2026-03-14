@@ -8,3 +8,7 @@ export interface VNPayPayment{
     orderId:string;
     totalPrice:number;
 }
+export interface VNPayPaymentTransaction{
+    transactionId: string;
+    amount: number;
+}

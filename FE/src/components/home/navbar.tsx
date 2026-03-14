@@ -15,7 +15,8 @@ import { LanguageSwitchButton } from '@/components/common/LanguageSwitchButton';
 import { useLogout } from '@/hooks/auth/useLogout';
 import type { Role } from '@/config/navigation/navigation.types';
 import { getPathbyRole } from '@/utils/role.utils';
-
+import { useGetMyCartWithItems } from '@/hooks/cart/useGetMyCartWithItems';
+import { useGetWalletByUserId } from '@/hooks/wallet/useGetWalletByUserId';
 interface NavbarProps {
   fixed?: boolean;
 }
@@ -27,6 +28,11 @@ export function Navbar({ fixed }: NavbarProps) {
   const navigate = useNavigate();
   const { logout } = useLogout();
   const dashboardPath = user?.role ? getPathbyRole(user.role as Role) : '/';
+  const { data } = useGetMyCartWithItems();
+  const cartItems = data?.items.length ?? 0;
+  const { data: wallet } = useGetWalletByUserId();
+  const walletBalance = wallet != null   ? `${t('common.wallet')} (${wallet.balance.toLocaleString()} ${wallet.currency})`
+  : t('common.wallet');
   return (
     <nav className={`z-50 w-full ${fixed ? 'fixed top-0 left-0 right-0' : 'relative'}`}>
       <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -64,7 +70,7 @@ export function Navbar({ fixed }: NavbarProps) {
                 <ShoppingBasket className="w-4 h-4" />
                 <span>{t('common.cart')}</span>
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-[10px] flex items-center justify-center font-bold">
-                  3
+                  {cartItems}
                 </span>
               </Link>
               <div className="w-px h-6 bg-white/10" />
@@ -107,7 +113,8 @@ export function Navbar({ fixed }: NavbarProps) {
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/wallet')}>
                       <Wallet className="w-4 h-4 mr-2" />
-                      {t('common.wallet')}
+                      {walletBalance} 
+
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -181,7 +188,7 @@ export function Navbar({ fixed }: NavbarProps) {
                 <ShoppingBasket className="w-4 h-4" />
                 Cart
                 <span className="ml-auto px-2 py-0.5 bg-blue-500 rounded-full text-xs font-bold">
-                  3
+                  {cartItems}
                 </span>
               </Link>
               <div className="w-full h-px bg-white/10 my-2" />

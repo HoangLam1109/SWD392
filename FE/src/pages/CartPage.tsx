@@ -95,7 +95,7 @@ export default function CartPage() {
                       Total Savings
                     </div>
                     <div className="text-xl font-bold text-green-400">
-                      ${totalSavings.toFixed(2)}
+                      VNĐ{totalSavings.toFixed(2)}
                     </div>
                   </div>
                 </div>
