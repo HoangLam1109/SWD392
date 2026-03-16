@@ -32,6 +32,8 @@ import { useUpdateGame } from '@/hooks/game/useUpdateGame';
 import { useDeleteGame } from '@/hooks/game/useDeleteGame';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { getImageUrl } from '@/lib/imageUtils';
+import { useCreateCategory } from '@/hooks/category/useGetCategories';
+import { CategoryDialog } from '@/components/dialog/category/CategoryDialog';
 
 export function GameManagementPage() {
     const [search, setSearch] = useState('');
@@ -40,6 +42,9 @@ export function GameManagementPage() {
     const [detailDialogOpen, setDetailDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [systemDialogOpen, setSystemDialogOpen] = useState(false);
+    const [createCategoryDialogOpen, setCreateCategoryDialogOpen] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [newCategoryDescription, setNewCategoryDescription] = useState('');
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
     const [gameToView, setGameToView] = useState<Game | null>(null);
     const [gameForSystem, setGameForSystem] = useState<Game | null>(null);
@@ -48,6 +53,7 @@ export function GameManagementPage() {
     const createGameMutation = useCreateGame();
     const updateGameMutation = useUpdateGame();
     const deleteGameMutation = useDeleteGame();
+    const createCategoryMutation = useCreateCategory();
 
     const filteredGames = useMemo(() => {
         let list = Array.isArray(games) ? games : [];
@@ -108,6 +114,23 @@ export function GameManagementPage() {
         setGameDialogOpen(true);
     };
 
+    const openCreateCategoryDialog = () => {
+        setNewCategoryName('');
+        setNewCategoryDescription('');
+        setCreateCategoryDialogOpen(true);
+    };
+
+    const handleCreateCategory = (): Promise<void> => {
+        return createCategoryMutation
+            .mutateAsync({
+                name: newCategoryName,
+                description: newCategoryDescription || undefined,
+            })
+            .then(() => {
+                setCreateCategoryDialogOpen(false);
+            }) as Promise<void>;
+    };
+
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -126,10 +149,23 @@ export function GameManagementPage() {
                     <h1 className="text-2xl sm:text-3xl font-bold text-slate-50">Game Management</h1>
                     <p className="text-sm text-slate-50 mt-1">Manage games and store visibility</p>
                 </div>
-                <Button onClick={openCreateDialog} className="bg-blue-600 hover:bg-blue-700 text-slate-50">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Game
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={openCreateCategoryDialog}
+                        variant="outline"
+                        className="border-slate-600 text-slate-50 hover:bg-slate-800"
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Category
+                    </Button>
+                    <Button
+                        onClick={openCreateDialog}
+                        className="bg-blue-600 hover:bg-blue-700 text-slate-50"
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Game
+                    </Button>
+                </div>
             </div>
 
             <Card className="bg-slate-900/60 border-slate-700">
@@ -333,6 +369,17 @@ export function GameManagementPage() {
                 open={systemDialogOpen}
                 onOpenChange={setSystemDialogOpen}
                 game={gameForSystem}
+            />
+
+            <CategoryDialog
+                open={createCategoryDialogOpen}
+                onOpenChange={setCreateCategoryDialogOpen}
+                name={newCategoryName}
+                description={newCategoryDescription}
+                onNameChange={setNewCategoryName}
+                onDescriptionChange={setNewCategoryDescription}
+                onSubmit={handleCreateCategory}
+                isSubmitting={createCategoryMutation.isPending}
             />
         </div>
     );
