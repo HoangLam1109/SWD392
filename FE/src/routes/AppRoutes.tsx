@@ -42,7 +42,7 @@ const AppRoutes = () => {
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/blogs/:id" element={<BlogDetailPage />} />
             <Route path="/new-post" element={<NewPostPage />} />
-            <Route path="/flappy-bird" element={<FlappyBirdPage />} />
+            <Route path="/flappy-bird/:libraryGameId" element={<FlappyBirdPage />} />
 
             {/* ADMIN routes */}
             <Route element={<RoleRoute allowRoles={['Admin']} />}>
