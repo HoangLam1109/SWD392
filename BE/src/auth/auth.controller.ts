@@ -135,19 +135,28 @@ export class AuthController {
     }
 =======
     const tokens = await this.authService.generateTokens(user);
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: 'lax',
     });
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: 'lax',
     });
+<<<<<<< Updated upstream
+    return {
+      message: 'Google OAuth login successful',
+      user,
+      tokens,
+    };
+=======
     const userData = encodeURIComponent(JSON.stringify(user));
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     res.redirect(
-      `http://localhost:5173/oauth/callback?accessToken=${tokens.accessToken}&user=${userData}`,
+      `${frontendUrl}/oauth/callback?accessToken=${tokens.accessToken}&user=${userData}`,
     );
 >>>>>>> Stashed changes
   }

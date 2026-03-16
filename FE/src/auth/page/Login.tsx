@@ -45,6 +45,7 @@ export default function SigninPage() {
         {
           onSuccess: (res) => {
             localStorage.setItem("token", res.accessToken);
+            localStorage.setItem("token_time", String(Date.now()));
             toast.success(t("auth.login.loginSuccess"));
             setUser(res.user);
             if (res.user.role === "ADMIN") {
@@ -79,13 +80,7 @@ export default function SigninPage() {
               </p>
               <Button
                 variant="outline"
-<<<<<<< Updated upstream
-                onClick={() => {
-                  window.location.href = `${import.meta.env.VITE_API_URL}/auth/oauth`;
-                }}
-=======
                 onClick={() => { window.location.href = `${import.meta.env.VITE_API_URL}/auth/oauth`; }}
->>>>>>> Stashed changes
                 className="w-full h-11 gap-3 border-2 hover:border-[#00E5FF] hover:bg-gray-300 hover:cursor-pointer hover:scale-105 transition-transform duration-300 ease-out"
               >
                 <svg

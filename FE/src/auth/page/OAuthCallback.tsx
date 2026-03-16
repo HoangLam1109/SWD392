@@ -21,6 +21,7 @@ export default function OAuthCallback() {
     try {
       const user = JSON.parse(userParam);
       localStorage.setItem("token", accessToken);
+      localStorage.setItem("token_time", String(Date.now()));
       setUser({
         id: user.userId,
         email: user.email,

@@ -4,15 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ca6d4dcc-1c29-47df-8186-da5771c34691" name="Changes" comment="">
+    <list default="true" id="b272d0f5-35d4-4381-a29c-2d7f1c38c0eb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/BE/src/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/BE/src/auth/auth.controller.ts" afterDir="false" />
-<<<<<<< Updated upstream
-=======
       <change beforePath="$PROJECT_DIR$/BE/src/auth/strategy/google.strategy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/BE/src/auth/strategy/google.strategy.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FE/src/auth/page/Login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/auth/page/Login.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FE/src/auth/page/Register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/auth/page/Register.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FE/src/routes/AppRoutes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/routes/AppRoutes.tsx" afterDir="false" />
->>>>>>> Stashed changes
+      <change beforePath="$PROJECT_DIR$/FE/src/hooks/auth/useLogout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/hooks/auth/useLogout.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FE/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/FE/src/main.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,20 +20,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-<<<<<<< Updated upstream
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "HoangPhatIsCoding"
-  }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/HoangLam1109/SWD392",
-    "accountId": "1d3079be-de48-496d-8e82-3c1c25779520"
-  }
-}]]></component>
-=======
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
     &quot;state&quot;: &quot;OPEN&quot;,
@@ -48,35 +32,34 @@
     &quot;accountId&quot;: &quot;1d3079be-de48-496d-8e82-3c1c25779520&quot;
   }
 }</component>
->>>>>>> Stashed changes
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 6
 }</component>
-  <component name="ProjectId" id="3APwdZsKXfNPg7AP1LW16pzWEMV" />
+  <component name="ProjectId" id="3B1DWJkKmbefYb1KwLoNTgGND8J" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "dev",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -87,19 +70,13 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="ca6d4dcc-1c29-47df-8186-da5771c34691" name="Changes" comment="" />
-      <created>1772507603297</created>
+      <changelist id="b272d0f5-35d4-4381-a29c-2d7f1c38c0eb" name="Changes" comment="" />
+      <created>1773647715105</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1772507603297</updated>
-      <workItem from="1772507605468" duration="746000" />
-      <workItem from="1772697016388" duration="1210000" />
-<<<<<<< Updated upstream
-=======
-      <workItem from="1773371519510" duration="1920000" />
-      <workItem from="1773373505250" duration="1230000" />
-      <workItem from="1773374757965" duration="900000" />
->>>>>>> Stashed changes
+      <updated>1773647715105</updated>
+      <workItem from="1773647716848" duration="2026000" />
+      <workItem from="1773657052731" duration="4297000" />
     </task>
     <servers />
   </component>
