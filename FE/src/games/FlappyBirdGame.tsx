@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./flappy-bird.css";
+import { useStartPlaying, useEndPlaying } from "@/hooks/game-session/useGameSession";
+import { useGetLeaderboardHighestScore } from "@/hooks/library/useGetLeaderboardHighestScore";
 
 type GamePhase = "idle" | "playing" | "gameover";
 
@@ -35,13 +37,28 @@ const createPipe = (id: number): Pipe => {
     };
 };
 
-export function FlappyBirdGame() {
+interface FlappyBirdGameProps {
+    libraryGameId: string;
+}
+
+export function FlappyBirdGame({ libraryGameId }: FlappyBirdGameProps) {
     const [phase, setPhase] = useState<GamePhase>("idle");
     const [birdY, setBirdY] = useState(GAME_HEIGHT / 2 - BIRD_SIZE / 2);
     const [birdVelocity, setBirdVelocity] = useState(0);
     const [pipes, setPipes] = useState<Pipe[]>([]);
     const [score, setScore] = useState(0);
     const [bestScore, setBestScore] = useState(0);
+    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+
+    const startPlayingMutation = useStartPlaying();
+    const endPlayingMutation = useEndPlaying();
+    const leaderboardQuery = useGetLeaderboardHighestScore({ limit: 5 });
+
+    useEffect(() => {
+        if (leaderboardQuery.data && leaderboardQuery.data.length > 0) {
+            setBestScore(leaderboardQuery.data[0].highest_score);
+        }
+    }, [leaderboardQuery.data]);
 
     const gameAreaRef = useRef<HTMLDivElement | null>(null);
     const animationFrameRef = useRef<number | null>(null);
@@ -101,14 +118,36 @@ export function FlappyBirdGame() {
         resetGame();
         phaseRef.current = "playing";
         setPhase("playing");
-    }, [resetGame]);
+
+        startPlayingMutation.mutate(libraryGameId, {
+            onSuccess: (session) => {
+                setCurrentSessionId(session._id);
+            },
+        });
+    }, [libraryGameId, resetGame, startPlayingMutation]);
 
     const endGame = useCallback(() => {
         phaseRef.current = "gameover";
         setPhase("gameover");
-        setBestScore((currentBest) => Math.max(currentBest, scoreRef.current));
+        setBestScore((currentBest) =>
+            Math.max(
+                currentBest,
+                scoreRef.current,
+                leaderboardQuery.data && leaderboardQuery.data.length > 0
+                    ? leaderboardQuery.data[0].highest_score
+                    : 0
+            )
+        );
         stopLoop();
-    }, [stopLoop]);
+
+        if (currentSessionId) {
+            endPlayingMutation.mutate({
+                gameSessionId: currentSessionId,
+                sessionScore: scoreRef.current,
+            });
+            setCurrentSessionId(null);
+        }
+    }, [currentSessionId, endPlayingMutation, stopLoop]);
 
     const flap = useCallback(() => {
         if (phaseRef.current !== "playing") {
@@ -375,9 +414,43 @@ export function FlappyBirdGame() {
                     )}
                 </div>
 
-                <div className="flappy-instructions">
-                    <p>Click or press the spacebar to keep the bird in the air.</p>
-                    <p>Avoid pipes, stay above the ground, and score by passing each pipe.</p>
+                <div className="flappy-footer">
+                    <div className="flappy-instructions">
+                        <p>Click or press the spacebar to keep the bird in the air.</p>
+                        <p>Avoid pipes, stay above the ground, and score by passing each pipe.</p>
+                    </div>
+
+                    <div className="flappy-leaderboard">
+                        <h2>Leaderboard</h2>
+                        {leaderboardQuery.isLoading && <p>Loading leaderboard...</p>}
+                        {leaderboardQuery.isError && (
+                            <p>Could not load leaderboard. Please try again later.</p>
+                        )}
+                        {leaderboardQuery.data && leaderboardQuery.data.length > 0 && (
+                            <ol>
+                                {leaderboardQuery.data.map((entry, index) => (
+                                    <li key={entry._id}>
+                                        <span>
+                                            #{index + 1}{" "}
+                                            {entry.user_id
+                                                ? `User ${entry.user_id.slice(0, 6)}…`
+                                                : "Unknown user"}
+                                        </span>
+                                        <span>
+                                            Score: <strong>{entry.highest_score}</strong>
+                                        </span>
+                                        <span>
+                                            Total playtime: {Math.round(entry.total_playtime / 60)}{" "}
+                                            min
+                                        </span>
+                                    </li>
+                                ))}
+                            </ol>
+                        )}
+                        {leaderboardQuery.data && leaderboardQuery.data.length === 0 && !leaderboardQuery.isLoading && !leaderboardQuery.isError && (
+                            <p>No leaderboard data yet. Be the first to set a high score!</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

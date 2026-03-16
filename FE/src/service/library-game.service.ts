@@ -97,4 +97,24 @@ export const libraryGameService = {
             mapLibraryGameToView(libraryGame, gamesById.get(libraryGame.game_id))
         );
     },
+
+    async getLeaderboardHighestScore(params?: {
+        gameId?: string;
+        limit?: number;
+    }): Promise<LibraryGameRecord[]> {
+        const response = await apiClient.get(
+            '/library-game/leaderboard/highest-score',
+            {
+                params: {
+                    ...(params?.gameId ? { game_id: params.gameId } : {}),
+                    ...(params?.limit ? { limit: params.limit } : {}),
+                },
+            }
+        );
+
+        const body =
+            response.data as { data?: LibraryGameRecord[] } | LibraryGameRecord[];
+
+        return Array.isArray(body) ? body : body.data ?? [];
+    },
 };

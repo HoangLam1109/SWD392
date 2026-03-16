@@ -1,6 +1,4 @@
 import { useTranslation } from "react-i18next"
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Mail } from "lucide-react"
