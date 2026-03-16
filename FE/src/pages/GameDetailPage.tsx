@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useGetSystemsByGameId } from '@/hooks/system/useGetSystemsByGameId';
 import { useAddGameToCart } from '@/hooks/cart/useAddGameToCart';
 import { useIsGameInCart } from '@/hooks/cart/useIsGameInCart';
+import { useGetCategoryById } from '@/hooks/category/useGetCategories';
 
 function formatPrice(price: number) {
     return new Intl.NumberFormat('en-US', {
@@ -40,6 +41,8 @@ export default function GameDetailPage() {
         isLoading: isLoadingSystems,
         error: systemsError,
     } = useGetSystemsByGameId(gameId);
+
+    const { data: category } = useGetCategoryById(game?.categoryId);
     
     // Cart functionality
     const { isInCart } = useIsGameInCart(gameId);
@@ -167,6 +170,11 @@ export default function GameDetailPage() {
                                 {game.title}
                             </h1>
                             <div className="flex flex-wrap items-center gap-3">
+                                {category?.categoryName && (
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-100">
+                                        {category.categoryName}
+                                    </span>
+                                )}
                                 <span
                                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${
                                         game.isActive

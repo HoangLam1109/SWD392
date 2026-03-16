@@ -11,6 +11,7 @@ import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { getImageUrl } from '@/lib/imageUtils';
 import type { Game } from '@/types/Game.types';
 import { Pencil, ExternalLink } from 'lucide-react';
+import { useGetCategoryById } from '@/hooks/category/useGetCategories';
 
 interface DetailGameDialogProps {
     open: boolean;
@@ -52,6 +53,7 @@ export function DetailGameDialog({
 
     const thumbnailUrl = getImageUrl(game.thumbnail) || '';
     const coverImageUrl = getImageUrl(game.coverImage) || '';
+    const categoryQuery = useGetCategoryById(game.categoryId);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -135,8 +137,17 @@ export function DetailGameDialog({
                                 <p className="text-sm">{game.publisher}</p>
                             </div>
                         ) : null}
+                        {game.categoryId ? (
+                            <div>
+                                <p className="text-sm font-medium text-slate-400">Category</p>
+                                <p className="text-sm">
+                                    {categoryQuery.isLoading
+                                        ? 'Loading...'
+                                        : categoryQuery.data?.categoryName ?? 'Unknown'}
+                                </p>
+                            </div>
+                        ) : null}
                     </div>
-
                     {game.releaseDate ? (
                         <div>
                             <p className="text-sm font-medium text-slate-400">Release date</p>

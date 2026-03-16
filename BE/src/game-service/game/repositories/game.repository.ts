@@ -38,7 +38,7 @@ export class GameRepository implements IGameRepository {
     return await this.gameModel.findById(
       id,
       fields ||
-        '_id title price discount isActive description developer publisher thumbnail coverImage releaseDate url',
+        '_id title price discount isActive description developer publisher thumbnail coverImage releaseDate url categoryId',
     );
   }
 

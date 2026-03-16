@@ -21,6 +21,7 @@ export const gameService = {
     },
     getGameById: async (id: string) => {
         const response = await apiClient.get(`/games/${id}`);
-        return response.data as Game;
+        const body = response.data as { data?: Game } | Game;
+        return (body as { data?: Game }).data ?? (body as Game);
     },
 }
