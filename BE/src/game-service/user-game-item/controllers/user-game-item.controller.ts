@@ -22,6 +22,8 @@ import { UserGameItemResponseDto } from '../dto/user-game-item-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { GetUser } from 'src/common/decorators/info.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
+import { Role } from 'src/auth/decorators/role.decorator';
 
 @ApiTags('User Game Items')
 @Controller('user-game-item')
@@ -39,6 +41,11 @@ export class UserGameItemController {
     description: 'Bad request - invalid input data',
   })
   @Post()
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   create(@Body() createUserGameItemDto: CreateUserGameItemDto) {
     return this.userGameItemService.create(createUserGameItemDto);
   }
@@ -85,6 +92,11 @@ export class UserGameItemController {
     description: 'List of all game items with pagination',
     type: PaginationResponseDto<UserGameItemResponseDto>,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
     return this.userGameItemService.findAllWithPagination(query);
@@ -132,6 +144,11 @@ export class UserGameItemController {
     description: 'User game item updated successfully',
     type: UserGameItemResponseDto,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -158,6 +175,11 @@ export class UserGameItemController {
     status: 200,
     description: 'User game item deleted successfully',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userGameItemService.remove(id);

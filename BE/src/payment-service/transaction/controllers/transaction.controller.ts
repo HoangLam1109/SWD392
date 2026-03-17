@@ -22,7 +22,9 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { TransactionResponseDto } from '../dto/transaction-response.dto';
 import { CreateDepositDto } from '../dto/create-deposit.dto';
-import { GetUser } from 'src/common/decorators/info.decorator';
+import { GetUser } from '../../../common/decorators/info.decorator';
+import { UserRole } from '../../../user-service/user/enum/user.enum';
+import { Role } from '../../../auth/decorators/role.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Transactions')
@@ -40,6 +42,11 @@ export class TransactionController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createTransactionDto: CreateTransactionDto) {
     return this.transactionService.create(createTransactionDto);
@@ -87,6 +94,11 @@ export class TransactionController {
     description: 'List of all transactions with pagination',
     type: PaginationResponseDto<TransactionResponseDto>,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
     return this.transactionService.findAllWithPagination(query);
@@ -102,6 +114,11 @@ export class TransactionController {
     status: 404,
     description: 'Transaction not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.transactionService.findTransactionById(id);
@@ -117,6 +134,11 @@ export class TransactionController {
     status: 404,
     description: 'Transaction not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get('ref/:refId')
   findByRefId(@Param('refId') refId: string) {
     return this.transactionService.findByRefId(refId);
@@ -128,6 +150,11 @@ export class TransactionController {
     description: 'Transactions found',
     type: TransactionResponseDto,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get('wallet/:walletId')
   findByWalletId(@Param('walletId') walletId: string) {
     return this.transactionService.findByWalletId(walletId);
@@ -143,6 +170,11 @@ export class TransactionController {
     status: 404,
     description: 'Transaction not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -160,6 +192,11 @@ export class TransactionController {
     status: 404,
     description: 'Transaction not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.transactionService.deleteTransaction(id);

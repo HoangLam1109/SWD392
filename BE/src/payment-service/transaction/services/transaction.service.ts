@@ -130,8 +130,8 @@ export class TransactionService {
       throw new NotFoundException('User wallet not found');
     }
 
-    await this.webWalletService.updateWalletBalance(
-      wallet.id,
+    await this.webWalletService.depositBalance(
+      wallet.userId,
       transaction.amount!,
     );
 

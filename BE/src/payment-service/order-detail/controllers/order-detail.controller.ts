@@ -21,6 +21,8 @@ import { UpdateOrderDetailDto } from '../dto/update-order-detail.dto';
 import { OrderDetailResponseDto } from '../dto/order-detail-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { Role } from '../../../auth/decorators/role.decorator';
+import { UserRole } from '../../../user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('Order Details')
@@ -34,6 +36,11 @@ export class OrderDetailController {
     description: 'Order detail created successfully',
     type: OrderDetailResponseDto,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createOrderDetailDto: CreateOrderDetailDto) {
     return this.orderDetailService.createOrderDetail(createOrderDetailDto);
@@ -71,6 +78,11 @@ export class OrderDetailController {
     description: 'Order details retrieved successfully',
     type: PaginationResponseDto<OrderDetailResponseDto>,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAllWithPagination(@Query() query: PaginationOptionsDto) {
     return this.orderDetailService.findAllWithPagination(query);
@@ -97,6 +109,11 @@ export class OrderDetailController {
     status: 404,
     description: 'Order detail not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.orderDetailService.findOrderDetailById(id);
@@ -116,6 +133,11 @@ export class OrderDetailController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -133,6 +155,11 @@ export class OrderDetailController {
     status: 404,
     description: 'Order detail not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.orderDetailService.deleteOrderDetail(id);
@@ -143,6 +170,11 @@ export class OrderDetailController {
     status: 200,
     description: 'Order details deleted successfully',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete('order/:orderId')
   removeByOrderId(@Param('orderId') orderId: string) {
     return this.orderDetailService.deleteOrderDetailsByOrderId(orderId);

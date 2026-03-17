@@ -20,7 +20,9 @@ import { UpdateOrderDto } from '../dto/update-order.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { OrderResponseDto } from '../dto/order-response.dto';
-import { GetUser } from 'src/common/decorators/info.decorator';
+import { GetUser } from '../../../common/decorators/info.decorator';
+import { Role } from '../../../auth/decorators/role.decorator';
+import { UserRole } from '../../../user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('Orders')
@@ -38,6 +40,11 @@ export class OrderController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.createOrder(createOrderDto.userId, createOrderDto);
@@ -85,6 +92,11 @@ export class OrderController {
     description: 'List of all orders with pagination',
     type: PaginationResponseDto<OrderResponseDto>,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
     return this.orderService.findAllWithPagination(query);
@@ -115,6 +127,11 @@ export class OrderController {
     status: 404,
     description: 'Order not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.updateOrder(id, updateOrderDto);

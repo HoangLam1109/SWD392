@@ -18,6 +18,7 @@ export class GameSessionService {
   ) {}
 
   async create(
+    userId: string,
     libraryGameId: string,
     createGameSessionDto: CreateGameSessionDto,
   ): Promise<GameSessionDocument> {
@@ -46,6 +47,7 @@ export class GameSessionService {
     });
 
     await this.syncLibraryGameHighestScore(
+      userId,
       createdSession.library_game_id,
       createdSession.session_score,
       createdSession.ended_at,
@@ -76,6 +78,7 @@ export class GameSessionService {
   }
 
   async update(
+    userId: string,
     id: string,
     updateGameSessionDto: UpdateGameSessionDto,
   ): Promise<GameSessionDocument | null> {
@@ -125,6 +128,7 @@ export class GameSessionService {
     }
 
     await this.syncLibraryGameHighestScore(
+      userId,
       updatedSession.library_game_id,
       updatedSession.session_score,
       updatedSession.ended_at,
@@ -205,11 +209,19 @@ export class GameSessionService {
   }
 
   private async syncLibraryGameHighestScore(
+    userId: string,
     libraryGameId: string,
     sessionScore: number,
     playedAt?: Date,
   ): Promise<void> {
-    const libraryGame = await this.libraryGameService.findOne(libraryGameId);
+    const libraryGame = await this.libraryGameService.findByUserId(
+      userId,
+      libraryGameId,
+    );
+
+    if (!libraryGame) {
+      throw new NotFoundException('Library game not found');
+    }
 
     if (sessionScore > libraryGame.highest_score) {
       await this.libraryGameService.update(libraryGameId, {

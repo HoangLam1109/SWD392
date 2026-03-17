@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { GameKeyService } from '../services/game-key.service';
 import { CreateGameKeyDto } from '../dto/create-game-key.dto';
@@ -21,7 +22,11 @@ import { UpdateGameKeyDto } from '../dto/update-game-key.dto';
 import { GameKeyResponseDto } from '../dto/game-key-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
 
+@ApiBearerAuth()
+@Role(UserRole.ADMIN, UserRole.MANAGER)
 @ApiTags('Game Keys')
 @Controller('game-key')
 export class GameKeyController {

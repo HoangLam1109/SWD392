@@ -22,6 +22,8 @@ import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto'
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { GetUser } from 'src/common/decorators/info.decorator';
 import { WebWalletResponseDto } from '../dto/web-wallet-response.dto';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('Web Wallets')
@@ -39,6 +41,11 @@ export class WebWalletController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createWebWalletDto: CreateWebWalletDto) {
     return this.webWalletService.create(createWebWalletDto);
@@ -86,6 +93,11 @@ export class WebWalletController {
     description: 'List of all web wallets with pagination',
     type: PaginationResponseDto<WebWalletResponseDto>,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
     return this.webWalletService.findAllWithPagination(query);
@@ -116,6 +128,11 @@ export class WebWalletController {
     status: 404,
     description: 'Web wallet not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.webWalletService.findWalletById(id);
@@ -131,6 +148,11 @@ export class WebWalletController {
     status: 404,
     description: 'Web wallet not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -149,6 +171,11 @@ export class WebWalletController {
     status: 404,
     description: 'Web wallet not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.webWalletService.deleteWallet(id);

@@ -15,6 +15,10 @@ export interface ILibraryGameRepository {
     libraryGameData: Partial<ILibraryGame>,
   ): Promise<LibraryGameDocument | null>;
   deleteById(id: string): Promise<LibraryGameDocument | null>;
+  findByUserId(
+    userId: string,
+    libraryGameId?: string,
+  ): Promise<LibraryGameDocument | null>;
   findAll(): Promise<LibraryGameDocument[]>;
   findWithQuery(
     query: Record<string, any>,
@@ -66,6 +70,17 @@ export class LibraryGameRepository implements ILibraryGameRepository {
     return await this.libraryGameModel.find();
   }
 
+  async findByUserId(
+    userId: string,
+    libraryGameId?: string,
+  ): Promise<LibraryGameDocument | null> {
+    const query: Record<string, any> = { user_id: userId };
+    if (libraryGameId) {
+      query._id = libraryGameId;
+    }
+    return await this.libraryGameModel.findOne(query);
+  }
+
   async findWithQuery(
     query: Record<string, any>,
     options: {
@@ -88,6 +103,13 @@ export class LibraryGameRepository implements ILibraryGameRepository {
 
   async countDocument(query: Record<string, any>): Promise<number> {
     return await this.libraryGameModel.countDocuments(query);
+  }
+
+  async findHighestScoreByUserId(userId: string) {
+    return await this.libraryGameModel
+      .findOne({ user_id: userId })
+      .sort({ highest_score: -1 })
+      .lean();
   }
 
   async findHighestScoreLeaderboardByUser(
