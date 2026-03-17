@@ -8,6 +8,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/providers/AuthProvider'
 
+document.documentElement.classList.add('dark')
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

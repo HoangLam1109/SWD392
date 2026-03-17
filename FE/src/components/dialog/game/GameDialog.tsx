@@ -17,6 +17,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import type { Game, CreateGameDTO, UpdateGameDTO } from '@/types/Game.types';
 import { Loader2 } from 'lucide-react';
+import { useGetCategories } from '@/hooks/category/useGetCategories';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 const gameSchema = z.object({
     title: z.string().min(1, 'Title is required'),
@@ -30,6 +38,7 @@ const gameSchema = z.object({
     publisher: z.string().optional(),
     releaseDate: z.string().optional(),
     url: z.string().url('Invalid URL').optional().or(z.literal('')),
+    categoryId: z.string().optional().or(z.literal('')),
 });
 
 type GameFormData = z.infer<typeof gameSchema>;
@@ -61,7 +70,10 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
         },
     });
 
+    const { data: categories = [], isLoading: isCategoriesLoading } = useGetCategories();
+
     const isActive = watch('isActive');
+    const categoryIdValue = watch('categoryId');
 
     useEffect(() => {
         if (game) {
@@ -77,6 +89,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                 publisher: game.publisher || '',
                 releaseDate: game.releaseDate ? String(game.releaseDate).slice(0, 10) : '',
                 url: game.url || '',
+                categoryId: game.categoryId || '',
             });
         } else {
             reset({
@@ -91,6 +104,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                 publisher: '',
                 releaseDate: '',
                 url: '',
+                categoryId: '',
             });
         }
         setApiError(null);
@@ -114,6 +128,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                     releaseDate: new Date(data.releaseDate.trim() + 'T00:00:00.000Z').toISOString(),
                 }),
                 ...(data.url?.trim() && { url: data.url.trim() }),
+                ...(data.categoryId?.trim() && { categoryId: data.categoryId.trim() }),
             };
             await onSave(payload);
             onOpenChange(false);
@@ -250,7 +265,33 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                             <p className="text-sm text-red-500">{errors.coverImage.message}</p>
                         )}
                     </div>
-
+                    <div className="space-y-2">
+                        <Label htmlFor="categoryId">Category</Label>
+                        <Select
+                            value={categoryIdValue || ''}
+                            onValueChange={(value) => setValue('categoryId', value)}
+                        >
+                            <SelectTrigger
+                                id="categoryId"
+                                className="bg-slate-900/60 border-slate-700 text-slate-50"
+                            >
+                                <SelectValue
+                                    placeholder={
+                                        isCategoriesLoading
+                                            ? 'Loading categories...'
+                                            : 'Select category'
+                                    }
+                                />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-900 border-slate-700 text-slate-50">
+                                {categories.map((category) => (
+                                    <SelectItem key={category.categoryId} value={category.categoryId}>
+                                        {category.categoryName}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="developer">Developer</Label>

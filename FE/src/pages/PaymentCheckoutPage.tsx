@@ -3,9 +3,9 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Navbar } from "@/components/home";
 import { useGetOrderById } from "@/hooks/order/useGetOrderById";
 import { useCancelOrder } from "@/hooks/order/useCancelOrder";
-import { paymentService } from "@/service/payment.service";
 import type { VNPayPayment } from "@/types/Payment.types";
 import { Check, CreditCard, Wallet, ArrowLeft } from "lucide-react";
+import { useCreateVnpayUrl } from "@/hooks/payment/useCreateVnpayUrl";
 
 interface LocationState {
     order?: {
@@ -25,7 +25,7 @@ export default function PaymentCheckoutPage() {
     const [error, setError] = useState<string | null>(null);
 
     const cancelOrderMutation = useCancelOrder();
-
+    const createVnpayUrlMutation = useCreateVnpayUrl();
     const { data: fetchedOrder, isLoading } = useGetOrderById(
         orderId,
         !locationState?.order
@@ -54,12 +54,12 @@ export default function PaymentCheckoutPage() {
                 totalPrice: order.totalPrice,
             };
 
-            const result = await paymentService.createVnpayUrl(payload);
+            const result = await createVnpayUrlMutation.mutateAsync(payload);
             if (result?.redirectUrl) {
                 window.location.href = result.redirectUrl;
             } else {
                 setError("Cannot create VNPay payment URL.");
-                setIsRedirecting(false);
+                setIsRedirecting(false  );
             }
         } catch (e) {
             console.error(e);

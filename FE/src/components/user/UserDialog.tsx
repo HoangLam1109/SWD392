@@ -27,7 +27,7 @@ const createUserSchema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
     email: z.string().email('Invalid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    role: z.enum(['Player', 'Moderator', 'Admin'], {
+    role: z.enum(['Player', 'Manager', 'Admin'], {
         required_error: 'Role is required',
     }),
     avatar: z.string().url('Invalid URL').optional().or(z.literal('')),
@@ -40,7 +40,7 @@ const updateUserSchema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
     email: z.string().email('Invalid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters').optional().or(z.literal('')),
-    role: z.enum(['Player', 'Moderator', 'Admin'], {
+    role: z.enum(['Player', 'Manager', 'Admin'], {
         required_error: 'Role is required',
     }),
     avatar: z.string().url('Invalid URL').optional().or(z.literal('')),
@@ -213,7 +213,7 @@ export function UserDialog({ open, onOpenChange, user, onSave }: UserDialogProps
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Player">Player</SelectItem>
-                                    <SelectItem value="Moderator">Moderator</SelectItem>
+                                    <SelectItem value="Manager">Manager</SelectItem>
                                     <SelectItem value="Admin">Admin</SelectItem>
                                 </SelectContent>
                             </Select>

@@ -1,9 +1,5 @@
 import type { NavigationItem } from "./navigation.types";
-import { Users, Gamepad2, FileText } from "lucide-react";
-
-
-
-
+import { Users, CalendarArrowDown, FileText, Gamepad2 } from "lucide-react";
 
 export const navigationConfig: NavigationItem[] = [
     // Admin navigation
@@ -11,14 +7,14 @@ export const navigationConfig: NavigationItem[] = [
         id: "user-management",
         label: "User Management",
         icon: Users,
-        roles: ["ADMIN"],
+        roles: ["Admin"],
         path: "/admin/user-management",
     },
     {
         id: "game-management-admin",
         label: "Game Management",
         icon: Gamepad2,
-        roles: ["ADMIN"],
+        roles: ["Admin"],
         path: "/admin/game-management",
     },
     {
@@ -26,7 +22,7 @@ export const navigationConfig: NavigationItem[] = [
         label: "Blog Moderation",
         path: "/admin/blogs",
         icon: FileText,
-        roles: ["ADMIN"]
+        roles: ["Admin"]
     },
 
     // Manager / Moderator navigation
@@ -34,8 +30,15 @@ export const navigationConfig: NavigationItem[] = [
         id: "game-management-manager",
         label: "Game Management",
         icon: Gamepad2,
-        roles: ["MANAGER"],
+        roles: ["Manager"],
         path: "/manager/game-management",
     },
-
+    {
+        id: "order-management-manager",
+        label: "Order Management",
+        icon: CalendarArrowDown,
+        roles: ["Manager"],
+        path: "/manager/order-management",
+    },
+    
 ];
