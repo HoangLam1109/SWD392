@@ -20,6 +20,8 @@ import { CartResponseDto } from '../dto/cart-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { GetUser } from '../../../common/decorators/info.decorator';
+import { Role } from '../../../auth/decorators/role.decorator';
+import { UserRole } from '../../../user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('Carts')
@@ -59,6 +61,11 @@ export class CartController {
     description: 'Paginated list of carts',
     type: PaginationResponseDto<CartResponseDto>,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAllWithPagination(@Query() query: PaginationOptionsDto) {
     return this.cartService.findAllWithPagination(query);
@@ -140,6 +147,11 @@ export class CartController {
     status: 404,
     description: 'Cart not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.cartService.findCartById(id);

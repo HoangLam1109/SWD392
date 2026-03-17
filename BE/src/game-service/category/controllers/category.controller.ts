@@ -21,6 +21,8 @@ import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { CategoryResponseDto } from '../dto/category-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('categories')
@@ -38,6 +40,11 @@ export class CategoryController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
@@ -147,6 +154,11 @@ export class CategoryController {
     status: 404,
     description: 'Category not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -164,6 +176,11 @@ export class CategoryController {
     status: 404,
     description: 'Category not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);

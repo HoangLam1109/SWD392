@@ -28,6 +28,8 @@ import type { Request, Response } from 'express';
 import type { ReturnQueryFromVNPay } from 'vnpay';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { CreateDepositUrlDto } from '../dto/create-deposit-url.dto';
+import { Role } from '../../../auth/decorators/role.decorator';
+import { UserRole } from '../../../user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('Payments')
@@ -45,6 +47,11 @@ export class PaymentController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentService.createPayment(createPaymentDto);
@@ -92,6 +99,11 @@ export class PaymentController {
     description: 'List of all payments with pagination',
     type: PaginationResponseDto,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
     return this.paymentService.findAllWithPagination(query);
@@ -107,6 +119,11 @@ export class PaymentController {
     status: 404,
     description: 'Payment not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.paymentService.findPaymentById(id);
@@ -122,6 +139,11 @@ export class PaymentController {
     status: 404,
     description: 'Payment not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get('transaction/:transactionCode')
   findByTransactionCode(@Param('transactionCode') transactionCode: string) {
     return this.paymentService.findByCode(transactionCode);
@@ -136,6 +158,11 @@ export class PaymentController {
     status: 404,
     description: 'Payment not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
     return this.paymentService.updatePayment(id, updatePaymentDto);

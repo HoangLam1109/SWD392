@@ -21,6 +21,8 @@ import { UpdateSystemRequirementDto } from '../dto/update-system_requirement.dto
 import { SystemRequirementResponseDto } from '../dto/system_requirement-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('system-requirements')
@@ -40,6 +42,11 @@ export class SystemRequirementController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createSystemRequirementDto: CreateSystemRequirementDto) {
     return this.systemRequirementService.create(createSystemRequirementDto);
@@ -87,6 +94,11 @@ export class SystemRequirementController {
     description: 'List of all system requirements with pagination',
     type: PaginationResponseDto,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
     return this.systemRequirementService.findAllWithPagination(query);
@@ -128,6 +140,11 @@ export class SystemRequirementController {
     status: 404,
     description: 'System requirement not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -145,6 +162,11 @@ export class SystemRequirementController {
     status: 404,
     description: 'System requirement not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.systemRequirementService.remove(id);

@@ -21,6 +21,8 @@ import { UpdateGameItemDto } from '../dto/update-game-item.dto';
 import { GameItemResponseDto } from '../dto/game-item-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('Game Items')
@@ -38,6 +40,11 @@ export class GameItemController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createGameItemDto: CreateGameItemDto) {
     return this.gameItemService.create(createGameItemDto);
@@ -115,6 +122,11 @@ export class GameItemController {
     status: 404,
     description: 'Game item not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -132,6 +144,11 @@ export class GameItemController {
     status: 404,
     description: 'Game item not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.gameItemService.remove(id);

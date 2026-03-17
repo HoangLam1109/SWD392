@@ -51,6 +51,20 @@ export class LibraryGameService {
     return libraryGame;
   }
 
+  async findByUserId(
+    userId: string,
+    libraryGameId?: string,
+  ): Promise<LibraryGameDocument> {
+    const libraryGame = await this.libraryGameRepository.findByUserId(
+      userId,
+      libraryGameId,
+    );
+    if (!libraryGame) {
+      throw new NotFoundException('Library game not found');
+    }
+    return libraryGame;
+  }
+
   async update(
     id: string,
     updateLibraryGameDto: UpdateLibraryGameDto,
@@ -69,6 +83,12 @@ export class LibraryGameService {
 
   async remove(id: string): Promise<LibraryGameDocument | null> {
     return await this.libraryGameRepository.deleteById(id);
+  }
+
+  async getHighestScoreByUserId(
+    userId: string,
+  ): Promise<LibraryGameDocument | null> {
+    return await this.libraryGameRepository.findHighestScoreByUserId(userId);
   }
 
   async getHighestScoreLeaderboard(

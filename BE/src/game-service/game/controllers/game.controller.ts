@@ -21,6 +21,8 @@ import { UpdateGameDto } from '../dto/update-game.dto';
 import { GameResponseDto } from '../dto/game-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('games')
@@ -38,6 +40,11 @@ export class GameController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createGameDto: CreateGameDto) {
     return this.gameService.createGame(createGameDto);
@@ -78,10 +85,6 @@ export class GameController {
     status: 200,
     description: 'Paginated list of games',
     type: PaginationResponseDto<GameResponseDto>,
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin access required',
   })
   @Get()
   findAllWithPagination(@Query() query: PaginationOptionsDto) {
@@ -127,6 +130,11 @@ export class GameController {
     status: 404,
     description: 'Game not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get('index')
   indexAllGames() {
     return this.gameService.findAllForIndexing();
@@ -171,6 +179,11 @@ export class GameController {
     status: 404,
     description: 'Game not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
     return this.gameService.updateGame(id, updateGameDto);
@@ -185,6 +198,11 @@ export class GameController {
     status: 404,
     description: 'Game not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.gameService.deleteGame(id);

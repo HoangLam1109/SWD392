@@ -22,6 +22,8 @@ import { LibraryGameLeaderboardResponseDto } from '../dto/library-game-leaderboa
 import { LibraryGameResponseDto } from '../dto/library-game.response';
 import { UpdateLibraryGameDto } from '../dto/update-library-game.dto';
 import { LibraryGameService } from '../services/library-game.service';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('Library Games')
@@ -35,6 +37,11 @@ export class LibraryGameController {
     description: 'Library game created successfully',
     type: LibraryGameResponseDto,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createLibraryGameDto: CreateLibraryGameDto) {
     return this.libraryGameService.create(createLibraryGameDto);
@@ -110,6 +117,11 @@ export class LibraryGameController {
     description: 'Library game updated successfully',
     type: LibraryGameResponseDto,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -123,6 +135,11 @@ export class LibraryGameController {
     status: 200,
     description: 'Library game deleted successfully',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.libraryGameService.remove(id);
