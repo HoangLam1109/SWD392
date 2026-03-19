@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import type { LibraryGameView } from '@/types/LibraryGame.types';
+import { getImageUrl } from '@/lib/imageUtils';
 
 interface GameCardProps {
     game: LibraryGameView;
@@ -26,18 +27,6 @@ export function GameCard({ game }: GameCardProps) {
         });
     };
 
-    const formatPlaytime = (minutes: number) => {
-        if (minutes < 60) {
-            return `${minutes}m`;
-        }
-
-        const hours = Math.floor(minutes / 60);
-        const remainingMinutes = minutes % 60;
-
-        return remainingMinutes > 0
-            ? `${hours}h ${remainingMinutes}m`
-            : `${hours}h`;
-    };
 
     const handlePlay = () => {
         if (!game.url) {
@@ -52,7 +41,10 @@ export function GameCard({ game }: GameCardProps) {
             {/* Game Thumbnail */}
             <div className="relative w-full aspect-[460/215] overflow-hidden bg-slate-800/50">
                 <img
-                    src={game.thumbnail || 'https://placehold.co/460x215/0f172a/e2e8f0?text=No+Image'}
+                    src={
+                        getImageUrl(game.thumbnail) ||
+                        'https://placehold.co/460x215/0f172a/e2e8f0?text=No+Image'
+                    }
                     alt={game.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -84,7 +76,7 @@ export function GameCard({ game }: GameCardProps) {
                             <span className="text-blue-400">{t('common.publisher')}:</span> {game.publisher}
                         </p>
                         <p>
-                            <span className="text-blue-400">Playtime:</span> {formatPlaytime(game.totalPlaytime)}
+                            <span className="text-blue-400">Playtime:</span> {game.totalPlaytime} minutes
                         </p>
                     </div>
                     <button

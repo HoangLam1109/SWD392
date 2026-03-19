@@ -11,9 +11,9 @@ import { useIsGameInCart } from '@/hooks/cart/useIsGameInCart';
 import { useGetCategoryById } from '@/hooks/category/useGetCategories';
 
 function formatPrice(price: number) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'VND',
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }).format(price);
@@ -23,7 +23,7 @@ function formatDate(value: string | undefined): string {
     if (!value) return '—';
     try {
         const date = new Date(value);
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleDateString('vi-VN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',

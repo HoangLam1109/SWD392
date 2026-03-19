@@ -20,7 +20,7 @@ export function LibraryPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGameId, setSelectedGameId] = useState<string | undefined>();
     const [filters, setFilters] = useState<LibraryFilters>({
-        genre: 'all',
+        category: 'all',
         sortBy: 'title',
         sortOrder: 'asc',
     });
@@ -41,8 +41,11 @@ export function LibraryPage() {
             );
         }
 
-        if (filters.genre !== 'all') {
-            result = result.filter((game) => game.genre === filters.genre);
+        if (filters.category !== 'all') {
+            result = result.filter((game) => {
+                const category = game.categoryName ?? game.genre;
+                return category === filters.category;
+            });
         }
 
         result.sort((a, b) => {
@@ -67,11 +70,11 @@ export function LibraryPage() {
         return result;
     }, [filters, libraryGames, searchQuery]);
 
-    const genres = useMemo(() => {
+    const categories = useMemo(() => {
         return Array.from(
             new Set(
                 libraryGames
-                    .map((game) => game.genre)
+                    .map((game) => game.categoryName ?? game.genre)
                     .filter((genre): genre is string => Boolean(genre))
             )
         ).sort((a, b) => a.localeCompare(b));
@@ -89,11 +92,11 @@ export function LibraryPage() {
                     <LibrarySidebar
                         searchValue={searchQuery}
                         onSearchChange={setSearchQuery}
-                        genreFilter={filters.genre}
-                        onGenreFilterChange={(value) =>
-                            setFilters((prev) => ({ ...prev, genre: value }))
+                        categoryFilter={filters.category}
+                        onCategoryFilterChange={(value) =>
+                            setFilters((prev) => ({ ...prev, category: value }))
                         }
-                        genres={genres}
+                        categories={categories}
                         games={filteredAndSortedGames}
                         selectedGameId={selectedGameId}
                         onSelectGame={(game) => setSelectedGameId(game.gameId)}
@@ -193,7 +196,7 @@ export function LibraryPage() {
                                 <LibraryStateCard
                                     title="No games found"
                                     description={
-                                        searchQuery || filters.genre !== 'all'
+                                        searchQuery || filters.category !== 'all'
                                             ? 'Try adjusting your search or filters'
                                             : 'No games were found in your library yet'
                                     }

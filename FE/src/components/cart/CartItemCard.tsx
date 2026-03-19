@@ -85,11 +85,11 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
             <div className="flex items-center gap-3">
               {originalPrice && (
                 <span className="text-slate-500 line-through text-sm">
-                  VNĐ{originalPrice.toFixed(2)}
+                  {originalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                 </span>
               )}
               <span className="text-2xl font-bold text-white">
-                VNĐ{finalPrice.toFixed(2)}
+                {finalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
               </span>
             </div>
           </div>

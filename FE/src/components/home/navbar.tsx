@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower, Wallet, History } from 'lucide-react';
+import { ShoppingBag, Library, Users, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower, Wallet, History } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { Button } from '@/components/ui/button';
@@ -61,10 +61,6 @@ export function Navbar({ fixed }: NavbarProps) {
               <Link to="/community" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Users className="w-4 h-4" />
                 <span>{t('common.community')}</span>
-              </Link>
-              <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
-                <Tag className="w-4 h-4" />
-                <span>{t('common.deals')}</span>
               </Link>
               <Link to="/cart" className="relative flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <ShoppingBasket className="w-4 h-4" />
@@ -178,14 +174,6 @@ export function Navbar({ fixed }: NavbarProps) {
               >
                 <Users className="w-4 h-4" />
                 Community
-              </Link>
-              <Link
-                to="/"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Tag className="w-4 h-4" />
-                Deals
               </Link>
               <Link
                 to="/cart"

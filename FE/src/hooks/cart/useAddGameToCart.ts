@@ -6,7 +6,7 @@ export const useAddGameToCart = () => {
     return useMutation({
         mutationFn: cartService.addGameToCart,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['myCart'] });
+            queryClient.invalidateQueries({ queryKey: ['myCart', 'withItems'] });
         },
     });
 }
