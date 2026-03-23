@@ -18,7 +18,6 @@ export default function GoogleCallback() {
       try {
         const user = JSON.parse(userParam);
         localStorage.setItem("token", accessToken);
-        localStorage.setItem("token_time", String(Date.now()));
         setUser(user);
         toast.success(t("auth.login.loginSuccess"));
 
