@@ -13,7 +13,6 @@ export default function StorePage() {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filters, setFilters] = useState<any>({
-    priceRange: [0, 100],
     priceRange: [0, 2000000],
     minRating: 0,
     categories: [],
@@ -46,7 +45,6 @@ export default function StorePage() {
         break;
       case 'popular':
       default:
-        games.sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime());
         games.sort((a, b) => new Date(b.releaseDate ?? '').getTime() - new Date(a.releaseDate ?? '').getTime());
         break;
     }
@@ -91,14 +89,11 @@ export default function StorePage() {
             </div>
           </div>
 
-          {/* Category Navigation */}
-          {/* <CategoryNav selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} /> */}
 
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="relative py-8">
       <section className="relative py-8">  
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-8">
