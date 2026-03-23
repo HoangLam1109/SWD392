@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useGetCurrentUser } from "@/hooks/auth/useGetCurrentUser";
 import { useGetWalletByUserId } from "@/hooks/wallet/useGetWalletByUserId";
 import { useDepositToWallet } from "@/hooks/transaction/useDepositToWallet";
@@ -11,9 +12,10 @@ const defaultForm: CreateWalletDTO = {
     status: "ACTIVED",
 };
 
-const PRESET_AMOUNTS = [50_000, 100_000, 200_000, 500_000, 1_000_000];
+const PRESET_AMOUNTS = [50_000, 100_000, 200_000, 500_000, 1_000_000,5_000_000,10_000_000];
 
 export default function WalletPage() {
+    const navigate = useNavigate();
     const { data: currentUser, isLoading: isLoadingUser } = useGetCurrentUser();
     const userId = currentUser?._id;
     const { data: wallet, isLoading: isLoadingWallet } = useGetWalletByUserId();
@@ -96,11 +98,21 @@ export default function WalletPage() {
     const currentStatus = wallet?.status ?? form.status;
 
     return (
-        <div className="p-6 max-w-2xl mx-auto space-y-6">
-            <h1 className="text-2xl font-semibold">My Wallet</h1>
+        <div className="min-h-screen bg-slate-50 text-slate-900 p-6">
+            <div className="max-w-2xl mx-auto space-y-6">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-semibold">My Wallet</h1>
+                    <button
+                        type="button"
+                        onClick={() => navigate("/")}
+                        className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                    >
+                        Go to Home
+                    </button>
+                </div>
 
             {/* Wallet summary */}
-            <div className="rounded-lg border bg-card p-4 space-y-2">
+            <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-2 shadow-sm">
                 <p className="text-sm text-muted-foreground">Balance</p>
                 <p className="text-2xl font-semibold">
                     {currentAmount.toLocaleString()} {currentCurrency}
@@ -120,8 +132,8 @@ export default function WalletPage() {
             </div>
 
             {/* Preset amounts */}
-            <div className="rounded-lg border bg-card p-4 space-y-3">
-                <p className="text-sm font-medium text-muted-foreground">
+            <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3 shadow-sm">
+                <p className="text-sm font-medium text-slate-700">
                     Chọn mệnh giá nạp nhanh
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -134,7 +146,12 @@ export default function WalletPage() {
                                 depositToWalletMutation.isPending ||
                                 createVNpayPaymentTransactionMutation.isPending
                             }
-                            className="rounded-lg border border-primary/50 bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20 disabled:opacity-50 transition-colors"
+                            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50
+                                ${
+                                    depositAmount === amount
+                                        ? "border-sky-500 bg-sky-50 text-sky-700"
+                                        : "border border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                                }`}
                         >
                             {amount >= 1_000_000
                                 ? `${amount / 1_000_000}M`
@@ -146,7 +163,7 @@ export default function WalletPage() {
             </div>
 
             {/* Create / Update form */}
-            <form className="rounded-lg border bg-card p-4 space-y-4">
+            <form className="rounded-lg border border-slate-200 bg-white p-4 space-y-4 shadow-sm">
                 <div className="space-y-2">
                     <label className="text-sm font-medium">Số tiền nạp (VND)</label>
                     <input
@@ -188,6 +205,7 @@ export default function WalletPage() {
                     </button>
                 </div>
             </form>
+            </div>
         </div>
     );
 }

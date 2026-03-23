@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { AuthContext } from "@/context/auth.context";
-import { useRefreshToken } from "@/hooks/auth/userRefreshToken";
+import { useRefreshToken } from "@/hooks/auth/useRefreshToken";
 import type { User } from "@/types/Auth.types";
 
 const AUTH_USER_KEY = "auth_user";

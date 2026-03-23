@@ -4,4 +4,3 @@
 export { GameCard } from './GameCard';
 export { LibrarySidebar } from './LibararySidebar';
 export { GameHeader } from './LibraryHeader';
-export { mockGames, getAllGenres } from './mockGameData';
