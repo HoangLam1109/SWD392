@@ -1,8 +1,19 @@
+import type { Game } from "@/types/Game.types";
 import { GameCard } from "./GameCard";
 import { useGetGames } from "@/hooks/game/useGetGames";
 
-export function GameList() {
-    const { data: games, isLoading, error } = useGetGames();
+type GameListProps = {
+    games?: Game[];
+    isLoading?: boolean;
+    error?: Error | null;
+};
+
+export function GameList({ games: externalGames, isLoading: externalLoading, error: externalError }: GameListProps = {}) {
+    const shouldFetch = externalGames === undefined;
+    const { data: fetchedGames, isLoading: fetchedLoading, error: fetchedError } = useGetGames();
+    const games = shouldFetch ? (fetchedGames ?? []) : externalGames;
+    const isLoading = shouldFetch ? fetchedLoading : (externalLoading ?? false);
+    const error = shouldFetch ? fetchedError : (externalError ?? null);
     if (isLoading) {
         return (
           <div className="grid grid-cols-4 gap-6">

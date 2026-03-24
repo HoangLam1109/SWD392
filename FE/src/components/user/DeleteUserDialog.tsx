@@ -39,7 +39,7 @@ export function DeleteUserDialog({
                     <AlertDialogDescription className="text-slate-400">
                         This action cannot be undone. This will permanently delete the user account for{' '}
                         <span className="font-semibold text-slate-50">
-                            {user?.firstName} {user?.lastName}
+                            {user?.fullName}
                         </span>{' '}
                         ({user?.email}).
                     </AlertDialogDescription>
