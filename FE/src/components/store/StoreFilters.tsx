@@ -11,7 +11,8 @@ export interface FilterState {
   /** Reserved for future use */
   minRating: number;
   categories: CategoryId[];
-  sortBy: 'popular' | 'newest' | 'price-low' | 'price-high';
+  sortBy: 'releaseDate' | 'price';
+  sortOrder: 'asc' | 'desc';
 }
 
 const categoryKeys = {
@@ -23,7 +24,7 @@ const categoryKeys = {
 } as const;
 
 type CategoryId = keyof typeof categoryKeys;
-type SortId = FilterState['sortBy'];
+type SortUiId = 'popular' | 'newest' | 'price-low' | 'price-high';
 
 export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
   const { t } = useTranslation();
@@ -35,38 +36,34 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
   });
 
   const [filters, setFilters] = useState<FilterState>({
-    priceRange: [0, 100],
+    priceRange: [0, 2000000], // 2,000,000 VND
+
     minRating: 0,
     categories: [],
-    sortBy: 'popular',
+    sortBy: 'releaseDate',
+    sortOrder: 'desc',
   });
+  const [selectedSort, setSelectedSort] = useState<SortUiId>('popular');
 
-  const categories = [
-    { id: 'action' as CategoryId },
-    { id: 'rpg' as CategoryId },
-    { id: 'strategy' as CategoryId },
-    { id: 'sports' as CategoryId },
-    { id: 'racing' as CategoryId },
-  ];
 
-  const sortOptions: { id: SortId; key: string }[] = [
+
+  const sortOptions: { id: SortUiId; key: string }[] = [
     { id: 'newest', key: 'store.filters.newest' },
     { id: 'price-low', key: 'store.filters.priceLowToHigh' },
     { id: 'price-high', key: 'store.filters.priceHighToLow' },
   ];
 
-  const toggleCategory = (categoryId: CategoryId) => {
-    const newCategories = filters.categories.includes(categoryId)
-      ? filters.categories.filter((c) => c !== categoryId)
-      : [...filters.categories, categoryId];
-    
-    const newFilters = { ...filters, categories: newCategories };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
+  
 
-  const handleSortChange = (sortId: SortId) => {
-    const newFilters = { ...filters, sortBy: sortId };
+  const handleSortChange = (sortId: SortUiId) => {
+    const sortMap: Record<SortUiId, Pick<FilterState, 'sortBy' | 'sortOrder'>> = {
+      popular: { sortBy: 'releaseDate', sortOrder: 'desc' },
+      newest: { sortBy: 'releaseDate', sortOrder: 'desc' },
+      'price-low': { sortBy: 'price', sortOrder: 'asc' },
+      'price-high': { sortBy: 'price', sortOrder: 'desc' },
+    };
+    setSelectedSort(sortId);
+    const newFilters = { ...filters, ...sortMap[sortId] };
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
@@ -107,7 +104,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
                 <input
                   type="radio"
                   name="sort"
-                  checked={filters.sortBy === option.id}
+                  checked={selectedSort === option.id}
                   onChange={() => handleSortChange(option.id)}
                   className="w-4 h-4 accent-blue-500"
                 />
@@ -117,41 +114,6 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
           </div>
         )}
       </div>
-
-      {/* Category */}
-      <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-4">
-        <button
-          onClick={() => setExpanded({ ...expanded, category: !expanded.category })}
-          className="flex items-center justify-between w-full mb-3"
-        >
-          <span className="font-medium">{t('store.filters.category')}</span>
-          {expanded.category ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
-        
-        {expanded.category && (
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <label
-                key={category.id}
-                className="flex items-center justify-between cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={filters.categories.includes(category.id)}
-                    onChange={() => toggleCategory(category.id)}
-                    className="w-4 h-4 accent-blue-500"
-                  />
-                  <span className="text-sm">{t(categoryKeys[category.id])}</span>
-                </div>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
-
-      
-
       {/* Price Range */}
       <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-4">
         <button
@@ -204,8 +166,10 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
             priceRange: [0, 100] as [number, number],
             minRating: 0,
             categories: [],
-            sortBy: 'popular',
+            sortBy: 'releaseDate',
+            sortOrder: 'desc',
           };
+          setSelectedSort('popular');
           setFilters(resetFilters);
           onFilterChange(resetFilters);
         }}

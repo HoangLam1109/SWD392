@@ -3,25 +3,28 @@ import { motion } from 'framer-motion';
 import { Search, SlidersHorizontal, X, Grid3x3, List } from 'lucide-react';
 import { Navbar } from '@/components/home';
 import { StoreFilters } from '@/components/store';
+import type { FilterState } from '@/components/store/StoreFilters';
 import type { Game } from '@/types/Game.types';
 import { GameList } from '@/components/store/GameList';
+import { useGetGames } from '@/hooks/game/useGetGames';
 
 
 export default function StorePage() {
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filters, setFilters] = useState<any>({
+  const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 2000000],
     minRating: 0,
     categories: [],
-    sortBy: 'popular',
+    sortBy: 'releaseDate',
+    sortOrder: 'desc',
   });
+  const { data: allGames = [], isLoading, error } = useGetGames();
 
   // Filter and sort products
   const filteredGames = useMemo(() => {
-    let games: Game[] = [];
+    let games: Game[] = [...allGames];
     // Filter by search query
     if (searchQuery) {
       games = games.filter((g) =>
@@ -36,21 +39,21 @@ export default function StorePage() {
     );
 
     // Sort products
-    switch (filters.sortBy) {
-      case 'price-low':
-        games.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        games.sort((a, b) => b.price - a.price);
-        break;
-      case 'popular':
-      default:
-        games.sort((a, b) => new Date(b.releaseDate ?? '').getTime() - new Date(a.releaseDate ?? '').getTime());
-        break;
+    if (filters.sortBy === 'price') {
+      const direction = filters.sortOrder === 'asc' ? 1 : -1;
+      games.sort((a, b) => (a.price - b.price) * direction);
+    } else {
+      const direction = filters.sortOrder === 'asc' ? 1 : -1;
+      games.sort(
+        (a, b) =>
+          (new Date(a.releaseDate ?? '').getTime() -
+            new Date(b.releaseDate ?? '').getTime()) *
+          direction,
+      );
     }
 
     return games;
-  }, [selectedCategory, searchQuery, filters]);
+  }, [allGames, searchQuery, filters]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -150,7 +153,7 @@ export default function StorePage() {
               </div>
 
               {/* Games */}
-              <GameList />
+              <GameList games={filteredGames} isLoading={isLoading} error={error} />
 
               {/* No Results */}
               {filteredGames.length === 0 && (
