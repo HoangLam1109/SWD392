@@ -12,3 +12,10 @@ export const useGetLeaderboardHighestScore = (params?: {
     });
 };
 
+export const useGetUserHighestScore = () => {
+    return useQuery<LibraryGameRecord, Error>({
+        queryKey: ['library-game', 'user', 'highest-score'],
+        queryFn: () => libraryGameService.getHighestScoreByUser(),
+    });
+}
+
