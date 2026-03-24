@@ -1,0 +1,29 @@
+[
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15d5" },
+    "userId": "698175d5c4308f3653af15d4",
+    "transactionId": "698175d5c4308f3653af15d9",
+    "transactionCode": "PAY_20240224_001",
+    "paymentMethod": "credit_card",
+    "created_at": { "$date": "2024-02-24T10:30:00Z" },
+    "updated_at": { "$date": "2024-02-24T10:30:00Z" }
+  },
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15d6" },
+    "userId": "698175d5c4308f3653af15d4",
+    "transactionId": "698175d5c4308f3653af15da",
+    "transactionCode": "PAY_20240223_002",
+    "paymentMethod": "paypal",
+    "created_at": { "$date": "2024-02-23T14:15:00Z" },
+    "updated_at": { "$date": "2024-02-23T14:15:00Z" }
+  },
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15d7" },
+    "userId": "698175d5c4308f3653af15d4",
+    "transactionId": "698175d5c4308f3653af15db",
+    "transactionCode": "PAY_20240222_003",
+    "paymentMethod": "bank_transfer",
+    "created_at": { "$date": "2024-02-22T09:45:00Z" },
+    "updated_at": { "$date": "2024-02-22T09:45:00Z" }
+  }
+]

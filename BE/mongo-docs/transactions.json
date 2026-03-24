@@ -1,0 +1,67 @@
+[
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15d9" },
+    "walletId": "698175d5c4308f3653af15d8",
+    "transType": "DEPOSIT",
+    "amount": 500.00,
+    "balanceBefore": 1000.00,
+    "balanceAfter": 1500.00,
+    "description": "Initial deposit via credit card",
+    "refId": "txn_001",
+    "status": "COMPLETED",
+    "created_at": { "$date": "2024-02-24T10:30:00Z" },
+    "updated_at": { "$date": "2024-02-24T10:30:00Z" }
+  },
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15da" },
+    "walletId": "698175d5c4308f3653af15d8",
+    "transType": "WITHDRAW",
+    "amount": 200.00,
+    "balanceBefore": 1500.00,
+    "balanceAfter": 1300.00,
+    "description": "ATM withdrawal",
+    "refId": "txn_002",
+    "status": "COMPLETED",
+    "created_at": { "$date": "2024-02-23T14:15:00Z" },
+    "updated_at": { "$date": "2024-02-23T14:15:00Z" }
+  },
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15db" },
+    "walletId": "698175d5c4308f3653af15d8",
+    "transType": "PAYMENT",
+    "amount": 150.00,
+    "balanceBefore": 1300.00,
+    "balanceAfter": 1150.00,
+    "description": "Online purchase - Electronics store",
+    "refId": "txn_003",
+    "status": "COMPLETED",
+    "created_at": { "$date": "2024-02-22T09:45:00Z" },
+    "updated_at": { "$date": "2024-02-22T09:45:00Z" }
+  },
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15dc" },
+    "walletId": "698175d5c4308f3653af15d8",
+    "transType": "TRANSFER",
+    "amount": 300.00,
+    "balanceBefore": 1150.00,
+    "balanceAfter": 850.00,
+    "description": "Transfer to friend wallet",
+    "refId": "txn_004",
+    "status": "COMPLETED",
+    "created_at": { "$date": "2024-02-21T16:20:00Z" },
+    "updated_at": { "$date": "2024-02-21T16:20:00Z" }
+  },
+  {
+    "_id": { "$oid": "698175d5c4308f3653af15dd" },
+    "walletId": "698175d5c4308f3653af15d8",
+    "transType": "DEPOSIT",
+    "amount": 1000.00,
+    "balanceBefore": 850.00,
+    "balanceAfter": 1850.00,
+    "description": "Salary deposit",
+    "refId": "txn_005",
+    "status": "PENDING",
+    "created_at": { "$date": "2024-02-20T08:00:00Z" },
+    "updated_at": { "$date": "2024-02-20T08:00:00Z" }
+  }
+]

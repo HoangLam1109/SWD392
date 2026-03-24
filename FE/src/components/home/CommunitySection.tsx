@@ -1,17 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import { Users, Trophy, MessageSquare, Clock } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { mockActivities, mockReviews } from './mockData';
 
 export function CommunitySection() {
+  const { t } = useTranslation();
   return (
     <section className="relative py-12 sm:py-16 lg:py-24">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
-            Join the <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Community</span>
+            {t('home.community.title')} <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{t('home.community.titleHighlight')}</span>
           </h2>
           <p className="text-base sm:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto px-4">
-            Connect with friends, share achievements, and discover new games together
+            {t('home.community.description')}
           </p>
         </div>
 
@@ -21,7 +23,7 @@ export function CommunitySection() {
             <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-4 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-                <h3 className="text-lg sm:text-xl font-semibold">Friends Activity</h3>
+                <h3 className="text-lg sm:text-xl font-semibold">{t('home.community.friendsActivity')}</h3>
               </div>
 
               <div className="space-y-3 sm:space-y-4">
@@ -43,21 +45,21 @@ export function CommunitySection() {
                         {activity.action === 'achievement' && (
                           <>
                             <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 shrink-0" />
-                            <span className="text-xs sm:text-sm text-slate-400">unlocked</span>
+                            <span className="text-xs sm:text-sm text-slate-400">{t('home.community.unlocked')}</span>
                             <span className="text-xs sm:text-sm text-blue-400">{activity.achievement}</span>
-                            <span className="text-xs sm:text-sm text-slate-400">in</span>
+                            <span className="text-xs sm:text-sm text-slate-400">{t('home.community.in')}</span>
                             <span className="text-xs sm:text-sm text-white">{activity.game}</span>
                           </>
                         )}
                         {activity.action === 'review' && (
                           <>
-                            <span className="text-xs sm:text-sm text-slate-400">reviewed</span>
+                            <span className="text-xs sm:text-sm text-slate-400">{t('home.community.reviewed')}</span>
                             <span className="text-xs sm:text-sm text-white">{activity.game}</span>
                           </>
                         )}
                         {activity.action === 'playing' && (
                           <>
-                            <span className="text-xs sm:text-sm text-slate-400">is playing</span>
+                            <span className="text-xs sm:text-sm text-slate-400">{t('home.community.isPlaying')}</span>
                             <span className="text-xs sm:text-sm text-white">{activity.game}</span>
                           </>
                         )}
@@ -74,7 +76,7 @@ export function CommunitySection() {
 
             {/* Recent Reviews */}
             <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Recent Reviews</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">{t('home.community.recentReviews')}</h3>
               <div className="space-y-3 sm:space-y-4">
                 {mockReviews.map((review) => (
                   <div key={review.id} className="p-3 sm:p-4 rounded-lg sm:rounded-xl bg-white/5">
@@ -112,7 +114,7 @@ export function CommunitySection() {
             <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-4 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-                <h3 className="text-lg sm:text-xl font-semibold">Chat</h3>
+                <h3 className="text-lg sm:text-xl font-semibold">{t('home.community.chat')}</h3>
               </div>
 
               <div className="space-y-3 sm:space-y-4">
@@ -133,13 +135,13 @@ export function CommunitySection() {
               </div>
 
               <button className="w-full mt-3 sm:mt-4 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-xs sm:text-sm">
-                View All Messages
+                {t('home.community.viewAllMessages')}
               </button>
             </div>
 
             {/* Online Friends */}
             <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Online Now</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">{t('home.community.onlineNow')}</h3>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {['AG', 'SP', 'MG', 'EP', 'GE', 'PG'].map((initial, i) => (
                   <Avatar key={i} className="w-8 h-8 sm:w-10 sm:h-10 cursor-pointer hover:ring-2 ring-blue-400 transition-all">

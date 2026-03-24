@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Star, Plus } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
 import { mockGames, type Game} from './mockData';
@@ -27,15 +28,16 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export function GamesSection() {
+  const { t } = useTranslation();
   return (
     <section className="relative py-12 sm:py-16 lg:py-24">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
-            Popular & <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Trending</span>
+            {t('home.games.title')} <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{t('home.games.titleHighlight')}</span>
           </h2>
           <p className="text-base sm:text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto px-4">
-            Discover the most popular games on our platform
+            {t('home.games.description')}
           </p>
         </div>
 
@@ -86,7 +88,7 @@ export function GamesSection() {
 
                   <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 transition-all group/btn text-sm sm:text-base">
                     <Plus className="w-4 h-4 group-hover/btn:rotate-90 transition-transform" />
-                    <span className="font-medium">Add to Library</span>
+                    <span className="font-medium">{t('home.games.addToLibrary')}</span>
                   </button>
                 </div>
               </div>

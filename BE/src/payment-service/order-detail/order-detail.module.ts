@@ -1,0 +1,38 @@
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { OrderDetailService } from './services/order-detail.service';
+import { OrderDetailController } from './controllers/order-detail.controller';
+import { OrderDetailRepository } from './repositories/order-detail.repository';
+import { OrderDetail, OrderDetailSchema } from './entities/order-detail.entity';
+import { PaginationService } from '../../common/services/pagination.service';
+import { ProductValidationService } from '../../common/services/productValidation.service';
+import { GameModule } from '../../game-service/game/game.module';
+import { CartModule } from '../cart/cart.module';
+import { CartItemModule } from '../cart-item/cart-item.module';
+import { GameItemModule } from '../../game-service/game-item/game-item.module';
+import { UserGameItemModule } from '../../game-service/user-game-item/user-game-item.module';
+import { LibraryGameModule } from '../../game-service/library-game/library-game.module';
+
+@Module({
+  imports: [
+    MongooseModule.forFeature(
+      [{ name: OrderDetail.name, schema: OrderDetailSchema }],
+      'PAYMENT_DB',
+    ),
+    CartModule,
+    CartItemModule,
+    GameModule,
+    GameItemModule,
+    UserGameItemModule,
+    LibraryGameModule,
+  ],
+  controllers: [OrderDetailController],
+  providers: [
+    OrderDetailService,
+    OrderDetailRepository,
+    PaginationService,
+    ProductValidationService,
+  ],
+  exports: [OrderDetailService],
+})
+export class OrderDetailModule {}

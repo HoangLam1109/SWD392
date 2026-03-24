@@ -12,6 +12,7 @@ export interface DropdownItem {
     icon: React.ComponentType<{ className?: string }>;
     dropdownItems?: DropdownItem[];
     badgeCount?: number;
+    path?: string;
   }
   
   export interface SidebarProps {

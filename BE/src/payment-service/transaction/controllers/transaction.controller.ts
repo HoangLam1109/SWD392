@@ -1,0 +1,225 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
+import { TransactionService } from '../services/transaction.service';
+import { CreateTransactionDto } from '../dto/create-transaction.dto';
+import { UpdateTransactionDto } from '../dto/update-transaction.dto';
+import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
+import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { TransactionResponseDto } from '../dto/transaction-response.dto';
+import { CreateDepositDto } from '../dto/create-deposit.dto';
+import { GetUser } from '../../../common/decorators/info.decorator';
+import { UserRole } from '../../../user-service/user/enum/user.enum';
+import { Role } from '../../../auth/decorators/role.decorator';
+
+@ApiBearerAuth()
+@ApiTags('Transactions')
+@Controller('transactions')
+export class TransactionController {
+  constructor(private readonly transactionService: TransactionService) {}
+
+  @ApiOperation({ summary: 'Create a new transaction' })
+  @ApiResponse({
+    status: 201,
+    description: 'Transaction created successfully',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - invalid input data',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Post()
+  create(@Body() createTransactionDto: CreateTransactionDto) {
+    return this.transactionService.create(createTransactionDto);
+  }
+
+  @ApiOperation({ summary: 'Get all transactions with pagination' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of items per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    type: String,
+    description: 'Field to sort by (default: _id)',
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    enum: ['asc', 'desc'],
+    description: 'Sort order (default: desc)',
+  })
+  @ApiQuery({
+    name: 'cursor',
+    required: false,
+    type: String,
+    description: 'Cursor for pagination',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search keyword',
+  })
+  @ApiQuery({
+    name: 'searchField',
+    required: false,
+    type: String,
+    description: 'Field to search in',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all transactions with pagination',
+    type: PaginationResponseDto<TransactionResponseDto>,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Get()
+  findAll(@Query() query: PaginationOptionsDto) {
+    return this.transactionService.findAllWithPagination(query);
+  }
+
+  @ApiOperation({ summary: 'Get transaction by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction found',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Transaction not found',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.transactionService.findTransactionById(id);
+  }
+
+  @ApiOperation({ summary: 'Get transaction by reference ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction found',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Transaction not found',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Get('ref/:refId')
+  findByRefId(@Param('refId') refId: string) {
+    return this.transactionService.findByRefId(refId);
+  }
+
+  @ApiOperation({ summary: 'Get transactions by wallet ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transactions found',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Get('wallet/:walletId')
+  findByWalletId(@Param('walletId') walletId: string) {
+    return this.transactionService.findByWalletId(walletId);
+  }
+
+  @ApiOperation({ summary: 'Update transaction' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction updated successfully',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Transaction not found',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateTransactionDto: UpdateTransactionDto,
+  ) {
+    return this.transactionService.updateTransaction(id, updateTransactionDto);
+  }
+
+  @ApiOperation({ summary: 'Delete transaction' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction deleted successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Transaction not found',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.transactionService.deleteTransaction(id);
+  }
+
+  @ApiOperation({ summary: 'Deposit to wallet ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Transaction created successfully',
+    type: TransactionResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Wallet not found',
+  })
+  @Post('deposit')
+  deposit(
+    @GetUser() user: Partial<{ _id: string }>,
+    @Body() createDepositDto: CreateDepositDto,
+  ) {
+    return this.transactionService.depositToWalletId(
+      user._id!,
+      createDepositDto.amount,
+    );
+  }
+}
