@@ -194,7 +194,9 @@
       "invalidEmail": "Invalid email address",
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 8 characters",
-      "loginSuccess": "Login successful"
+      "loginSuccess": "Login successful",
+      "invalidCredentials": "Invalid email or password",
+      "loginFailed": "Login failed"
     },
     "register": {
       "createAccount": "Create an account",
