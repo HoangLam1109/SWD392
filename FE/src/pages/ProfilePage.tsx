@@ -2,9 +2,6 @@ import { Navbar, Footer } from '@/components/home';
 import {
     Settings,
     LogOut,
-    Gamepad2,
-    Trophy,
-    Clock,
     Users,
     Facebook,
     Youtube,

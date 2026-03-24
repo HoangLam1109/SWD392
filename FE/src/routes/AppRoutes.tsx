@@ -4,7 +4,7 @@ import Login from "@/auth/page/Login";
 import GoogleCallback from "@/auth/page/GoogleCallback";
 import Temp from "@/auth/page/Temp";
 import RegisterPage from "@/auth/page/Register";
-import ForgotPasswordPage from "@/auth/page/ForgotPasswordPage";
+
 import ProfilePage from "@/pages/ProfilePage";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { LibraryPage, UserManagementPage, StorePage, GameDetailPage, CartPage, WalletPage, PaymentCheckoutPage, PaymentSuccessPage, CommunityPage } from "@/pages";
@@ -32,7 +32,6 @@ const AppRoutes = () => {
             <Route path="auth/google/callback" element={<GoogleCallback />} />
             <Route path="temp" element={<Temp />} />
             <Route path="register" element={<RegisterPage />} />
-            <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="oauth/callback" element={<OAuthCallback />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="/store" element={<StorePage />} />
