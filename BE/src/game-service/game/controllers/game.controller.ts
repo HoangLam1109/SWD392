@@ -21,8 +21,8 @@ import { UpdateGameDto } from '../dto/update-game.dto';
 import { GameResponseDto } from '../dto/game-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
-import { Role } from 'src/auth/decorators/role.decorator';
-import { UserRole } from 'src/user-service/user/enum/user.enum';
+import { Role } from '../../../auth/decorators/role.decorator';
+import { UserRole } from '../../../user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('games')
@@ -91,6 +91,25 @@ export class GameController {
     return this.gameService.findAllWithPagination(query);
   }
 
+  @ApiOperation({ summary: 'Index all games' })
+  @ApiResponse({
+    status: 200,
+    description: 'Games indexed successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game not found',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Get('index')
+  indexAllGames() {
+    return this.gameService.findAllForIndexing();
+  }
+
   @ApiOperation({ summary: 'Get game by category ID' })
   @ApiResponse({
     status: 200,
@@ -119,25 +138,6 @@ export class GameController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gameService.findGameById(id);
-  }
-
-  @ApiOperation({ summary: 'Index all games' })
-  @ApiResponse({
-    status: 200,
-    description: 'Games indexed successfully',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Game not found',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
-  @Get('index')
-  indexAllGames() {
-    return this.gameService.findAllForIndexing();
   }
 
   @ApiOperation({ summary: 'Get game by release date' })

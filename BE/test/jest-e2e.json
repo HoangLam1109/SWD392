@@ -6,7 +6,9 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
+  "transformIgnorePatterns": ["<rootDir>/node_modules/(?!nanoid|jose)"],
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/src/$1"
-  }
+  },
+  "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
 }
