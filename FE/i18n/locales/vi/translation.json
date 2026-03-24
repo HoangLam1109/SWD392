@@ -17,8 +17,7 @@
     "or": "Hoặc",
     "continueWithGoogle": "Tiếp tục với Google",
     "gotodashboard": "Đi đến trang quản lý",
-    "logout": "Đăng xuất",
-    "wallet": "Ví"
+    "logout": "Đăng xuất"
   },
   "home": {
     "hero": {
@@ -106,7 +105,7 @@
       "newsletterDesc": "Đăng ký để nhận thông báo về game mới và ưu đãi độc quyền.",
       "enterEmail": "Nhập email của bạn",
       "subscribe": "Đăng ký",
-      "copyright": "© {{year}} Platfun. Bảo lưu mọi quyền.",
+      "copyright": "© {{year}} NexusPlay. Bảo lưu mọi quyền.",
       "madeWithLove": "Được tạo với ❤️ cho game thủ",
       "platformDesc": "Nền tảng gaming tối ưu. Mua, quản lý và chơi hàng ngàn game trong một hệ sinh thái thống nhất."
     }
@@ -139,7 +138,7 @@
     "discount": "Giảm giá",
     "tax": "Thuế (10%)",
     "total": "Tổng cộng",
-    "youSave": "Bạn tiết kiệm VNĐ{{amount}}",
+    "youSave": "Bạn tiết kiệm ${{amount}}",
     "proceedToCheckout": "Tiến hành thanh toán",
     "secureCheckout": "Thanh toán an toàn với mã hóa chuẩn công nghiệp",
     "acceptedPaymentMethods": "Phương thức thanh toán được chấp nhận",

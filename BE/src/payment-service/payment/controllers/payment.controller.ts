@@ -7,8 +7,6 @@ import {
   Param,
   Delete,
   Query,
-  Req,
-  Res,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -21,18 +19,11 @@ import { PaymentService } from '../services/payment.service';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { UpdatePaymentDto } from '../dto/update-payment.dto';
 import { PaymentResponseDto } from '../dto/payment-response.dto';
-import { CreatePaymentUrlDto } from '../dto/create-payment-url.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
-import type { Request, Response } from 'express';
-import type { ReturnQueryFromVNPay } from 'vnpay';
-import { Public } from 'src/auth/decorators/public.decorator';
-import { CreateDepositUrlDto } from '../dto/create-deposit-url.dto';
-import { Role } from '../../../auth/decorators/role.decorator';
-import { UserRole } from '../../../user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
-@ApiTags('Payments')
+@ApiTags('payments')
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
@@ -47,11 +38,6 @@ export class PaymentController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentService.createPayment(createPaymentDto);
@@ -99,11 +85,6 @@ export class PaymentController {
     description: 'List of all payments with pagination',
     type: PaginationResponseDto,
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAll(@Query() query: PaginationOptionsDto) {
     return this.paymentService.findAllWithPagination(query);
@@ -119,11 +100,6 @@ export class PaymentController {
     status: 404,
     description: 'Payment not found',
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.paymentService.findPaymentById(id);
@@ -139,11 +115,6 @@ export class PaymentController {
     status: 404,
     description: 'Payment not found',
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get('transaction/:transactionCode')
   findByTransactionCode(@Param('transactionCode') transactionCode: string) {
     return this.paymentService.findByCode(transactionCode);
@@ -158,11 +129,6 @@ export class PaymentController {
     status: 404,
     description: 'Payment not found',
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
     return this.paymentService.updatePayment(id, updatePaymentDto);
@@ -180,106 +146,5 @@ export class PaymentController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.paymentService.deletePayment(id);
-  }
-
-  @ApiOperation({ summary: 'Create VNPay payment URL' })
-  @ApiResponse({
-    status: 201,
-    description: 'Payment URL created successfully',
-    type: 'redirectUrl',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request',
-  })
-  @Post('/vnpay/create-deposit-url')
-  async createDepositUrl(
-    @Body() createDepositUrlDto: CreateDepositUrlDto,
-    @Req() req: Request,
-  ) {
-    const ipAddr =
-      (req.headers['x-forwarded-for'] as string) ||
-      req.socket.remoteAddress ||
-      '127.0.0.1';
-    return await this.paymentService.createVnpayUrl(
-      createDepositUrlDto.transactionId,
-      createDepositUrlDto.amount,
-      ipAddr,
-    );
-  }
-
-  @ApiOperation({ summary: 'Create VNPay payment URL' })
-  @ApiResponse({
-    status: 201,
-    description: 'Payment URL created successfully',
-    type: 'redirectUrl',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request',
-  })
-  @Post('/vnpay/create-url')
-  async createPaymentUrl(
-    @Body() createPaymentUrlDto: CreatePaymentUrlDto,
-    @Req() req: Request,
-  ) {
-    const ipAddr =
-      (req.headers['x-forwarded-for'] as string) ||
-      req.socket.remoteAddress ||
-      '127.0.0.1';
-    return await this.paymentService.createVnpayUrl(
-      createPaymentUrlDto.orderId,
-      createPaymentUrlDto.totalPrice,
-      ipAddr,
-    );
-  }
-
-  @ApiOperation({ summary: 'Handle VNPay IPN' })
-  @ApiResponse({
-    status: 200,
-    description: 'IPN handled successfully',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request',
-  })
-  @ApiOperation({ summary: 'Handle VNPay return' })
-  @ApiResponse({
-    status: 302,
-    description: 'Redirect to success or failure page',
-  })
-  @Get('/vnpay/ipn')
-  async vnpayIpn(@Query() query: ReturnQueryFromVNPay) {
-    return this.paymentService.handleIpn(query);
-  }
-
-  @ApiOperation({ summary: 'Handle VNPay return' })
-  @ApiResponse({
-    status: 302,
-    description: 'Redirect to success or failure page',
-  })
-  @Public()
-  @Get('/vnpay/return')
-  async vnpayReturn(
-    @Query() query: ReturnQueryFromVNPay,
-    @Res() res: Response,
-  ) {
-    const result = await this.paymentService.handleReturn(query);
-
-    if (result.success) {
-      const redirectUrl = result.orderId
-        ? `${process.env.FRONTEND_URL}/payment/success?orderId=${result.orderId.toString()}`
-        : result.walletId
-          ? `${process.env.FRONTEND_URL}/payment/success?walletId=${result.walletId}`
-          : `${process.env.FRONTEND_URL}/payment/success?orderId=unknown`;
-      res.redirect(redirectUrl);
-    } else {
-      const redirectUrl = result.orderId
-        ? `${process.env.FRONTEND_URL}/payment/failed?orderId=${result.orderId.toString()}`
-        : result.walletId
-          ? `${process.env.FRONTEND_URL}/payment/failed?walletId=${result.walletId}`
-          : `${process.env.FRONTEND_URL}/payment/failed?orderId=unknown`;
-      res.redirect(redirectUrl);
-    }
   }
 }

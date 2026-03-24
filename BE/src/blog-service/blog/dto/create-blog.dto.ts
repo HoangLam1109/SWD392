@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsUrl, IsOptional } from 'class-validator';
 import { BlogStatus } from '../enum/blog.enum';
 
 export class CreateBlogDto {
@@ -24,13 +24,4 @@ export class CreateBlogDto {
   @IsOptional()
   @IsString()
   thumbnailUrl?: string;
-
-  @ApiPropertyOptional({
-    description: 'Blog status',
-    example: BlogStatus.PENDING_APPROVAL,
-    enum: BlogStatus,
-  })
-  @IsOptional()
-  @IsEnum(BlogStatus)
-  status?: BlogStatus;
 }

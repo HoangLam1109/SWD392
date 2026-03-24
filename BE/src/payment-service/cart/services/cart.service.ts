@@ -4,6 +4,7 @@ import { UpdateCartDto } from '../dto/update-cart.dto';
 import { CartRepository } from '../repositories/cart.repository';
 import { CartDocument } from '../entities/cart.entity';
 import { CartItemService } from '../../cart-item/services/cart-item.service';
+import { GameService } from '../../../game-service/game/services/game.service';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { PaginationService } from '../../../common/services/pagination.service';
@@ -13,6 +14,7 @@ export class CartService {
   constructor(
     private readonly cartRepository: CartRepository,
     private readonly paginationService: PaginationService,
+    private readonly gameService: GameService,
     private readonly cartItemService: CartItemService,
   ) {}
 
@@ -28,7 +30,7 @@ export class CartService {
     if (!cart) {
       throw new NotFoundException('Cart not found');
     }
-    return (await this._UpdateCheck(id)).cart;
+    return cart;
   }
 
   async findCartByUserId(userId: string): Promise<CartDocument> {
@@ -36,7 +38,7 @@ export class CartService {
     if (!cart) {
       throw new NotFoundException('Cart not found for this user');
     }
-    return (await this._UpdateCheck(cart._id.toString())).cart;
+    return cart;
   }
 
   async findAll(): Promise<CartDocument[]> {
@@ -62,28 +64,34 @@ export class CartService {
 
   async addItemToCart(
     userId: string,
-    productId: string,
+    gameId: string,
   ): Promise<CartDocument | null> {
     let cart = await this.cartRepository.findByUserId(userId);
     if (!cart) {
       cart = await this.createCart(userId, {});
     }
 
-    const cartItem = await this.cartItemService.createCartItemFromId(
-      cart._id.toString(),
-      productId,
-    );
-    if (!cartItem) {
-      throw new NotFoundException('Cart item not found');
+    const game = await this.gameService.findGameById(gameId);
+    if (!game) {
+      throw new NotFoundException('Game not found');
     }
+
+    const priceAtPurchase =
+      game.price - (game.price * (game.discount || 0)) / 100;
+
+    const cartItem = await this.cartItemService.createCartItem({
+      cartId: cart._id.toString(),
+      gameId,
+      priceAtPurchase,
+    });
     return await this.updateCart(cart._id.toString(), {
-      itemId: [...cart.itemId, cartItem._id.toString()],
+      itemId: [cartItem._id.toString()],
     });
   }
 
   async removeItemFromCart(
     userId: string,
-    productId: string,
+    gameId: string,
   ): Promise<CartDocument | null> {
     const cart = await this.findCartByUserId(userId);
     if (!cart) throw new NotFoundException('Cart not found');
@@ -91,13 +99,13 @@ export class CartService {
     const cartItems = await this.cartItemService.findCartItemsByCartId(
       cart._id.toString(),
     );
-    for (const cartItem of cartItems) {
-      if (cartItem.productId === productId) {
-        await this.cartItemService.deleteCartItem(cartItem._id.toString());
-        cart.itemId = cart.itemId.filter(
-          (id) => id !== cartItem._id.toString(),
-        );
-      }
+    const itemToRemove = cartItems.find((item) => item.gameId === gameId);
+
+    if (itemToRemove) {
+      await this.cartItemService.deleteCartItem(itemToRemove._id.toString());
+      cart.itemId = cart.itemId.filter(
+        (id) => id !== itemToRemove._id.toString(),
+      );
     }
 
     return await this.cartRepository.updateById(cart._id.toString(), {
@@ -124,55 +132,5 @@ export class CartService {
       throw new NotFoundException('Cart not found');
     }
     return await this.cartRepository.deleteById(id);
-  }
-
-  async getAllCartItemsFromUserId(
-    userId: string,
-  ): Promise<{ itemId: string[] }> {
-    const cart = await this.cartRepository.findByUserId(userId);
-    if (!cart) {
-      throw new NotFoundException('Cart not found for this user');
-    }
-    return { itemId: cart.itemId };
-  }
-
-  private async _UpdateCheck(cartId: string): Promise<{
-    cart: CartDocument;
-    priceChanged: boolean;
-  }> {
-    const cart = await this.cartRepository.findById(cartId);
-    if (!cart) {
-      throw new NotFoundException('Cart not found');
-    }
-
-    if (!cart.itemId || cart.itemId.length === 0) {
-      return { cart: cart, priceChanged: false };
-    }
-
-    const existingItems = await this.cartItemService.findCartItemsByIds(
-      cart.itemId,
-    );
-    const validIds = existingItems.map((item) => item._id.toString());
-    const invalidIds = cart.itemId.filter((id) => !validIds.includes(id));
-
-    if (invalidIds.length > 0) {
-      await this.cartRepository.updateById(cartId, {
-        itemId: validIds,
-      });
-      cart.itemId = validIds;
-    }
-
-    const results = await Promise.allSettled(
-      validIds.map((id) =>
-        this.cartItemService.updateProductPriceById(id.toString()),
-      ),
-    );
-
-    const priceChanged = results.length > 0;
-
-    return {
-      cart: cart,
-      priceChanged,
-    };
   }
 }

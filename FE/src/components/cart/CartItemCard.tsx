@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trash2, Tag } from 'lucide-react';
 import { ImageWithFallback } from '../ui/image-with-fallback';
-import type { CartItemWithGame } from '@/types/Cart.types';
+import type { CartItem } from './mockCartData';
 import { motion } from 'framer-motion';
-import { getImageUrl } from '@/lib/imageUtils';
 
 interface CartItemCardProps {
-  item: CartItemWithGame;
-  onRemove: (productId: string) => void;
+  item: CartItem;
+  onQuantityChange: (id: number, quantity: number) => void;
+  onRemove: (id: number) => void;
 }
 
 export function CartItemCard({ item, onRemove }: CartItemCardProps) {
@@ -18,14 +18,14 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
   const handleRemove = () => {
     setIsRemoving(true);
     setTimeout(() => {
-      onRemove(item.productId);
+      onRemove(item.id);
     }, 300);
   };
 
-  const game = item.game;
-  const finalPrice = item.priceAtPurchase * (1 - item.discount / 100);
-  const originalPrice = item.discount > 0 ? item.priceAtPurchase : null;
-  const imageUrl = getImageUrl(game.thumbnail || game.coverImage) || '';
+  
+
+  const itemTotal = item.price * item.quantity;
+  const originalTotal = item.originalPrice ? item.originalPrice * item.quantity : null;
 
   return (
     <motion.div
@@ -43,11 +43,11 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
         {/* Product Image */}
         <div className="relative w-full sm:w-32 h-40 sm:h-32 shrink-0">
           <ImageWithFallback
-            src={imageUrl}
-            alt={game.title}
+            src={item.coverImage}
+            alt={item.title}
             className="w-full h-full object-cover rounded-lg"
           />
-          {item.discount > 0 && (
+          {item.discount && (
             <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-semibold">
               -{item.discount}%
             </div>
@@ -60,14 +60,14 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
             <div className="flex items-start justify-between gap-4 mb-2">
               <div>
                 <h3 className="text-lg font-semibold mb-1 group-hover:text-blue-400 transition-colors">
-                  {game.title}
+                  {item.title}
                 </h3>
                 <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
-                  {game.developer && (
-                    <>
-                      <span>{game.developer}</span>
-                    </>
-                  )}
+                  <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10">
+                    {item.category}
+                  </span>
+                  <span>•</span>
+                  <span>{item.developer}</span>
                 </div>
               </div>
               <button
@@ -81,15 +81,17 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-4">
+  
+
             {/* Price */}
             <div className="flex items-center gap-3">
-              {originalPrice && (
+              {originalTotal && (
                 <span className="text-slate-500 line-through text-sm">
-                  {originalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                  ${originalTotal.toFixed(2)}
                 </span>
               )}
               <span className="text-2xl font-bold text-white">
-                {finalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                ${itemTotal.toFixed(2)}
               </span>
             </div>
           </div>
@@ -97,12 +99,12 @@ export function CartItemCard({ item, onRemove }: CartItemCardProps) {
       </div>
 
       {/* Savings Badge */}
-      {item.discount > 0 && originalPrice && (
+      {item.discount && originalTotal && (
         <div className="absolute top-4 left-4 sm:top-auto sm:bottom-4 sm:left-4">
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-500/20 border border-green-500/30 backdrop-blur-sm">
             <Tag className="w-3.5 h-3.5 text-green-400" />
             <span className="text-xs font-medium text-green-400">
-              Save VNĐ{(originalPrice - finalPrice).toFixed(2)}
+              Save ${(originalTotal - itemTotal).toFixed(2)}
             </span>
           </div>
         </div>

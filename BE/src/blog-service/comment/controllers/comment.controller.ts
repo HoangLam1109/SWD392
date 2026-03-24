@@ -113,10 +113,7 @@ export class CommentController {
     type: [CommentResponseDto],
   })
   @Get('blog/:blogId')
-  findByBlogId(
-    @Param('blogId') blogId: string,
-    @Query('isDeleted') isDeleted?: string,
-  ) {
+  findByBlogId(@Param('blogId') blogId: string, @Query('isDeleted') isDeleted?: string) {
     return this.commentService.findByBlogId(blogId, isDeleted);
   }
 
@@ -133,10 +130,7 @@ export class CommentController {
     type: [CommentResponseDto],
   })
   @Get('user/:userId')
-  findByUserId(
-    @Param('userId') userId: string,
-    @Query('isDeleted') isDeleted?: string,
-  ) {
+  findByUserId(@Param('userId') userId: string, @Query('isDeleted') isDeleted?: string) {
     return this.commentService.findByUserId(userId, isDeleted);
   }
 
@@ -153,14 +147,8 @@ export class CommentController {
     type: [CommentResponseDto],
   })
   @Get('parent/:parentCommentId')
-  findByParentCommentId(
-    @Param('parentCommentId') parentCommentId: string,
-    @Query('isDeleted') isDeleted?: string,
-  ) {
-    return this.commentService.findByParentCommentId(
-      parentCommentId,
-      isDeleted,
-    );
+  findByParentCommentId(@Param('parentCommentId') parentCommentId: string, @Query('isDeleted') isDeleted?: string) {
+    return this.commentService.findByParentCommentId(parentCommentId, isDeleted);
   }
 
   @ApiOperation({ summary: 'Get comment by ID' })

@@ -20,11 +20,9 @@ import { CartResponseDto } from '../dto/cart-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
 import { GetUser } from '../../../common/decorators/info.decorator';
-import { Role } from '../../../auth/decorators/role.decorator';
-import { UserRole } from '../../../user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
-@ApiTags('Carts')
+@ApiTags('carts')
 @Controller('carts')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
@@ -61,11 +59,6 @@ export class CartController {
     description: 'Paginated list of carts',
     type: PaginationResponseDto<CartResponseDto>,
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get()
   findAllWithPagination(@Query() query: PaginationOptionsDto) {
     return this.cartService.findAllWithPagination(query);
@@ -96,12 +89,12 @@ export class CartController {
     status: 404,
     description: 'Cart not found',
   })
-  @Patch('me/add/:productId')
+  @Patch('me/add/:gameId')
   addGameToCart(
     @GetUser() user: Partial<{ _id: string }>,
-    @Param('productId') productId: string,
+    @Param('gameId') gameId: string,
   ) {
-    return this.cartService.addItemToCart(user._id!, productId);
+    return this.cartService.addItemToCart(user._id!, gameId);
   }
 
   @ApiOperation({ summary: 'Remove game from cart' })
@@ -114,12 +107,12 @@ export class CartController {
     status: 404,
     description: 'Cart not found',
   })
-  @Patch('me/remove/:productId')
+  @Patch('me/remove/:gameId')
   removeGameFromCart(
     @GetUser() user: Partial<{ _id: string }>,
-    @Param('productId') productId: string,
+    @Param('gameId') gameId: string,
   ) {
-    return this.cartService.removeItemFromCart(user._id!, productId);
+    return this.cartService.removeItemFromCart(user._id!, gameId);
   }
 
   @ApiOperation({ summary: 'Clear all items from cart' })
@@ -147,11 +140,6 @@ export class CartController {
     status: 404,
     description: 'Cart not found',
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.cartService.findCartById(id);

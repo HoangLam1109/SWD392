@@ -18,12 +18,4 @@ export class UpdateCartItemDto {
   @IsOptional()
   @IsNumber()
   priceAtPurchase?: number;
-
-  @ApiPropertyOptional({
-    description: 'Discount at purchase',
-    example: 15,
-  })
-  @IsOptional()
-  @IsNumber()
-  discount: number;
 }

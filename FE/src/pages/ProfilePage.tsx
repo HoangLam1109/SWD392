@@ -6,500 +6,218 @@ import {
     Trophy,
     Clock,
     Users,
-    Facebook,
-    Youtube,
-    MessageCircle,
-    MapPin,
-    Phone,
-    Globe,
     Calendar,
-    User
+    ChevronRight,
+    Star
 } from 'lucide-react';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { useLogout } from '@/hooks/auth/useLogout';
-import { useAuth } from '@/hooks/auth/useAuth';
-import { useGetMyProfile } from '@/hooks/profile/useGetMyProfile';
-import { useCreateProfile } from '@/hooks/profile/useCreateProfile';
-import { useUpdateProfile } from '@/hooks/profile/useUpdateProfile';
-import { useForm } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/components/ui/dialog';
-import { useState, useEffect } from 'react';
-import type { CreateProfileDTO, UpdateProfileDTO } from '@/types/Profile.types';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from '@/components/ui/select';
-import { Controller } from 'react-hook-form';
 
 export default function ProfilePage() {
+    const stats = [
+        { label: 'Games Owned', value: '124', icon: Gamepad2, color: 'text-blue-400' },
+        { label: 'Hours Played', value: '1,240', icon: Clock, color: 'text-purple-400' },
+        { label: 'Achievements', value: '842', icon: Trophy, color: 'text-yellow-400' },
+        { label: 'Friends', value: '42', icon: Users, color: 'text-emerald-400' },
+    ];
 
-    const { user } = useAuth();
+    const recentGames = [
+        {
+            title: 'Cyberpunk 2077',
+            lastPlayed: '2 hours ago',
+            progress: 85,
+            image: 'https://images.unsplash.com/photo-1605898960710-9aa877994792?q=80&w=400&auto=format&fit=crop',
+        },
+        {
+            title: 'Elden Ring',
+            lastPlayed: 'Yesterday',
+            progress: 42,
+            image: 'https://images.unsplash.com/photo-1612285329112-0a183e20e89d?q=80&w=400&auto=format&fit=crop',
+        },
+        {
+            title: 'Destiny 2',
+            lastPlayed: '3 days ago',
+            progress: 100,
+            image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400&auto=format&fit=crop',
+        }
+    ];
+
+    const activities = [
+        { type: 'achievement', title: 'Legendary Finisher', game: 'Elden Ring', time: '5 hours ago' },
+        { type: 'purchase', title: 'Baldur\'s Gate 3', game: 'Store', time: '1 day ago' },
+        { type: 'friend', title: 'New friend added: ShadowRunner', game: 'Network', time: '2 days ago' },
+    ];
+
     const { logout } = useLogout();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    const { data: profile, isLoading: profileLoading, isError } = useGetMyProfile();
-    const { mutate: createProfile, isPending: isCreating } = useCreateProfile();
-    const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
-
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm<UpdateProfileDTO>();
-
-    useEffect(() => {
-        if (profile) {
-            reset({
-                bio: profile.bio || '',
-                phoneNumber: profile.phoneNumber || '',
-                address: profile.address || '',
-                country: profile.country || '',
-                dateOfBirth: profile.dateOfBirth ? profile.dateOfBirth.split('T')[0] : '',
-                sex: profile.sex || '',
-                socialLinks: {
-                    facebook: profile.socialLinks?.facebook || '',
-                    discord: profile.socialLinks?.discord || '',
-                    youtube: profile.socialLinks?.youtube || '',
-                }
-            });
-        }
-    }, [profile, reset]);
-
-    const onSubmit = (data: UpdateProfileDTO) => {
-        if (profile) {
-            updateProfile(data, {
-                onSuccess: () => setIsDialogOpen(false),
-            });
-        } else {
-            if (!user?.id) return;
-            createProfile({
-                ...data,
-                userId: user.id,
-            } as CreateProfileDTO, {
-                onSuccess: () => setIsDialogOpen(false),
-            });
-        }
-    };
-
-    // Fake stats nếu backend chưa có
-    // const stats = [
-    //     { label: 'Games Owned', value: '124', icon: Gamepad2, color: 'text-blue-400' },
-    //     { label: 'Hours Played', value: '1,240', icon: Clock, color: 'text-purple-400' },
-    //     { label: 'Achievements', value: '842', icon: Trophy, color: 'text-yellow-400' },
-    //     { label: 'Friends', value: '42', icon: Users, color: 'text-emerald-400' },
-    // ];
-
-    if (profileLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p>Loading profile...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-                <p>Please login to view your profile.</p>
-            </div>
-        );
-    }
-
-    if (isError || !profile) {
-        return (
-            <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden flex flex-col">
-                <Navbar />
-                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-8 max-w-md w-full">
-                        <Users className="w-16 h-16 text-slate-500 mx-auto mb-4" />
-                        <h2 className="text-xl font-bold mb-2">Profile not found</h2>
-                        <p className="text-slate-400 mb-6">
-                            We couldn't find a profile for your account. You may need to complete your setup.
-                        </p>
-                        <button
-                            onClick={() => {
-                                reset({
-                                    bio: '',
-                                    phoneNumber: '',
-                                    address: '',
-                                    country: '',
-                                    dateOfBirth: '',
-                                    sex: '',
-                                    socialLinks: { facebook: '', discord: '', youtube: '' }
-                                });
-                                setIsDialogOpen(true);
-                            }}
-                            className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 transition-colors"
-                        >
-                            Create Profile
-                        </button>
-                    </div>
-                </div>
-                {/* Form Dialog */}
-                {renderProfileDialog()}
-                <Footer />
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
+            {/* Animated background gradient */}
+            <div className="fixed inset-0 bg-linear-to-br from-blue-950/30 via-slate-950 to-purple-950/30 pointer-events-none" />
+            <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)] pointer-events-none" />
 
             <Navbar />
 
-            <main className="max-w-[1400px] mx-auto px-4 py-16">
+            <main className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+                <div className="space-y-8 lg:space-y-12">
 
-                {/* PROFILE HEADER */}
-                {/* PROFILE HEADER */}
-                <div className="relative overflow-hidden backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 lg:p-12 mb-10 transition-all duration-300 hover:bg-white/[0.07]">
-                    {/* Background Accents */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 blur-[100px] pointer-events-none" />
-
-                    <div className="relative z-10 flex flex-col lg:flex-row gap-10 items-start">
-
-                        {/* Avatar Section */}
-                        <div className="relative group">
-                            <div className="absolute -inset-1 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-500" />
-                            <div className="relative w-40 h-40 lg:w-48 lg:h-48 rounded-2xl overflow-hidden border border-white/20 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
-                                <ImageWithFallback
-                                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"
-                                    alt="avatar"
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Info Section */}
-                        <div className="flex-1 w-full space-y-8">
-
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                                <div className="space-y-2">
-                                    <h1 className="text-4xl lg:text-5xl font-black bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent">
-                                        {user.fullName || `User #${profile.userId}`}
-                                    </h1>
-                                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 w-fit">
-                                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                                        <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Premium Member</span>
+                    {/* Profile Header */}
+                    <div className="relative group">
+                        <div className="absolute -inset-4 bg-linear-to-r from-blue-500/20 to-purple-600/20 rounded-3xl blur-3xl opacity-50 transition-opacity group-hover:opacity-70" />
+                        <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 lg:p-10 shadow-2xl overflow-hidden">
+                            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+                                {/* Avatar */}
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-600 rounded-2xl blur-lg opacity-50 animate-pulse" />
+                                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl border-2 border-white/20 overflow-hidden">
+                                        <ImageWithFallback
+                                            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop"
+                                            alt="User Avatar"
+                                            className="w-full h-full object-cover"
+                                        />
                                     </div>
+                                    <div className="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-slate-900 shadow-lg" />
                                 </div>
 
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={() => setIsDialogOpen(true)}
-                                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white text-slate-950 font-bold transition-all hover:bg-blue-50 hover:scale-105 active:scale-95 shadow-lg shadow-white/5"
-                                    >
-                                        <Settings className="w-4 h-4" />
-                                        <span>Edit Profile</span>
-                                    </button>
-                                    <button
-                                        onClick={logout}
-                                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600/10 text-red-500 border border-red-500/20 font-bold transition-all hover:bg-red-600 hover:text-white active:scale-95"
-                                    >
-                                        <LogOut className="w-4 h-4" />
-                                    </button>
+                                {/* User Info */}
+                                <div className="flex-1 text-center lg:text-left space-y-4">
+                                    <div className="space-y-1">
+                                        <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                                            Alex "NexusPrime" Johnson
+                                        </h1>
+                                        <div className="flex items-center justify-center lg:justify-start gap-3 text-slate-400">
+                                            <span className="flex items-center gap-1.5 text-sm sm:text-base">
+                                                <Calendar className="w-4 h-4 text-blue-400" />
+                                                Member since 2022
+                                            </span>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                                            <span className="text-sm sm:text-base font-medium text-blue-300">Pro Member</span>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-slate-400 text-sm sm:text-base max-w-2xl leading-relaxed">
+                                        Passionate gamer and technology enthusiast. Currently tackling Elden Ring and exploring the cyberpunk neon streets. Always looking for new squads to join.
+                                    </p>
+
+                                    <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 transition-all text-sm font-medium shadow-lg shadow-blue-500/20">
+                                            <Settings className="w-4 h-4" />
+                                            Edit Profile
+                                        </button>
+                                        <button
+                                            onClick={logout}
+                                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-sm font-medium"
+                                        >
+                                            <LogOut className="w-4 h-4 text-red-400" />
+                                            Logout
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
-                            <p className="max-w-2xl text-lg text-slate-400 leading-relaxed font-medium italic">
-                                "{profile.bio || "No bio available. Adding a bio helps others get to know you!"}"
-                            </p>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-12 pt-6 border-t border-white/5">
-                                {profile.phoneNumber && (
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-blue-500/20 group-hover:border-blue-500/30 transition-colors">
-                                            <Phone className="w-4 h-4 text-slate-400 group-hover:text-blue-400" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Phone</span>
-                                            <span className="text-sm font-semibold">{profile.phoneNumber}</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {profile.address && (
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-purple-500/20 group-hover:border-purple-500/30 transition-colors">
-                                            <MapPin className="w-4 h-4 text-slate-400 group-hover:text-purple-400" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Location</span>
-                                            <span className="text-sm font-semibold">{profile.address}</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {profile.country && (
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-emerald-500/20 group-hover:border-emerald-500/30 transition-colors">
-                                            <Globe className="w-4 h-4 text-slate-400 group-hover:text-emerald-400" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Country</span>
-                                            <span className="text-sm font-semibold">{profile.country}</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {profile.dateOfBirth && (
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-yellow-500/20 group-hover:border-yellow-500/30 transition-colors">
-                                            <Calendar className="w-4 h-4 text-slate-400 group-hover:text-yellow-400" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Birthday</span>
-                                            <span className="text-sm font-semibold">{new Date(profile.dateOfBirth).toLocaleDateString(undefined, { dateStyle: 'long' })}</span>
-                                        </div>
-                                    </div>
-                                )}
-                                {profile.sex && (
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-orange-500/20 group-hover:border-orange-500/30 transition-colors">
-                                            <User className="w-4 h-4 text-slate-400 group-hover:text-orange-400" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Identity</span>
-                                            <span className="text-sm font-semibold uppercase tracking-wider">{profile.sex}</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {profile.socialLinks && (
-                                <div className="flex flex-wrap gap-3 pt-6 border-t border-white/5">
-                                    {profile.socialLinks.facebook && (
-                                        <a href={profile.socialLinks.facebook} target="_blank" rel="noopener noreferrer"
-                                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1877F2]/10 border border-[#1877F2]/20 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all duration-300">
-                                            <Facebook className="w-4 h-4" />
-                                            <span className="text-xs font-bold uppercase">Facebook</span>
-                                        </a>
-                                    )}
-                                    {profile.socialLinks.discord && (
-                                        <a href={profile.socialLinks.discord} target="_blank" rel="noopener noreferrer"
-                                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#5865F2]/10 border border-[#5865F2]/20 text-[#5865F2] hover:bg-[#5865F2] hover:text-white transition-all duration-300">
-                                            <MessageCircle className="w-4 h-4" />
-                                            <span className="text-xs font-bold uppercase tracking-wider">Discord</span>
-                                        </a>
-                                    )}
-                                    {profile.socialLinks.youtube && (
-                                        <a href={profile.socialLinks.youtube} target="_blank" rel="noopener noreferrer"
-                                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF0000]/10 border border-[#FF0000]/20 text-[#FF0000] hover:bg-[#FF0000] hover:text-white transition-all duration-300">
-                                            <Youtube className="w-4 h-4" />
-                                            <span className="text-xs font-bold uppercase tracking-wider">YouTube</span>
-                                        </a>
-                                    )}
-                                </div>
-                            )}
-
                         </div>
                     </div>
-                </div>
 
-                {/* STATS SECTION */}
-                {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                    {stats.map((stat) => (
-                        <div
-                            key={stat.label}
-                            className="group relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 transition-all duration-500 hover:bg-white/[0.08] hover:-translate-y-2"
-                        >
-                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <stat.icon className="w-20 h-20" />
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        {stats.map((stat) => (
+                            <div key={stat.label} className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 transition-transform hover:scale-105">
+                                <div className="flex items-center justify-between mb-3 sm:mb-4">
+                                    <div className={`p-2 sm:p-3 rounded-xl bg-white/5 ${stat.color}`}>
+                                        <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                    </div>
+                                    <Star className="w-4 h-4 text-white/10" />
+                                </div>
+                                <div className="text-2xl sm:text-3xl font-bold">{stat.value}</div>
+                                <div className="text-xs sm:text-sm text-slate-500 font-medium">{stat.label}</div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Main Content Sections */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12">
+
+                        {/* Library Section */}
+                        <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+                                    <Gamepad2 className="w-6 h-6 text-blue-400" />
+                                    Recent Library
+                                </h2>
+                                <button className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
+                                    View All <ChevronRight className="w-4 h-4" />
+                                </button>
                             </div>
 
-                            <div className="relative z-10 space-y-4">
-                                <div className={`w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6`}>
-                                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="text-3xl font-black text-white">{stat.value}</div>
-                                    <div className="text-sm text-slate-500 font-bold uppercase tracking-widest">{stat.label}</div>
+                            <div className="space-y-4">
+                                {recentGames.map((game) => (
+                                    <div key={game.title} className="group relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 flex items-center gap-4 sm:gap-6 hover:bg-white/10 transition-all">
+                                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border border-white/10">
+                                            <img src={game.image} alt={game.title} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                        </div>
+                                        <div className="flex-1 space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="font-bold sm:text-lg">{game.title}</div>
+                                                <div className="text-xs text-slate-500">{game.lastPlayed}</div>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <div className="flex items-center justify-between text-xs sm:text-sm">
+                                                    <span className="text-slate-400">Completion</span>
+                                                    <span className="font-medium text-blue-400">{game.progress}%</span>
+                                                </div>
+                                                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-linear-to-r from-blue-500 to-purple-600 rounded-full transition-all duration-1000"
+                                                        style={{ width: `${game.progress}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Activity Feed */}
+                        <div className="space-y-6 sm:space-y-8">
+                            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-3">
+                                <Star className="w-6 h-6 text-purple-400" />
+                                Recent Activity
+                            </h2>
+
+                            <div className="space-y-6">
+                                {activities.map((activity, idx) => (
+                                    <div key={idx} className="relative pl-6 border-l-2 border-white/5 space-y-1">
+                                        <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-slate-900 border-2 border-purple-500" />
+                                        <div className="text-sm font-bold text-slate-300">{activity.title}</div>
+                                        <div className="text-xs text-slate-500 flex items-center gap-2">
+                                            <span>{activity.game}</span>
+                                            <div className="w-1 h-1 rounded-full bg-white/10" />
+                                            <span>{activity.time}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Decorative Banner */}
+                            <div className="relative mt-8 rounded-2xl overflow-hidden aspect-video">
+                                <img
+                                    src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=400&auto=format&fit=crop"
+                                    className="w-full h-full object-cover"
+                                    alt="Nexus"
+                                />
+                                <div className="absolute inset-0 bg-linear-to-t from-slate-950 to-transparent" />
+                                <div className="absolute bottom-4 left-4 right-4">
+                                    <div className="text-xs font-bold text-blue-400 mb-1">RECOMMENDED</div>
+                                    <div className="text-sm font-medium leading-tight">Join the new Community Challenge this weekend!</div>
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div> */}
 
+                    </div>
+                </div>
             </main>
-
-            {renderProfileDialog()}
 
             <Footer />
         </div>
     );
-
-    function renderProfileDialog() {
-
-        return (
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[500px] bg-slate-900 text-white border-white/10 max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>{profile ? 'Edit Profile' : 'Create Profile'}</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="bio" className={errors.bio ? 'text-red-400' : ''}>Bio</Label>
-                            <Textarea
-                                id="bio"
-                                placeholder="Tell us about yourself..."
-                                className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.bio ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
-                                {...register('bio', {
-                                    required: profile ? false : 'Bio is required for new profiles',
-                                    minLength: { value: 10, message: 'Bio must be at least 10 characters' }
-                                })}
-                            />
-                            {errors.bio && <span className="text-xs text-red-400 font-medium">{errors.bio.message}</span>}
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="phoneNumber" className={errors.phoneNumber ? 'text-red-400' : ''}>Phone Number</Label>
-                                <Input
-                                    id="phoneNumber"
-                                    placeholder="0123456789"
-                                    className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.phoneNumber ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
-                                    {...register('phoneNumber', {
-                                        required: 'Phone number is required',
-                                        pattern: {
-                                            value: /^[0-9+]{10,15}$/,
-                                            message: 'Please enter a valid phone number'
-                                        }
-                                    })}
-                                />
-                                {errors.phoneNumber && <span className="text-xs text-red-400 font-medium">{errors.phoneNumber.message}</span>}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="sex" className={errors.sex ? 'text-red-400' : ''}>Sex</Label>
-                                <Controller
-                                    name="sex"
-                                    control={control}
-                                    rules={{ required: 'Please select your sex' }}
-                                    render={({ field }) => (
-                                        <div className="space-y-1">
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <SelectTrigger className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.sex ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}>
-                                                    <SelectValue placeholder="Select sex" />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-slate-900 text-white border-white/10">
-                                                    <SelectItem value="Male">Male</SelectItem>
-                                                    <SelectItem value="Female">Female</SelectItem>
-                                                    <SelectItem value="Other">Other</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.sex && <span className="text-xs text-red-400 font-medium">{errors.sex.message}</span>}
-                                        </div>
-                                    )}
-                                />
-                            </div>
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="address" className={errors.address ? 'text-red-400' : ''}>Address</Label>
-                            <Input
-                                id="address"
-                                placeholder="123 Street Name"
-                                className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.address ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
-                                {...register('address', { required: 'Address is required' })}
-                            />
-                            {errors.address && <span className="text-xs text-red-400 font-medium">{errors.address.message}</span>}
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="country" className={errors.country ? 'text-red-400' : ''}>Country</Label>
-                                <Input
-                                    id="country"
-                                    placeholder="Vietnam"
-                                    className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.country ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
-                                    {...register('country', { required: 'Country is required' })}
-                                />
-                                {errors.country && <span className="text-xs text-red-400 font-medium">{errors.country.message}</span>}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="dateOfBirth" className={errors.dateOfBirth ? 'text-red-400' : ''}>Date of Birth</Label>
-                                <Input
-                                    id="dateOfBirth"
-                                    type="date"
-                                    className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.dateOfBirth ? 'border-red-500/50 focus-visible:ring-red-500' : ''} [color-scheme:dark]`}
-                                    {...register('dateOfBirth', { required: 'Date of birth is required' })}
-                                    onClick={(e) => (e.target as HTMLInputElement).showPicker?.()}
-                                />
-                                {errors.dateOfBirth && <span className="text-xs text-red-400 font-medium">{errors.dateOfBirth.message}</span>}
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <Label className="text-sm font-bold uppercase tracking-wider text-slate-500">Social Links</Label>
-                            <div className="grid gap-4">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="facebook" className={errors.socialLinks?.facebook ? 'text-red-400' : ''}>Facebook URL</Label>
-                                    <Input
-                                        id="facebook"
-                                        placeholder="https://facebook.com/..."
-                                        className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.socialLinks?.facebook ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
-                                        {...register('socialLinks.facebook', {
-                                            pattern: {
-                                                value: /^(https?:\/\/)?(www\.)?facebook\.com\/.+/i,
-                                                message: 'Please enter a valid Facebook URL'
-                                            }
-                                        })}
-                                    />
-                                    {errors.socialLinks?.facebook && <span className="text-xs text-red-400 font-medium">{errors.socialLinks.facebook.message}</span>}
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="discord" className={errors.socialLinks?.discord ? 'text-red-400' : ''}>Discord Invite/User</Label>
-                                    <Input
-                                        id="discord"
-                                        placeholder="https://discord.gg/..."
-                                        className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.socialLinks?.discord ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
-                                        {...register('socialLinks.discord')}
-                                    />
-                                    {errors.socialLinks?.discord && <span className="text-xs text-red-400 font-medium">{errors.socialLinks.discord.message}</span>}
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="youtube" className={errors.socialLinks?.youtube ? 'text-red-400' : ''}>YouTube Channel</Label>
-                                    <Input
-                                        id="youtube"
-                                        placeholder="https://youtube.com/@..."
-                                        className={`bg-slate-950 border-white/10 focus-visible:ring-blue-500 ${errors.socialLinks?.youtube ? 'border-red-500/50 focus-visible:ring-red-500' : ''}`}
-                                        {...register('socialLinks.youtube', {
-                                            pattern: {
-                                                value: /^(https?:\/\/)?(www\.)?youtube\.com\/.+/i,
-                                                message: 'Please enter a valid YouTube URL'
-                                            }
-                                        })}
-                                    />
-                                    {errors.socialLinks?.youtube && <span className="text-xs text-red-400 font-medium">{errors.socialLinks.youtube.message}</span>}
-                                </div>
-                            </div>
-                        </div>
-
-                        <DialogFooter className="pt-4">
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={() => setIsDialogOpen(false)}
-                                className="hover:bg-white/5"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={isCreating || isUpdating}
-                                className="bg-blue-600 hover:bg-blue-500"
-                            >
-                                {isCreating || isUpdating ? 'Saving...' : 'Save Changes'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-        );
-    }
 }

@@ -1,6 +1,6 @@
 import React, { type ComponentType } from "react";
 import type { LucideIcon } from "lucide-react";
-export type Role = 'Admin' | 'Player' | 'Manager';
+export type Role = 'ADMIN' | 'PLAYER' | 'MANAGER';
 
 export interface NavigationItem {
     id:string;

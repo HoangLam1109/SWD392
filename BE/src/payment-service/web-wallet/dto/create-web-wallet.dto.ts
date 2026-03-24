@@ -1,11 +1,5 @@
-import {
-  IsString,
-  IsNumber,
-  IsEnum,
-  IsMongoId,
-  IsOptional,
-} from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNumber, IsEnum, IsMongoId } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateWebWalletDto {
   @ApiProperty({
@@ -21,7 +15,7 @@ export class CreateWebWalletDto {
     example: 100.5,
   })
   @IsNumber()
-  balance: number;
+  amount: number;
 
   @ApiProperty({
     description: 'Currency',
@@ -30,12 +24,11 @@ export class CreateWebWalletDto {
   @IsString()
   currency: string;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Status',
     example: 'ACTIVED',
     enum: ['ACTIVED', 'INACTIVED'],
   })
   @IsEnum(['ACTIVED', 'INACTIVED'])
-  @IsOptional()
-  status?: string;
+  status: string;
 }

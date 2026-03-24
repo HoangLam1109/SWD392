@@ -3,13 +3,13 @@ import { HydratedDocument } from 'mongoose';
 
 export interface ITransaction {
   walletId: string;
-  type: string;
+  transType: string;
   amount: number;
   balanceBefore: number;
   balanceAfter: number;
+  description: string;
   refId: string;
-  description?: string;
-  status?: string;
+  status: string;
 }
 
 export type TransactionDocument = HydratedDocument<ITransaction>;
@@ -26,9 +26,9 @@ export class Transaction {
 
   @Prop({
     required: true,
-    enum: ['DEPOSIT', 'PAYMENT'],
+    enum: ['DEPOSIT', 'WITHDRAW', 'TRANSFER', 'PAYMENT'],
   })
-  type: string;
+  transType: string;
 
   @Prop({ required: true })
   amount: number;
@@ -39,17 +39,17 @@ export class Transaction {
   @Prop({ required: true })
   balanceAfter: number;
 
-  @Prop()
-  description?: string;
+  @Prop({ required: true })
+  description: string;
 
   @Prop({ required: true })
   refId: string;
 
   @Prop({
+    required: true,
     enum: ['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED'],
-    default: 'PENDING',
   })
-  status?: string;
+  status: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

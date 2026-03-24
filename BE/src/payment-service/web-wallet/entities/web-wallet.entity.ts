@@ -5,7 +5,7 @@ export interface IWebWallet {
   userId: string;
   balance: number;
   currency: string;
-  status?: string;
+  status: string;
 }
 
 export type WebWalletDocument = HydratedDocument<IWebWallet>;
@@ -26,8 +26,8 @@ export class WebWallet {
   @Prop({ required: true, default: 'USD' })
   currency: string;
 
-  @Prop({ default: 'ACTIVED', enum: ['ACTIVED', 'INACTIVED'] })
-  status?: string;
+  @Prop({ required: true, default: 'ACTIVED', enum: ['ACTIVED', 'INACTIVED'] })
+  status: string;
 }
 
 export const WebWalletSchema = SchemaFactory.createForClass(WebWallet);

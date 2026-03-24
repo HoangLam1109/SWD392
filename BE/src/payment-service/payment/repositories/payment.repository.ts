@@ -42,7 +42,7 @@ export class PaymentRepository implements IPaymentRepository {
     paymentData: Partial<IPayment>,
   ): Promise<PaymentDocument | null> {
     return await this.paymentModel
-      .findByIdAndUpdate(id, paymentData, { returnDocument: 'after' })
+      .findByIdAndUpdate(id, paymentData, { new: true })
       .orFail(new NotFoundException('Payment not found'))
       .exec();
   }

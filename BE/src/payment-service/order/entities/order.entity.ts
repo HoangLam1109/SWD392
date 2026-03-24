@@ -1,14 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { PaymentStatus } from '../enum/status.enum';
 
 export interface IOrder {
   userId: string;
-  walletTransactionId?: string;
-  orderDetailId: string[];
+  walletTransactionId: string;
+  orderDetailId: string;
   totalPrice: number;
-  paymentStatus: PaymentStatus;
-  completedAt?: Date;
+  paymentStatus: string;
+  completedAt: Date;
 }
 
 export type OrderDocument = HydratedDocument<IOrder>;
@@ -20,26 +19,25 @@ export type OrderDocument = HydratedDocument<IOrder>;
   },
 })
 export class Order {
-  @Prop({ required: true })
+  @Prop({ required: true, ref: 'User' })
   userId: string;
 
-  @Prop()
-  walletTransactionId?: string;
+  @Prop({ required: true, ref: 'WalletTransaction' })
+  walletTransactionId: string;
 
   @Prop({ required: true, ref: 'OrderDetail' })
-  orderDetailId: string[];
+  orderDetailId: string;
 
   @Prop({ required: true })
   totalPrice: number;
 
   @Prop({
     required: true,
-    type: String,
-    enum: PaymentStatus,
+    enum: ['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED'],
   })
-  paymentStatus: PaymentStatus;
+  paymentStatus: string;
 
-  @Prop()
+  @Prop({ required: true })
   completedAt: Date;
 }
 

@@ -1,12 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsUrl, IsString, ValidateIf } from 'class-validator';
+import { IsOptional, IsUrl, IsString } from 'class-validator';
 
 export class SocialLinksDto {
   @ApiPropertyOptional({
     example: 'https://facebook.com/user',
   })
   @IsOptional()
-  @ValidateIf((o) => o.facebook !== '')
   @IsUrl()
   facebook?: string;
 
@@ -21,7 +20,6 @@ export class SocialLinksDto {
     example: 'https://youtube.com/@user',
   })
   @IsOptional()
-  @ValidateIf((o) => o.youtube !== '')
   @IsUrl()
   youtube?: string;
 }

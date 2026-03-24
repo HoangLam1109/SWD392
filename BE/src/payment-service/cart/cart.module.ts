@@ -6,6 +6,7 @@ import { PaginationService } from 'src/common/services/pagination.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Cart, CartSchema } from './entities/cart.entity';
 import { CartItemModule } from '../cart-item/cart-item.module';
+import { GameModule } from 'src/game-service/game/game.module';
 
 @Module({
   imports: [
@@ -13,10 +14,10 @@ import { CartItemModule } from '../cart-item/cart-item.module';
       [{ name: Cart.name, schema: CartSchema }],
       'PAYMENT_DB',
     ),
+    GameModule,
     CartItemModule,
   ],
   controllers: [CartController],
   providers: [CartService, PaginationService, CartRepository],
-  exports: [CartService],
 })
 export class CartModule {}

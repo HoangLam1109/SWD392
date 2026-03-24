@@ -1,0 +1,148 @@
+/**
+ * Mock game data for GameManagementPage
+ * Steam-inspired game collection
+ */
+import type { Game } from '@/types/Game.types';
+
+export const mockGames: Game[] = [
+    {
+        id: '1',
+        title: 'Cyberpunk Legends',
+        genre: 'RPG',
+        releaseDate: '2024-03-15',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=460&h=215&fit=crop',
+        developer: 'Neon Studios',
+        publisher: 'Digital Entertainment',
+        description: 'An immersive RPG set in a dystopian future',
+    },
+    {
+        id: '2',
+        title: 'Space Commanders',
+        genre: 'Strategy',
+        releaseDate: '2024-01-20',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=460&h=215&fit=crop',
+        developer: 'Stellar Games',
+        publisher: 'Cosmic Publishing',
+        description: 'Build and command your fleet across the galaxy',
+    },
+    {
+        id: '3',
+        title: 'Racing Thunder',
+        genre: 'Racing',
+        releaseDate: '2023-11-10',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=460&h=215&fit=crop',
+        developer: 'Speed Devs',
+        publisher: 'Velocity Games',
+        description: 'High-speed racing with realistic physics',
+    },
+    {
+        id: '4',
+        title: 'Shadow Realm',
+        genre: 'Horror',
+        releaseDate: '2024-02-28',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=460&h=215&fit=crop',
+        developer: 'Dark Studios',
+        publisher: 'Nightmare Entertainment',
+        description: 'Survive the horrors of the shadow realm',
+    },
+    {
+        id: '5',
+        title: 'Puzzle Master',
+        genre: 'Puzzle',
+        releaseDate: '2023-09-05',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=460&h=215&fit=crop',
+        developer: 'Mind Games Inc',
+        publisher: 'Brain Teasers Co',
+        description: 'Challenge your mind with intricate puzzles',
+    },
+    {
+        id: '6',
+        title: 'Battlefield Warriors',
+        genre: 'FPS',
+        releaseDate: '2024-04-12',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=460&h=215&fit=crop',
+        developer: 'Combat Games',
+        publisher: 'Warfare Studios',
+        description: 'Intense first-person shooter action',
+    },
+    {
+        id: '7',
+        title: 'Farm Life Simulator',
+        genre: 'Simulation',
+        releaseDate: '2023-12-18',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=460&h=215&fit=crop',
+        developer: 'Life Sim Studios',
+        publisher: 'Relaxing Games',
+        description: 'Build and manage your dream farm',
+    },
+    {
+        id: '8',
+        title: 'Soccer Champions',
+        genre: 'Sports',
+        releaseDate: '2024-05-01',
+        status: 'inactive',
+        thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=460&h=215&fit=crop',
+        developer: 'Sports Dev Team',
+        publisher: 'Athletic Games',
+        description: 'The ultimate soccer management experience',
+    },
+    {
+        id: '9',
+        title: 'Mystic Adventure',
+        genre: 'Adventure',
+        releaseDate: '2023-10-25',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=460&h=215&fit=crop',
+        developer: 'Adventure Works',
+        publisher: 'Explorer Games',
+        description: 'Embark on an epic journey through mystical lands',
+    },
+    {
+        id: '10',
+        title: 'Indie Dreams',
+        genre: 'Indie',
+        releaseDate: '2024-01-08',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=460&h=215&fit=crop',
+        developer: 'Small Studio',
+        publisher: 'Independent Games',
+        description: 'A charming indie game with heart',
+    },
+    {
+        id: '11',
+        title: 'World of Legends',
+        genre: 'MMO',
+        releaseDate: '2023-08-14',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=460&h=215&fit=crop',
+        developer: 'MMO Studios',
+        publisher: 'Online Games Inc',
+        description: 'Free-to-play MMO with endless content',
+    },
+    {
+        id: '12',
+        title: 'Action Hero',
+        genre: 'Action',
+        releaseDate: '2024-03-30',
+        status: 'active',
+        thumbnail: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=460&h=215&fit=crop',
+        developer: 'Action Games Co',
+        publisher: 'Thrill Entertainment',
+        description: 'Non-stop action and adrenaline',
+    },
+];
+
+/**
+ * Get all unique genres from the game list
+ */
+export const getAllGenres = (): string[] => {
+    const genres = new Set(mockGames.map((game) => game.genre));
+    return Array.from(genres).sort();
+};

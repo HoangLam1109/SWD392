@@ -3,43 +3,44 @@ import { ApiProperty } from '@nestjs/swagger';
 export class PaymentResponseDto {
   @ApiProperty({
     description: 'Payment unique identifier',
-    example: '507f1f77bcf86cd799439011',
+    example: '1',
   })
-  _id: string;
+  id: string;
 
   @ApiProperty({
     description: 'User ID',
-    example: '507f1f77bcf86cd799439011',
+    example: '1',
   })
   userId: string;
 
   @ApiProperty({
-    description: 'Transaction ID',
-    example: '507f1f77bcf86cd799439011',
+    description: 'Payment transaction ID',
+    example: '123456789',
   })
   transactionId: string;
 
   @ApiProperty({
-    description: 'Transaction code',
-    example: 'TXN123456789',
+    description: 'Payment transaction code',
+    example: '123456789',
   })
   transactionCode: string;
 
   @ApiProperty({
     description: 'Payment method',
-    example: 'VNPay',
+    example: 'Credit Card',
+    required: false,
   })
-  paymentMethod: string;
+  method?: string;
 
   @ApiProperty({
     description: 'Payment creation date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  createdAt: Date;
+  createdAt: string;
 
   @ApiProperty({
     description: 'Payment last update date',
     example: '2024-01-01T00:00:00.000Z',
   })
-  updatedAt: Date;
+  updatedAt: string;
 }

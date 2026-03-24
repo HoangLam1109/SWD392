@@ -12,7 +12,6 @@ import {
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import type { Response } from 'express';
-import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -110,29 +109,27 @@ export class AuthController {
 
   @Get('oauth/callback')
   @Public()
-  @UseGuards(GoogleAuthGuard)
+  @UseGuards(AuthGuard('google'))
   async googleAuthCallback(
     @GetUser() user: any,
-    @Res() res: Response,
+    @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.generateTokens(user);
-    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', tokens.accessToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'strict',
     });
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'strict',
     });
-
-    const userData = encodeURIComponent(JSON.stringify(user));
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    res.redirect(
-      `${frontendUrl}/oauth/callback?accessToken=${tokens.accessToken}&user=${userData}`,
-    );
+    return {
+      message: 'Google OAuth login successful',
+      user,
+      tokens,
+    };
   }
 
   @ApiOperation({ summary: 'User refresh token' })

@@ -32,8 +32,8 @@ export class CommentService {
       throw new NotFoundException('Blog not found');
     }
 
-    if (blog.status !== BlogStatus.APPROVED) {
-      throw new BadRequestException('Blog is not approved');
+    if (blog.status !== BlogStatus.PUBLISHED) {
+      throw new BadRequestException('Blog is not published');
     }
 
     if (createCommentDto.parentCommentId) {

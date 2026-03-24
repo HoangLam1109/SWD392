@@ -26,12 +26,6 @@ export class GameResponseDto {
   isActive: boolean;
 
   @ApiProperty({
-    description: 'Game category ID',
-    example: 'category-id',
-  })
-  categoryId: string;
-
-  @ApiProperty({
     description: 'Game description',
     example: 'An epic adventure game',
     required: false,

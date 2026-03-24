@@ -21,8 +21,6 @@ import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { CategoryResponseDto } from '../dto/category-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
-import { Role } from 'src/auth/decorators/role.decorator';
-import { UserRole } from 'src/user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('categories')
@@ -40,11 +38,6 @@ export class CategoryController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
@@ -134,16 +127,6 @@ export class CategoryController {
     return this.categoryService.findById(id);
   }
 
-  @ApiOperation({ summary: 'Index all categories for AI search' })
-  @ApiResponse({
-    status: 200,
-    description: 'Categories indexed successfully',
-  })
-  @Get('get/index')
-  indexAllCategories() {
-    return this.categoryService.findAllForIndexing();
-  }
-
   @ApiOperation({ summary: 'Update category' })
   @ApiResponse({
     status: 200,
@@ -154,11 +137,6 @@ export class CategoryController {
     status: 404,
     description: 'Category not found',
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -176,11 +154,6 @@ export class CategoryController {
     status: 404,
     description: 'Category not found',
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin or Manager access required',
-  })
-  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);

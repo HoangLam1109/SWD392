@@ -1,13 +1,7 @@
-import {
-  IsUrl,
-  IsString,
-  IsNumber,
-  IsBoolean,
-  IsDate,
-  IsMongoId,
-} from 'class-validator';
+import { IsUrl, IsString, IsNumber, IsBoolean, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
 
 export class CreateGameDto {
   @ApiProperty({
@@ -30,14 +24,6 @@ export class CreateGameDto {
   })
   @IsBoolean()
   isActive: boolean;
-
-  @ApiProperty({
-    description: 'Game category ID',
-    example: 'category-id',
-  })
-  @IsMongoId()
-  @IsString()
-  categoryId: string;
 
   @ApiPropertyOptional({
     description: 'Game discount',
@@ -75,8 +61,7 @@ export class CreateGameDto {
   publisher?: string;
 
   @ApiPropertyOptional({
-    description:
-      'Release date (ISO string, e.g. 2024-01-01 or 2024-01-01T00:00:00.000Z)',
+    description: 'Release date (ISO string, e.g. 2024-01-01 or 2024-01-01T00:00:00.000Z)',
     example: '2024-01-01',
   })
   @Type(() => Date)
@@ -87,10 +72,6 @@ export class CreateGameDto {
     description: 'Game url',
     example: 'https://example.com/game',
   })
-  @IsUrl({
-    require_protocol: true,
-    require_tld: false,
-    protocols: ['http', 'https'],
-  })
+  @IsUrl()
   url?: string;
 }

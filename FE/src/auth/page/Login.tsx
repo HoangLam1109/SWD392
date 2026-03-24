@@ -6,11 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useLogin } from "@/hooks/auth/useLogin";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
-import { useEffect } from "react";
 
 
   type FormValues = {
@@ -22,15 +21,8 @@ import { useEffect } from "react";
 export default function SigninPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { setUser } = useAuth();
   const { mutate: login, isPending, error } = useLogin();
-
-  useEffect(() => {
-    if (searchParams.get("error") === "google_auth_failed") {
-      toast.error(t("auth.login.loginFailed") || "Google login failed");
-    }
-  }, [searchParams, t]);
     const form = useForm<FormValues>({
       defaultValues: {
         email: "",
@@ -45,13 +37,10 @@ export default function SigninPage() {
         {
           onSuccess: (res) => {
             localStorage.setItem("token", res.accessToken);
-            localStorage.setItem("token_time", String(Date.now()));
             toast.success(t("auth.login.loginSuccess"));
             setUser(res.user);
-            if (res.user.role === "Admin") {
+            if (res.user.role === "ADMIN") {
               navigate("/admin");
-            } else if (res.user.role === "Manager") {
-              navigate("/manager");
             } else {
               navigate("/");
             }
@@ -82,7 +71,7 @@ export default function SigninPage() {
               </p>
               <Button
                 variant="outline"
-                onClick={() => { window.location.href = `${import.meta.env.VITE_API_URL}/auth/oauth`; }}
+                onClick={() => { }}
                 className="w-full h-11 gap-3 border-2 hover:border-[#00E5FF] hover:bg-gray-300 hover:cursor-pointer hover:scale-105 transition-transform duration-300 ease-out"
               >
                 <svg

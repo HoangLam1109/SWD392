@@ -15,6 +15,5 @@ import { PaginationService } from '../../common/services/pagination.service';
   ],
   controllers: [WebWalletController],
   providers: [WebWalletService, WebWalletRepository, PaginationService],
-  exports: [WebWalletService],
 })
 export class WebWalletModule {}

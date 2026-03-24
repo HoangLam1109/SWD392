@@ -18,29 +18,7 @@ export class CreateTransactionDto {
   walletId: string;
 
   @ApiProperty({
-    description: 'Reference ID',
-    example: '698175d5c4308f3653af15d4',
-  })
-  @IsMongoId()
-  @IsString()
-  refId: string;
-
-  @ApiProperty({
-    description: 'Balance before transaction',
-    example: 100.5,
-  })
-  @IsNumber()
-  balanceBefore: number;
-
-  @ApiProperty({
-    description: 'Balance after transaction',
-    example: 100.5,
-  })
-  @IsNumber()
-  balanceAfter: number;
-
-  @ApiProperty({
-    description: 'Amount',
+    description: 'Transaction amount',
     example: 100.5,
   })
   @IsNumber()

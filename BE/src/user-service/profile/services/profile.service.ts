@@ -5,7 +5,7 @@ import { ProfileDocument } from '../entities/profile.entity';
 
 @Injectable()
 export class ProfileService {
-  constructor(private readonly profileRepository: ProfileRepository) { }
+  constructor(private readonly profileRepository: ProfileRepository) {}
 
   async getProfileById(id: string): Promise<ProfileDocument> {
     const profile = await this.profileRepository.findById(id);
@@ -40,12 +40,9 @@ export class ProfileService {
 
     if (updateProfileDto.socialLinks) {
       const existingProfile = await this.profileRepository.findByUserId(userId);
-      const existingSocialLinks = existingProfile?.socialLinks
-        ? JSON.parse(JSON.stringify(existingProfile.socialLinks))
-        : {};
 
       updateData.socialLinks = {
-        ...existingSocialLinks,
+        ...(existingProfile?.socialLinks || {}),
         ...updateProfileDto.socialLinks,
       };
     }

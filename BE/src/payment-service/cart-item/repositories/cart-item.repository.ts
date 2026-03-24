@@ -9,7 +9,6 @@ import { InjectModel } from '@nestjs/mongoose';
 
 export interface ICartItemRepository {
   findById(id: string, fields?: string): Promise<CartItemDocument | null>;
-  findByIds(ids: string[]): Promise<CartItemDocument[]>;
   findByCartId(cartId: string): Promise<CartItemDocument[]>;
   create(cartItemData: Partial<ICartItem>): Promise<CartItemDocument>;
   updateById(
@@ -39,18 +38,12 @@ export class CartItemRepository implements ICartItemRepository {
   ): Promise<CartItemDocument | null> {
     return await this.cartItemModel.findById(
       id,
-      fields || 'cartId productId priceAtPurchase',
+      fields || 'cartId gameId priceAtPurchase',
     );
   }
 
-  async findByIds(ids: string[]): Promise<CartItemDocument[]> {
-    return await this.cartItemModel
-      .find({ _id: { $in: ids } })
-      .populate('productId');
-  }
-
   async findByCartId(cartId: string): Promise<CartItemDocument[]> {
-    return await this.cartItemModel.find({ cartId }).populate('productId');
+    return await this.cartItemModel.find({ cartId }).populate('gameId');
   }
 
   async create(cartItemData: Partial<ICartItem>): Promise<CartItemDocument> {
@@ -63,7 +56,7 @@ export class CartItemRepository implements ICartItemRepository {
     cartItemData: Partial<ICartItem>,
   ): Promise<CartItemDocument | null> {
     return await this.cartItemModel
-      .findByIdAndUpdate(id, cartItemData, { returnDocument: 'after' })
+      .findByIdAndUpdate(id, cartItemData, { new: true })
       .orFail(new NotFoundException('Cart item not found'))
       .exec();
   }
@@ -81,8 +74,8 @@ export class CartItemRepository implements ICartItemRepository {
 
   async findAll(): Promise<CartItemDocument[]> {
     return await this.cartItemModel
-      .find({}, 'cartId productId priceAtPurchase')
-      .populate('productId');
+      .find({}, 'cartId gameId priceAtPurchase')
+      .populate('gameId');
   }
 
   async findWithQuery(
@@ -98,7 +91,7 @@ export class CartItemRepository implements ICartItemRepository {
     const sortObj: Record<string, 1 | -1> = { [sortField]: sortDirection };
     return await this.cartItemModel
       .find(query)
-      .populate('productId')
+      .populate('gameId')
       .sort(sortObj)
       .collation({ locale: 'en', strength: 2 })
       .limit(options?.limit)

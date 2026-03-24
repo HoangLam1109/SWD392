@@ -66,7 +66,7 @@ export class SystemRequirementRepository
     requirementData: Partial<ISystemRequirement>,
   ): Promise<SystemRequirementDocument | null> {
     return await this.systemRequirementModel
-      .findByIdAndUpdate(id, requirementData, { returnDocument: 'after' })
+      .findByIdAndUpdate(id, requirementData, { new: true })
       .orFail(new NotFoundException('System requirement not found'))
       .exec();
   }

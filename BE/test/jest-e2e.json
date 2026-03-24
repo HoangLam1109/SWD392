@@ -5,10 +5,14 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+<<<<<<< HEAD
   },
   "transformIgnorePatterns": ["<rootDir>/node_modules/(?!nanoid|jose)"],
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/src/$1"
   },
   "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
+=======
+  }
+>>>>>>> parent of 4376748 (Merge branch 'dev' of https://github.com/HoangLam1109/SWD392 into feature/update-login)
 }

@@ -36,7 +36,7 @@ export class ProfileRepository implements IProfileRepository {
     profileData: Partial<IProfile>,
   ): Promise<ProfileDocument> {
     return this.profileModel
-      .findByIdAndUpdate(id, profileData, { returnDocument: 'after' })
+      .findByIdAndUpdate(id, profileData, { new: true })
       .orFail(new NotFoundException('Profile not found'))
       .exec();
   }
@@ -56,7 +56,7 @@ export class ProfileRepository implements IProfileRepository {
       userId: new Types.ObjectId(userId),
     },
     {
-      returnDocument: 'after',
+      new: true,
       upsert: true,
       setDefaultsOnInsert: true,
     },

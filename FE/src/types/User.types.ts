@@ -1,54 +1,44 @@
-export const UserRole = {
-    PLAYER: 'Player',
-    MANAGER: 'Manager',
-    ADMIN: 'Admin',
+export const UserAccountType = {
+    PLAYER: 'player',
+    MANAGER: 'manager',
+    ADMIN: 'admin',
 } as const;
 
-export type UserRole = typeof UserRole[keyof typeof UserRole];
-
-export const UserStatus = {
-    ACTIVE: 'ACTIVE',
-    INACTIVE: 'INACTIVE',
-} as const;
-
-export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
-
-// Keep legacy type for backward compatibility
-export type UserAccountType = UserRole;
+export type UserAccountType = typeof UserAccountType[keyof typeof UserAccountType];
 
 export interface User {
-    _id?: string; // MongoDB ID
-    id?: string;  // Alternative ID
+    id: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    fullName: string;
-    role: UserRole;
-    avatar?: string;
-    status: UserStatus;
+    accountType: UserAccountType;
+    primaryPhone: string;
+    secondaryPhone: string;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface CreateUserDTO {
+    firstName: string;
+    lastName: string;
     email: string;
-    fullName: string;
-    password: string;
-    role: UserRole;
-    avatar?: string;
-    status: UserStatus;
+    accountType: UserAccountType;
+    primaryPhone?: string;
+    secondaryPhone?: string;
 }
 
 export interface UpdateUserDTO {
+    firstName?: string;
+    lastName?: string;
     email?: string;
-    fullName?: string;
-    password?: string;
-    role?: UserRole;
-    avatar?: string;
-    status?: UserStatus;
+    accountType?: UserAccountType;
+    primaryPhone?: string;
+    secondaryPhone?: string;
 }
 
 export interface UsersResponse {
-    data: User[];
-    hasNextPage: boolean;
-    totalCount?: number;
-    nextCursor?: string;
+    users: User[];
+    total: number;
+    page: number;
+    pageSize: number;
 }

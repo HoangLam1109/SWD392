@@ -27,8 +27,7 @@ export class BlogRepository implements IBlogRepository {
   async findById(id: string, fields?: string): Promise<BlogDocument | null> {
     return await this.blogModel.findOne(
       { _id: id },
-      fields ||
-        '_id title content thumbnailUrl status viewCount publishedAt userId created_at updated_at',
+      fields || '_id title content thumbnailUrl status viewCount publishedAt userId created_at updated_at',
     );
   }
 
@@ -50,14 +49,18 @@ export class BlogRepository implements IBlogRepository {
     blogData: Partial<IBlog>,
   ): Promise<BlogDocument> {
     return await this.blogModel
-      .findOneAndUpdate({ _id: id }, blogData, { returnDocument: 'after' })
+      .findOneAndUpdate(
+        { _id: id },
+        blogData,
+        { new: true },
+      )
       .orFail(new NotFoundException('Blog not found'))
       .exec();
   }
 
   async deleteById(id: string): Promise<void> {
-    await this.blogModel.findByIdAndDelete(id).exec();
-  }
+  await this.blogModel.findByIdAndDelete(id).exec();
+}
 
   async findAll(fields?: string): Promise<BlogDocument[]> {
     return await this.blogModel.find({}, fields);
@@ -74,7 +77,7 @@ export class BlogRepository implements IBlogRepository {
     const sortField = options?.sortBy || '_id';
     const sortDirection = options.sortOrder === 'asc' ? 1 : -1;
     const sortObj: Record<string, 1 | -1> = { [sortField]: sortDirection };
-
+    
     return await this.blogModel
       .find(query)
       .sort(sortObj)
@@ -92,7 +95,7 @@ export class BlogRepository implements IBlogRepository {
       .findOneAndUpdate(
         { _id: id },
         { $inc: { viewCount: 1 } },
-        { returnDocument: 'after' },
+        { new: true },
       )
       .exec();
   }

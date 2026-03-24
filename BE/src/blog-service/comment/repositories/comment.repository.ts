@@ -7,10 +7,7 @@ export interface ICommentRepository {
   findById(id: string, fields?: string): Promise<CommentDocument | null>;
   findByBlogId(blogId: string, isDeleted?: boolean): Promise<CommentDocument[]>;
   findByUserId(userId: string, isDeleted?: boolean): Promise<CommentDocument[]>;
-  findByParentCommentId(
-    parentCommentId: string,
-    isDeleted?: boolean,
-  ): Promise<CommentDocument[]>;
+  findByParentCommentId(parentCommentId: string, isDeleted?: boolean): Promise<CommentDocument[]>;
   create(commentData: any): Promise<CommentDocument>;
   updateById(id: string, commentData: any): Promise<CommentDocument | null>;
   softDeleteById(id: string): Promise<CommentDocument | null>;
@@ -33,31 +30,30 @@ export class CommentRepository implements ICommentRepository {
   async findById(id: string, fields?: string): Promise<CommentDocument | null> {
     return await this.commentModel.findOne(
       { _id: id, isDeleted: false },
-      fields ||
-        '_id content blogId userId parentCommentId isDeleted created_at updated_at',
+      fields || '_id content blogId userId parentCommentId isDeleted created_at updated_at',
     );
   }
 
-  async findByBlogId(
-    blogId: string,
-    isDeleted?: boolean,
-  ): Promise<CommentDocument[]> {
+  async findByBlogId(blogId: string, isDeleted?: boolean): Promise<CommentDocument[]> {
     const query: any = { blogId };
     if (isDeleted !== undefined) {
       query.isDeleted = isDeleted;
     }
-    return await this.commentModel.find(query).sort({ created_at: -1 }).lean();
+    return await this.commentModel
+      .find(query)
+      .sort({ created_at: -1 })
+      .lean();
   }
 
-  async findByUserId(
-    userId: string,
-    isDeleted?: boolean,
-  ): Promise<CommentDocument[]> {
+  async findByUserId(userId: string, isDeleted?: boolean): Promise<CommentDocument[]> {
     const query: any = { userId };
     if (isDeleted !== undefined) {
       query.isDeleted = isDeleted;
     }
-    return await this.commentModel.find(query).sort({ created_at: -1 }).lean();
+    return await this.commentModel
+      .find(query)
+      .sort({ created_at: -1 })
+      .lean();
   }
 
   async findByParentCommentId(
@@ -68,7 +64,10 @@ export class CommentRepository implements ICommentRepository {
     if (isDeleted !== undefined) {
       query.isDeleted = isDeleted;
     }
-    return await this.commentModel.find(query).sort({ created_at: -1 }).lean();
+    return await this.commentModel
+      .find(query)
+      .sort({ created_at: -1 })
+      .lean();
   }
 
   async create(commentData: any): Promise<CommentDocument> {
@@ -82,7 +81,7 @@ export class CommentRepository implements ICommentRepository {
   ): Promise<CommentDocument | null> {
     return await this.commentModel
       .findOneAndUpdate({ _id: id, isDeleted: false }, commentData, {
-        returnDocument: 'after',
+        new: true,
       })
       .orFail(new NotFoundException('Comment not found'))
       .exec();
@@ -93,7 +92,7 @@ export class CommentRepository implements ICommentRepository {
       .findOneAndUpdate(
         { _id: id, isDeleted: false },
         { isDeleted: true },
-        { returnDocument: 'after' },
+        { new: true },
       )
       .orFail(new NotFoundException('Comment not found'))
       .exec();

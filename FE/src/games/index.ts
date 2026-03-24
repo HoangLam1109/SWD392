@@ -1,1 +1,0 @@
-export { FlappyBirdGame } from "./FlappyBirdGame";

@@ -33,24 +33,19 @@ export function DeleteUserDialog({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent className="bg-slate-900 text-slate-50 border border-slate-700">
+            <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription className="text-slate-400">
+                    <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete the user account for{' '}
-                        <span className="font-semibold text-slate-50">
+                        <span className="font-semibold text-gray-900">
                             {user?.firstName} {user?.lastName}
                         </span>{' '}
                         ({user?.email}).
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel
-                        disabled={isLoading}
-                        className="bg-slate-800 text-slate-50 border-slate-600 hover:bg-slate-700"
-                    >
-                        Cancel
-                    </AlertDialogCancel>
+                    <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleConfirm}
                         disabled={isLoading}

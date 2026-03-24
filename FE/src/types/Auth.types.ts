@@ -4,7 +4,6 @@ export interface LoginPayload{
 }
 export interface LoginResponse{
     accessToken: string;
-    refreshToken: string;
     user: User;
 }
 export interface User{
@@ -24,11 +23,10 @@ export interface RegisterPayload{
 }
 export interface RegisterResponse{
     accessToken: string;
-    refreshToken: string;
     user: User;
 }
 export interface CurrentUserResponse{
-    _id?: string;
+    id: string;
     email: string;
     fullName: string;
     role: string;
@@ -36,9 +34,4 @@ export interface CurrentUserResponse{
     avatar: string;
     createdAt: string;
     updatedAt: string;
-}
-export interface RefreshTokenResponse{
-    refreshToken: string;
-    accessToken: string;
-    user: User;
 }
