@@ -31,6 +31,7 @@ const AppRoutes = () => {
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            
             <Route path="/store" element={<StorePage />} />
             <Route path="/store/:gameId" element={<GameDetailPage />} />
             <Route path="/library" element={<LibraryPage />} />
