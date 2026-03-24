@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Request,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,6 +25,7 @@ import { UpdateLibraryGameDto } from '../dto/update-library-game.dto';
 import { LibraryGameService } from '../services/library-game.service';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { UserRole } from 'src/user-service/user/enum/user.enum';
+import { GetUser } from 'src/common/decorators/info.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Library Games')
@@ -109,6 +111,21 @@ export class LibraryGameController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.libraryGameService.findOne(id);
+  }
+
+  @ApiOperation({ summary: "Get user's highest score across all games" })
+  @ApiResponse({
+    status: 200,
+    description: "User's highest score found",
+    type: LibraryGameResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No games found for user',
+  })
+  @Get('user/highest-score')
+  getHighestScoreByUser(@GetUser() user: Partial<{ _id: string }>) {
+    return this.libraryGameService.getHighestScoreByUserId(user._id!);
   }
 
   @ApiOperation({ summary: 'Update library game record' })
