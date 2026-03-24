@@ -7,7 +7,7 @@ export class UpdateBlogStatusDto {
     enum: BlogStatus,
     enumName: 'BlogStatus',
     description: 'Blog status',
-    example: BlogStatus.PUBLISHED,
+    example: BlogStatus.APPROVED,
   })
   @IsEnum(BlogStatus)
   status: BlogStatus;

@@ -5,11 +5,13 @@ import { InjectModel } from '@nestjs/mongoose';
 
 export interface IGameRepository {
   findById(id: string, fields?: string): Promise<GameDocument | null>;
+  findByIds(ids: string[]): Promise<GameDocument[]>;
   getGameBasicInfo(
     id: string,
   ): Promise<{ title: string; price: number; isActive: boolean } | null>;
-  findByReleaseDate(releaseDate: Date): Promise<GameDocument | null>;
-  findByPrice(price: number): Promise<GameDocument | null>;
+  findByReleaseDate(releaseDate: Date): Promise<GameDocument[] | null>;
+  findByCategoryId(categoryId: string): Promise<GameDocument[] | null>;
+  findByPrice(price: number): Promise<GameDocument[] | null>;
   create(userData: any): Promise<any>;
   updateById(id: string, userData: any): Promise<any>;
   deleteById(id: string): Promise<any>;
@@ -36,8 +38,12 @@ export class GameRepository implements IGameRepository {
     return await this.gameModel.findById(
       id,
       fields ||
-        '_id title price discount isActive description developer publisher thumbnail coverImage releaseDate url',
+        '_id title price discount isActive description developer publisher thumbnail coverImage releaseDate url categoryId',
     );
+  }
+
+  async findByIds(ids: string[]): Promise<GameDocument[]> {
+    return await this.gameModel.find({ _id: { $in: ids } });
   }
 
   async getGameBasicInfo(
@@ -46,12 +52,16 @@ export class GameRepository implements IGameRepository {
     return await this.gameModel.findById(id, 'title price isActive');
   }
 
-  async findByReleaseDate(releaseDate: Date): Promise<GameDocument | null> {
-    return await this.gameModel.findOne({ releaseDate });
+  async findByReleaseDate(releaseDate: Date): Promise<GameDocument[] | null> {
+    return await this.gameModel.find({ releaseDate });
   }
 
-  async findByPrice(price: number): Promise<GameDocument | null> {
-    return await this.gameModel.findOne({ price });
+  async findByCategoryId(categoryId: string): Promise<GameDocument[] | null> {
+    return await this.gameModel.find({ categoryId });
+  }
+
+  async findByPrice(price: number): Promise<GameDocument[] | null> {
+    return await this.gameModel.find({ price });
   }
 
   async findAll(): Promise<GameDocument[]> {
@@ -68,7 +78,7 @@ export class GameRepository implements IGameRepository {
     userData: Partial<IGame>,
   ): Promise<GameDocument | null> {
     return await this.gameModel
-      .findByIdAndUpdate(id, userData, { new: true })
+      .findByIdAndUpdate(id, userData, { returnDocument: 'after' })
       .orFail(new NotFoundException('Game not found'))
       .exec();
   }

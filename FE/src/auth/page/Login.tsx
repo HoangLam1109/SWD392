@@ -48,8 +48,10 @@ export default function SigninPage() {
             localStorage.setItem("token_time", String(Date.now()));
             toast.success(t("auth.login.loginSuccess"));
             setUser(res.user);
-            if (res.user.role === "ADMIN") {
+            if (res.user.role === "Admin") {
               navigate("/admin");
+            } else if (res.user.role === "Manager") {
+              navigate("/manager");
             } else {
               navigate("/");
             }

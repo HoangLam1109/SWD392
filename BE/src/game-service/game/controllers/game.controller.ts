@@ -21,6 +21,8 @@ import { UpdateGameDto } from '../dto/update-game.dto';
 import { GameResponseDto } from '../dto/game-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { UserRole } from 'src/user-service/user/enum/user.enum';
 
 @ApiBearerAuth()
 @ApiTags('games')
@@ -38,6 +40,11 @@ export class GameController {
     status: 400,
     description: 'Bad request - invalid input data',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Post()
   create(@Body() createGameDto: CreateGameDto) {
     return this.gameService.createGame(createGameDto);
@@ -79,13 +86,24 @@ export class GameController {
     description: 'Paginated list of games',
     type: PaginationResponseDto<GameResponseDto>,
   })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Admin access required',
-  })
   @Get()
   findAllWithPagination(@Query() query: PaginationOptionsDto) {
     return this.gameService.findAllWithPagination(query);
+  }
+
+  @ApiOperation({ summary: 'Get game by category ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Game found',
+    type: [GameResponseDto],
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game not found',
+  })
+  @Get('category/:categoryId')
+  findByCategoryId(@Param('categoryId') categoryId: string) {
+    return this.gameService.findGameByCategoryId(categoryId);
   }
 
   @ApiOperation({ summary: 'Get game by ID' })
@@ -103,17 +121,36 @@ export class GameController {
     return this.gameService.findGameById(id);
   }
 
-  @ApiOperation({ summary: 'Get game by release date' })
+  @ApiOperation({ summary: 'Index all games' })
   @ApiResponse({
     status: 200,
-    description: 'Game found',
-    type: GameResponseDto,
+    description: 'Games indexed successfully',
   })
   @ApiResponse({
     status: 404,
     description: 'Game not found',
   })
-  @Get(':releaseDate')
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
+  @Get('index')
+  indexAllGames() {
+    return this.gameService.findAllForIndexing();
+  }
+
+  @ApiOperation({ summary: 'Get game by release date' })
+  @ApiResponse({
+    status: 200,
+    description: 'Game found',
+    type: [GameResponseDto],
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Game not found',
+  })
+  @Get('release-date/:releaseDate')
   findByReleaseDate(@Param('releaseDate') releaseDate: Date) {
     return this.gameService.findGameByReleaseDate(releaseDate);
   }
@@ -122,13 +159,13 @@ export class GameController {
   @ApiResponse({
     status: 200,
     description: 'Game found',
-    type: GameResponseDto,
+    type: [GameResponseDto],
   })
   @ApiResponse({
     status: 404,
     description: 'Game not found',
   })
-  @Get(':price')
+  @Get('price/:price')
   findByPrice(@Param('price') price: number) {
     return this.gameService.findByPrice(price);
   }
@@ -142,6 +179,11 @@ export class GameController {
     status: 404,
     description: 'Game not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
     return this.gameService.updateGame(id, updateGameDto);
@@ -156,6 +198,11 @@ export class GameController {
     status: 404,
     description: 'Game not found',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Admin or Manager access required',
+  })
+  @Role(UserRole.ADMIN, UserRole.MANAGER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.gameService.deleteGame(id);

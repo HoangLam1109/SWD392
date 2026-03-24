@@ -17,7 +17,7 @@ export type PaymentDocument = HydratedDocument<IPayment>;
   },
 })
 export class Payment {
-  @Prop({ required: true, ref: 'User' })
+  @Prop({ required: true })
   userId: string;
 
   @Prop({ required: true, ref: 'Transaction' })

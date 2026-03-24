@@ -13,7 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import type { Game, GameGenre } from '@/types/Game.types';
+import type { LibraryGameView } from '@/types/LibraryGame.types';
 
 interface LibrarySidebarProps {
     className?: string;
@@ -22,26 +22,26 @@ interface LibrarySidebarProps {
     /** Callback khi đổi search */
     onSearchChange: (value: string) => void;
     /** Genre đang chọn (hoặc 'all') */
-    genreFilter: GameGenre | 'all';
+    categoryFilter: string | 'all';
     /** Callback khi đổi genre */
-    onGenreFilterChange: (value: GameGenre | 'all') => void;
-    /** Danh sách genre cho dropdown */
-    genres: string[];
+    onCategoryFilterChange: (value: string | 'all') => void;
+    /** Danh sách category cho dropdown */
+    categories: string[];
     /** Danh sách game để hiển thị tên (thường là danh sách đã filter) */
-    games: Game[];
+    games: LibraryGameView[];
     /** ID game đang được chọn (highlight trong list) */
     selectedGameId?: string;
     /** Callback khi click vào một game trong list */
-    onSelectGame?: (game: Game) => void;
+    onSelectGame?: (game: LibraryGameView) => void;
 }
 
 export function LibrarySidebar({
     className,
     searchValue,
     onSearchChange,
-    genreFilter,
-    onGenreFilterChange,
-    genres,
+    categoryFilter,
+    onCategoryFilterChange,
+    categories,
     games,
     selectedGameId,
     onSelectGame,
@@ -70,15 +70,15 @@ export function LibrarySidebar({
                 </div>
             </div>
 
-            {/* Filter by Genre */}
+            {/* Filter by Category */}
             <div className="px-4 pb-4 border-b border-slate-700/50 shrink-0">
                 <label className="text-slate-400 text-xs font-medium block mb-2">
-                    {t('library.sidebar.genre')}
+                    {t('library.sidebar.category')}
                 </label>
                 <Select
-                    value={genreFilter}
+                    value={categoryFilter}
                     onValueChange={(value) =>
-                        onGenreFilterChange(value as GameGenre | 'all')
+                        onCategoryFilterChange(value as string | 'all')
                     }
                 >
                     <SelectTrigger className="w-full h-9 bg-slate-800/50 border-slate-600 text-white text-sm focus:border-blue-400">
@@ -91,13 +91,13 @@ export function LibrarySidebar({
                         >
                             {t('library.sidebar.allGenres')}
                         </SelectItem>
-                        {genres.map((genre) => (
+                        {categories.map((category) => (
                             <SelectItem
-                                key={genre}
-                                value={genre}
+                                key={category}
+                                value={category}
                                 className="text-white hover:bg-slate-700 focus:bg-slate-700"
                             >
-                                {genre}
+                                {category}
                             </SelectItem>
                         ))}
                     </SelectContent>
@@ -117,9 +117,9 @@ export function LibrarySidebar({
                             </li>
                         ) : (
                             games.map((game) => {
-                                const isSelected = selectedGameId === game.id;
+                                const isSelected = selectedGameId === game.gameId;
                                 return (
-                                    <li key={game.id}>
+                                    <li key={game.libraryGameId}>
                                         <button
                                             type="button"
                                             onClick={() => onSelectGame?.(game)}

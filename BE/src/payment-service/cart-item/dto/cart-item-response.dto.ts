@@ -14,16 +14,22 @@ export class CartItemResponseDto {
   cartId: string;
 
   @ApiProperty({
-    description: 'Game ID',
+    description: 'Product ID',
     example: '698175d5c4308f3653af15d5',
   })
-  gameId: string;
+  productId: string;
 
   @ApiProperty({
     description: 'Price at purchase',
     example: 59.99,
   })
   priceAtPurchase: number;
+
+  @ApiProperty({
+    description: 'Discount at purchase',
+    example: 15,
+  })
+  discount: number;
 
   @ApiProperty({
     description: 'Cart item creation date',

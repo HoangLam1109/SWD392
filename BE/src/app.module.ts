@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ProfileModule } from './user-service/profile/profile.module';
 import { GameModule } from './game-service/game/game.module';
+import { UserGameItemModule } from './game-service/user-game-item/user-game-item.module';
+import { GameItemModule } from './game-service/game-item/game-item.module';
 import { BlogModule } from './blog-service/blog/blog.module';
 import { CommentModule } from './blog-service/comment/comment.module';
 import { CategoryModule } from './game-service/category/category.module';
@@ -14,6 +16,12 @@ import { WebWalletModule } from './payment-service/web-wallet/web-wallet.module'
 import { TransactionModule } from './payment-service/transaction/transaction.module';
 import { CartModule } from './payment-service/cart/cart.module';
 import { CartItemModule } from './payment-service/cart-item/cart-item.module';
+import { OrderModule } from './payment-service/order/order.module';
+import { OrderDetailModule } from './payment-service/order-detail/order-detail.module';
+import { GameKeyModule } from './game-service/game-key/game-key.module';
+import { AiModule } from './ai/ai.module';
+import { LibraryGameModule } from './game-service/library-game/library-game.module';
+import { GameSessionModule } from './game-service/game-session/game-session.module';
 
 @Module({
   imports: [
@@ -53,6 +61,14 @@ import { CartItemModule } from './payment-service/cart-item/cart-item.module';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      connectionName: 'AI_DB',
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('AI_MONGO_URL'),
+      }),
+      inject: [ConfigService],
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET_KEY,
@@ -61,6 +77,11 @@ import { CartItemModule } from './payment-service/cart-item/cart-item.module';
     AuthModule,
     ProfileModule,
     GameModule,
+    GameKeyModule,
+    UserGameItemModule,
+    GameItemModule,
+    LibraryGameModule,
+    GameSessionModule,
     CommentModule,
     BlogModule,
     CategoryModule,
@@ -70,6 +91,9 @@ import { CartItemModule } from './payment-service/cart-item/cart-item.module';
     TransactionModule,
     CartModule,
     CartItemModule,
+    OrderModule,
+    OrderDetailModule,
+    AiModule,
   ],
 })
 export class AppModule {}

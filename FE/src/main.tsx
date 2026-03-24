@@ -15,6 +15,7 @@ if (tokenTime && Date.now() - Number(tokenTime) > 60 * 60 * 1000) {
   localStorage.removeItem('auth_user')
   localStorage.removeItem('token_time')
 }
+document.documentElement.classList.add('dark')
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Filter, ChevronDown, ChevronUp, DollarSign, Star, Calendar } from 'lucide-react';
+import { Filter, ChevronDown, ChevronUp, DollarSign, Calendar } from 'lucide-react';
 
 interface StoreFiltersProps {
   onFilterChange: (filters: FilterState) => void;
@@ -8,10 +8,22 @@ interface StoreFiltersProps {
 
 export interface FilterState {
   priceRange: [number, number];
+  /** Reserved for future use */
   minRating: number;
-  categories: string[];
-  sortBy: string;
+  categories: CategoryId[];
+  sortBy: 'popular' | 'newest' | 'price-low' | 'price-high';
 }
+
+const categoryKeys = {
+  action: 'store.categories.action',
+  rpg: 'store.categories.rpg',
+  strategy: 'store.categories.strategy',
+  sports: 'store.categories.sports',
+  racing: 'store.categories.racing',
+} as const;
+
+type CategoryId = keyof typeof categoryKeys;
+type SortId = FilterState['sortBy'];
 
 export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
   const { t } = useTranslation();
@@ -29,31 +41,21 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
     sortBy: 'popular',
   });
 
-  const categoryKeys: Record<string, string> = {
-    action: 'store.categories.action',
-    rpg: 'store.categories.rpg',
-    strategy: 'store.categories.strategy',
-    sports: 'store.categories.sports',
-    racing: 'store.categories.racing',
-  };
-
   const categories = [
-    { id: 'action', count: 87 },
-    { id: 'rpg', count: 62 },
-    { id: 'strategy', count: 45 },
-    { id: 'sports', count: 28 },
-    { id: 'racing', count: 23 },
+    { id: 'action' as CategoryId },
+    { id: 'rpg' as CategoryId },
+    { id: 'strategy' as CategoryId },
+    { id: 'sports' as CategoryId },
+    { id: 'racing' as CategoryId },
   ];
 
-  const sortOptions = [
-    { id: 'popular', key: 'store.filters.mostPopular' },
+  const sortOptions: { id: SortId; key: string }[] = [
     { id: 'newest', key: 'store.filters.newest' },
     { id: 'price-low', key: 'store.filters.priceLowToHigh' },
     { id: 'price-high', key: 'store.filters.priceHighToLow' },
-    { id: 'rating', key: 'store.filters.highestRated' },
   ];
 
-  const toggleCategory = (categoryId: string) => {
+  const toggleCategory = (categoryId: CategoryId) => {
     const newCategories = filters.categories.includes(categoryId)
       ? filters.categories.filter((c) => c !== categoryId)
       : [...filters.categories, categoryId];
@@ -63,18 +65,17 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
     onFilterChange(newFilters);
   };
 
-  const handleSortChange = (sortId: string) => {
+  const handleSortChange = (sortId: SortId) => {
     const newFilters = { ...filters, sortBy: sortId };
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
 
-  const handleRatingChange = (rating: number) => {
-    const newFilters = { ...filters, minRating: rating };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(value);
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -143,56 +144,13 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
                   />
                   <span className="text-sm">{t(categoryKeys[category.id])}</span>
                 </div>
-                <span className="text-xs text-slate-500">{category.count}</span>
               </label>
             ))}
           </div>
         )}
       </div>
 
-      {/* Rating */}
-      <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-4">
-        <button
-          onClick={() => setExpanded({ ...expanded, rating: !expanded.rating })}
-          className="flex items-center justify-between w-full mb-3"
-        >
-          <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-yellow-400" />
-            <span className="font-medium">{t('store.filters.rating')}</span>
-          </div>
-          {expanded.rating ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
-        
-        {expanded.rating && (
-          <div className="space-y-2">
-            {[4, 3, 2, 1].map((rating) => (
-              <label
-                key={rating}
-                className="flex items-center gap-2 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors"
-              >
-                <input
-                  type="radio"
-                  name="rating"
-                  checked={filters.minRating === rating}
-                  onChange={() => handleRatingChange(rating)}
-                  className="w-4 h-4 accent-blue-500"
-                />
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-3.5 h-3.5 ${
-                        i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-600'
-                      }`}
-                    />
-                  ))}
-                  <span className="text-sm ml-1">{t('store.filters.andUp')}</span>
-                </div>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
+      
 
       {/* Price Range */}
       <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-4">
@@ -210,11 +168,13 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
         {expanded.price && (
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <span className="text-sm text-slate-400">$0</span>
+              <span className="text-sm text-slate-400">
+                {formatCurrency(0)}
+              </span>
               <input
                 type="range"
-                min="0"
-                max="100"
+                min={0}
+                max={2000000}
                 value={filters.priceRange[1]}
                 onChange={(e) => {
                   const newFilters = {
@@ -226,7 +186,9 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
                 }}
                 className="flex-1 accent-blue-500"
               />
-              <span className="text-sm text-slate-400">${filters.priceRange[1]}</span>
+              <span className="text-sm text-slate-400">
+                {formatCurrency(filters.priceRange[1])}
+              </span>
             </div>
             <div className="text-center text-sm text-slate-400">
               {t('store.filters.upTo', { value: filters.priceRange[1] })}
@@ -238,7 +200,7 @@ export function StoreFilters({ onFilterChange }: StoreFiltersProps) {
       {/* Reset Button */}
       <button
         onClick={() => {
-          const resetFilters = {
+          const resetFilters: FilterState = {
             priceRange: [0, 100] as [number, number],
             minRating: 0,
             categories: [],
