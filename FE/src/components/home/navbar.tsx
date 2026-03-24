@@ -29,10 +29,14 @@ export function Navbar({ fixed }: NavbarProps) {
   const { logout } = useLogout();
   const dashboardPath = user?.role ? getPathbyRole(user.role as Role) : '/';
   const { data } = useGetMyCartWithItems();
-  const cartItems = data?.items.length ?? 0;
+  const cartItems = data?.items?.length ?? 0;
   const { data: wallet } = useGetWalletByUserId();
-  const walletBalance = wallet != null   ? `${t('common.wallet')} (${wallet.balance.toLocaleString()} ${wallet.currency})`
-  : t('common.wallet');
+  const walletBalance =
+    wallet != null && wallet.balance != null
+      ? `${t('common.wallet')} (${Number(wallet.balance).toLocaleString()}${
+          wallet.currency ? ` ${wallet.currency}` : ''
+        })`
+      : t('common.wallet');
   return (
     <nav className={`z-50 w-full ${fixed ? 'fixed top-0 left-0 right-0' : 'relative'}`}>
       <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -110,15 +114,16 @@ export function Navbar({ fixed }: NavbarProps) {
                       <LogOut className="w-4 h-4 mr-2" />
                       {t('common.gotodashboard')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={logout}>
-                      <CirclePower className="w-4 h-4 mr-2" />
-                      {t('common.logout')}
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/wallet')}>
                       <Wallet className="w-4 h-4 mr-2" />
                       {walletBalance} 
 
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={logout}>
+                      <CirclePower className="w-4 h-4 mr-2" />
+                      {t('common.logout')}
+                    </DropdownMenuItem>
+                    
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
@@ -231,19 +236,20 @@ export function Navbar({ fixed }: NavbarProps) {
                   <button
                     type="button"
                     className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
-                    onClick={logout}
-                  >
-                    <CirclePower className="w-4 h-4" />
-                    {t('common.logout')}
-                  </button>
-                  <button
-                    type="button"
-                    className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
                     onClick={() => navigate('/wallet')}
                   >
                     <Wallet className="w-4 h-4" />
                     {t('common.wallet')}
                   </button>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
+                    onClick={logout}
+                  >
+                    <CirclePower className="w-4 h-4" />
+                    {t('common.logout')}
+                  </button>
+                  
                 </div>
               ) : (
                 <Button
