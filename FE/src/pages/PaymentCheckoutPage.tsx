@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Navbar } from "@/components/home";
 import { useGetOrderById } from "@/hooks/order/useGetOrderById";
@@ -6,6 +6,7 @@ import { useCancelOrder } from "@/hooks/order/useCancelOrder";
 import type { VNPayPayment } from "@/types/Payment.types";
 import { Check, CreditCard, Wallet, ArrowLeft } from "lucide-react";
 import { useCreateVnpayUrl } from "@/hooks/payment/useCreateVnpayUrl";
+import { useClearCart } from "@/hooks/cart/useClearCart";
 
 interface LocationState {
     order?: {
@@ -23,18 +24,29 @@ export default function PaymentCheckoutPage() {
 
     const [isRedirecting, setIsRedirecting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [hasClearedCart, setHasClearedCart] = useState(false);
 
     const cancelOrderMutation = useCancelOrder();
     const createVnpayUrlMutation = useCreateVnpayUrl();
+    const clearCartMutation = useClearCart();
     const { data: fetchedOrder, isLoading } = useGetOrderById(
         orderId,
         !locationState?.order
     );
 
     const order = locationState?.order || fetchedOrder;
+    const isCompleted = order?.paymentStatus?.trim() === "COMPLETED";
+
+    useEffect(() => {
+        if (isCompleted && !hasClearedCart) {
+            clearCartMutation.mutate(undefined, {
+                onSettled: () => setHasClearedCart(true),
+            });
+        }
+    }, [isCompleted, hasClearedCart, clearCartMutation]);
 
     const handleBackToCart = () => {
-        if (order?._id && order.paymentStatus !== "COMPLETED") {
+        if (order?._id && !isCompleted) {
             cancelOrderMutation.mutate(order._id, {
                 onSettled: () => navigate("/cart"),
             });
@@ -76,13 +88,23 @@ export default function PaymentCheckoutPage() {
             <Navbar />
 
             <main className="relative w-full px-4 sm:px-6 lg:px-8 py-10">
-                <button
-                    onClick={handleBackToCart}
-                    className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6"
-                >
-                    <ArrowLeft className="h-4 w-4" />
-                    <span>Back to cart</span>
-                </button>
+                {isCompleted ? (
+                    <button
+                        onClick={() => navigate("/library")}
+                        className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-200 transition-colors mb-6"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        <span>Go to library</span>
+                    </button>
+                ) : (
+                    <button
+                        onClick={handleBackToCart}
+                        className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6"
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        <span>Back to cart</span>
+                    </button>
+                )}
 
                 <div className="max-w-4xl mx-auto space-y-8">
                     <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8">
@@ -134,46 +156,48 @@ export default function PaymentCheckoutPage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-3">
-                                    <h2 className="text-lg font-semibold">Payment methods</h2>
+                                {!isCompleted && (
                                     <div className="space-y-3">
-                                        <button
-                                            type="button"
-                                            onClick={handlePayWithVnPay}
-                                            disabled={isRedirecting}
-                                            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <CreditCard className="h-5 w-5" />
-                                                <div className="text-left">
-                                                    <div className="text-sm font-semibold">
-                                                        Pay with VNPay
-                                                    </div>
-                                                    <div className="text-xs text-slate-100/80">
-                                                        Secure online payment via VNPay gateway.
+                                        <h2 className="text-lg font-semibold">Payment methods</h2>
+                                        <div className="space-y-3">
+                                            <button
+                                                type="button"
+                                                onClick={handlePayWithVnPay}
+                                                disabled={isRedirecting}
+                                                className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <CreditCard className="h-5 w-5" />
+                                                    <div className="text-left">
+                                                        <div className="text-sm font-semibold">
+                                                            Pay with VNPay
+                                                        </div>
+                                                        <div className="text-xs text-slate-100/80">
+                                                            Secure online payment via VNPay gateway.
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <span className="text-sm font-medium">
+                                                    {isRedirecting ? "Redirecting..." : "Continue"}
+                                                </span>
+                                            </button>
+
+                                            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300">
+                                                <Wallet className="h-5 w-5 text-slate-300" />
+                                                <span>
+                                                    Other payment methods can be added here in the future
+                                                    (e.g. wallet, card, etc.).
+                                                </span>
                                             </div>
-                                            <span className="text-sm font-medium">
-                                                {isRedirecting ? "Redirecting..." : "Continue"}
-                                            </span>
-                                        </button>
 
-                                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300">
-                                            <Wallet className="h-5 w-5 text-slate-300" />
-                                            <span>
-                                                Other payment methods can be added here in the future
-                                                (e.g. wallet, card, etc.).
-                                            </span>
+                                            {error && (
+                                                <p className="text-sm text-red-400">
+                                                    {error}
+                                                </p>
+                                            )}
                                         </div>
-
-                                        {error && (
-                                            <p className="text-sm text-red-400">
-                                                {error}
-                                            </p>
-                                        )}
                                     </div>
-                                </div>
+                                )}
                             </div>
                         )}
                     </div>

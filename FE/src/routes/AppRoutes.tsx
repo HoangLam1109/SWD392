@@ -1,6 +1,7 @@
 import HomePage from "@/pages/HomePage";
 import { Routes, Route } from "react-router-dom";
 import Login from "@/auth/page/Login";
+import GoogleCallback from "@/auth/page/GoogleCallback";
 import Temp from "@/auth/page/Temp";
 import RegisterPage from "@/auth/page/Register";
 import ForgotPasswordPage from "@/auth/page/ForgotPasswordPage";
@@ -18,6 +19,7 @@ import NewPostPage from "@/pages/NewPostPage";
 import BlogModerationPage from "@/pages/admin/BlogModerationPage";
 import TransactionHistoryPage from "@/pages/TransactionHistoryPage";
 import FlappyBirdPage from "@/pages/FlappyBirdPage";
+import OAuthCallback from "@/auth/page/OAuthCallback";
 
 const AppRoutes = () => {
     const { data: currentUser } = useGetCurrentUser();
@@ -27,9 +29,11 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="login" element={<Login />} />
+            <Route path="auth/google/callback" element={<GoogleCallback />} />
             <Route path="temp" element={<Temp />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="oauth/callback" element={<OAuthCallback />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="/store" element={<StorePage />} />
             <Route path="/store/:gameId" element={<GameDetailPage />} />

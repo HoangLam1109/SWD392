@@ -42,7 +42,7 @@ export interface LibraryGameQueryParams {
 export type LibrarySortBy = 'title' | 'releaseDate';
 
 export interface LibraryFilters {
-    genre: string | 'all';
+    category: string | 'all';
     sortBy: LibrarySortBy;
     sortOrder: 'asc' | 'desc';
 }
@@ -57,7 +57,10 @@ export interface LibraryGameView {
     libraryGameId: string;
     gameId: string;
     title: string;
-    genre: string;
+    /** Category name from backend (preferred for filtering) */
+    categoryName?: string;
+    /** Fallback genre field for backward compatibility */
+    genre?: string;
     thumbnail?: string;
     description?: string;
     developer?: string;

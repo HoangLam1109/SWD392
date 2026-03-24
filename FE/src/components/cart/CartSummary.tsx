@@ -26,7 +26,7 @@ export function CartSummary({ subtotal, itemCount, onCheckout }: CartSummaryProp
             <span className="text-slate-400">
               {t('cart.subtotal', { count: itemCount, items: itemCount === 1 ? t('cart.item') : t('cart.items') })}
             </span>
-            <span className="font-medium">VNĐ{subtotal.toFixed(2)}</span>
+            <span className="font-medium">{subtotal.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
           </div>
         </div>
 

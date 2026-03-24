@@ -6,7 +6,7 @@ export const useRemoveGameFromCart = () => {
     return useMutation({
         mutationFn: cartService.removeGameFromCart,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['myCart'] });
+            queryClient.invalidateQueries({ queryKey: ['myCart', 'withItems'] });
         },
     });
 }

@@ -75,7 +75,7 @@ export default function CartPage() {
         }
 
         try {
-          const orders = (await ordersService.getOrdersByUserId(user.id)) as Order[];
+          const orders = (await ordersService.getOrderbyUserId(user.id)) as Order[];
           const pendingOrder = orders.find((item) => item.paymentStatus === 'PENDING');
 
           if (pendingOrder?._id) {
@@ -153,7 +153,7 @@ export default function CartPage() {
                       Total Savings
                     </div>
                     <div className="text-xl font-bold text-green-400">
-                      VNĐ{totalSavings.toFixed(2)}
+                      {totalSavings.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </div>
                   </div>
                 </div>

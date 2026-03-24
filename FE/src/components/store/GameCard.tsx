@@ -19,11 +19,6 @@ export function GameCard({ game }: GameCardProps) {
   const originalPrice = game.price ?? 0;
   const finalPrice = hasDiscount ? originalPrice * (1 - game.discount! / 100) : originalPrice;
 
-  const formatPrice = (value: number) =>
-    new Intl.NumberFormat('vi-VN', {
-      maximumFractionDigits: 0,
-    }).format(value);
-
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -70,7 +65,7 @@ export function GameCard({ game }: GameCardProps) {
           <div className="flex flex-col items-start gap-0.5">
             {hasDiscount && originalPrice > 0 && (
               <span className="text-slate-500 line-through text-xs sm:text-sm">
-                VNĐ {formatPrice(originalPrice)}
+                {originalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
               </span>
             )}
             <span
@@ -78,7 +73,7 @@ export function GameCard({ game }: GameCardProps) {
             >
               {finalPrice === 0
                 ? t('common.free')
-                : `VNĐ ${formatPrice(finalPrice)}`}
+                : finalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
             </span>
           </div>
 
