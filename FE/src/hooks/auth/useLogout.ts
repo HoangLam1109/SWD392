@@ -7,6 +7,8 @@ export const useLogout = () => {
 
     const logout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('token_time');
+        localStorage.removeItem('auth_user');
         queryClient.setQueryData(['currentUser'], null);
         queryClient.removeQueries({ queryKey: ['currentUser'] });
         navigate('/login', { replace: true });
