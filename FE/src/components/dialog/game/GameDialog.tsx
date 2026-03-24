@@ -17,6 +17,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import type { Game, CreateGameDTO, UpdateGameDTO } from '@/types/Game.types';
 import { Loader2 } from 'lucide-react';
+import { useGetCategories } from '@/hooks/category/useGetCategories';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 const gameSchema = z.object({
     title: z.string().min(1, 'Title is required'),
@@ -30,6 +38,7 @@ const gameSchema = z.object({
     publisher: z.string().optional(),
     releaseDate: z.string().optional(),
     url: z.string().url('Invalid URL').optional().or(z.literal('')),
+    categoryId: z.string().optional().or(z.literal('')),
 });
 
 type GameFormData = z.infer<typeof gameSchema>;
@@ -61,7 +70,10 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
         },
     });
 
+    const { data: categories = [], isLoading: isCategoriesLoading } = useGetCategories();
+
     const isActive = watch('isActive');
+    const categoryIdValue = watch('categoryId');
 
     useEffect(() => {
         if (game) {
@@ -77,6 +89,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                 publisher: game.publisher || '',
                 releaseDate: game.releaseDate ? String(game.releaseDate).slice(0, 10) : '',
                 url: game.url || '',
+                categoryId: game.categoryId || '',
             });
         } else {
             reset({
@@ -91,6 +104,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                 publisher: '',
                 releaseDate: '',
                 url: '',
+                categoryId: '',
             });
         }
         setApiError(null);
@@ -114,6 +128,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                     releaseDate: new Date(data.releaseDate.trim() + 'T00:00:00.000Z').toISOString(),
                 }),
                 ...(data.url?.trim() && { url: data.url.trim() }),
+                ...(data.categoryId?.trim() && { categoryId: data.categoryId.trim() }),
             };
             await onSave(payload);
             onOpenChange(false);
@@ -132,10 +147,12 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto bg-slate-900 text-slate-50 border border-slate-700">
                 <DialogHeader>
-                    <DialogTitle>{isEditMode ? 'Edit Game' : 'Add New Game'}</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-slate-50">
+                        {isEditMode ? 'Edit Game' : 'Add New Game'}
+                    </DialogTitle>
+                    <DialogDescription className="text-slate-400">
                         {isEditMode
                             ? 'Update game information.'
                             : 'Fill in the information to add a new game.'}
@@ -143,7 +160,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                 </DialogHeader>
 
                 {apiError && (
-                    <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+                    <div className="rounded-md bg-red-900/40 border border-red-700 px-3 py-2 text-sm text-red-200">
                         {apiError}
                     </div>
                 )}
@@ -157,7 +174,9 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                             id="title"
                             {...register('title')}
                             placeholder="Game title"
-                            className={errors.title ? 'border-red-500' : ''}
+                            className={`bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500 ${
+                                errors.title ? 'border-red-500' : ''
+                            }`}
                         />
                         {errors.title && (
                             <p className="text-sm text-red-500">{errors.title.message}</p>
@@ -175,7 +194,9 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                                 step="0.01"
                                 {...register('price')}
                                 placeholder="0"
-                                className={errors.price ? 'border-red-500' : ''}
+                                className={`bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500 ${
+                                    errors.price ? 'border-red-500' : ''
+                                }`}
                             />
                             {errors.price && (
                                 <p className="text-sm text-red-500">{errors.price.message}</p>
@@ -190,6 +211,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                                 max={100}
                                 {...register('discount')}
                                 placeholder="0"
+                                className="bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500"
                             />
                         </div>
                     </div>
@@ -210,7 +232,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                             {...register('description')}
                             placeholder="Game description"
                             rows={3}
-                            className="resize-none"
+                            className="resize-none bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500"
                         />
                     </div>
 
@@ -220,7 +242,9 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                             id="thumbnail"
                             {...register('thumbnail')}
                             placeholder="https://..."
-                            className={errors.thumbnail ? 'border-red-500' : ''}
+                            className={`bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500 ${
+                                errors.thumbnail ? 'border-red-500' : ''
+                            }`}
                         />
                         {errors.thumbnail && (
                             <p className="text-sm text-red-500">{errors.thumbnail.message}</p>
@@ -233,13 +257,41 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                             id="coverImage"
                             {...register('coverImage')}
                             placeholder="https://..."
-                            className={errors.coverImage ? 'border-red-500' : ''}
+                            className={`bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500 ${
+                                errors.coverImage ? 'border-red-500' : ''
+                            }`}
                         />
                         {errors.coverImage && (
                             <p className="text-sm text-red-500">{errors.coverImage.message}</p>
                         )}
                     </div>
-
+                    <div className="space-y-2">
+                        <Label htmlFor="categoryId">Category</Label>
+                        <Select
+                            value={categoryIdValue || ''}
+                            onValueChange={(value) => setValue('categoryId', value)}
+                        >
+                            <SelectTrigger
+                                id="categoryId"
+                                className="bg-slate-900/60 border-slate-700 text-slate-50"
+                            >
+                                <SelectValue
+                                    placeholder={
+                                        isCategoriesLoading
+                                            ? 'Loading categories...'
+                                            : 'Select category'
+                                    }
+                                />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-900 border-slate-700 text-slate-50">
+                                {categories.map((category) => (
+                                    <SelectItem key={category.categoryId} value={category.categoryId}>
+                                        {category.categoryName}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="developer">Developer</Label>
@@ -247,6 +299,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                                 id="developer"
                                 {...register('developer')}
                                 placeholder="Developer name"
+                                className="bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500"
                             />
                         </div>
                         <div className="space-y-2">
@@ -255,6 +308,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                                 id="publisher"
                                 {...register('publisher')}
                                 placeholder="Publisher name"
+                                className="bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500"
                             />
                         </div>
                     </div>
@@ -265,6 +319,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                             id="releaseDate"
                             type="date"
                             {...register('releaseDate')}
+                            className="bg-slate-900/60 border-slate-700 text-slate-50"
                         />
                     </div>
 
@@ -274,7 +329,9 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                             id="url"
                             {...register('url')}
                             placeholder="https://..."
-                            className={errors.url ? 'border-red-500' : ''}
+                            className={`bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500 ${
+                                errors.url ? 'border-red-500' : ''
+                            }`}
                         />
                         {errors.url && (
                             <p className="text-sm text-red-500">{errors.url.message}</p>
@@ -287,6 +344,7 @@ export function GameDialog({ open, onOpenChange, game, onSave }: GameDialogProps
                             variant="outline"
                             onClick={() => onOpenChange(false)}
                             disabled={isLoading}
+                            className="border-slate-600 text-slate-200 hover:bg-slate-800"
                         >
                             Cancel
                         </Button>

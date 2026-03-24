@@ -1,27 +1,94 @@
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, ArrowLeft, ShoppingBag, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/home';
-import { CartItemCard, CartSummary, mockCartItems, type CartItem } from '@/components/cart';
+import { CartItemCard, CartSummary } from '@/components/cart';
+import { useGetMyCartWithItems } from '@/hooks/cart/useGetMyCartWithItems';
+import { useRemoveGameFromCart } from '@/hooks/cart/useRemoveGameFromCart';
+import { useCheckoutOrder } from '@/hooks/order/useCheckoutOrder';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { ordersService } from '@/service/orders.service';
+import type { Order } from '@/types/Orders.types';
+import type { AxiosError } from 'axios';
+import { toast } from 'sonner';
+
+type ApiErrorData = {
+  message?: string | string[];
+};
+
+function parseApiMessage(error: unknown): string {
+  const axiosError = error as AxiosError<ApiErrorData>;
+  const message = axiosError?.response?.data?.message;
+
+  if (Array.isArray(message) && message.length > 0) {
+    return message[0];
+  }
+
+  if (typeof message === 'string' && message.trim().length > 0) {
+    return message;
+  }
+
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  return 'Checkout failed';
+}
 
 export default function CartPage() {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState<CartItem[]>(mockCartItems);
+  const { user } = useAuth();
+  const { data, isLoading, error } = useGetMyCartWithItems();
+  const removeGameMutation = useRemoveGameFromCart();
+  const checkoutOrderMutation = useCheckoutOrder();
 
-  const handleQuantityChange = (id: number, quantity: number) => {
-    setCartItems((items) =>
-      items.map((item) => (item.id === id ? { ...item, quantity } : item))
-    );
+  const cartItems = data?.items || [];
+
+  const handleRemoveItem = async (productId: string) => {
+    try {
+      await removeGameMutation.mutateAsync(productId);
+    } catch (error) {
+      console.error('Failed to remove item:', error);
+    }
   };
 
-  const handleRemoveItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
-  };
+  const handleCheckout = async () => {
+    checkoutOrderMutation.mutate(undefined, {
+      onSuccess: (order: Order) => {
+        console.log('order', order);
+        navigate(`/payment/checkout/${order._id}`, { state: { order } });
+      },
+      onError: async (err: unknown) => {
+        if (!user?.id) {
+          return;
+        }
 
-  const handleCheckout = () => {
-    // Navigate to checkout page (to be implemented)
-    alert('Proceeding to checkout...');
+        const message = parseApiMessage(err);
+        const isRecoverableCheckoutError =
+          message === 'Insufficient balance' ||
+          message === 'Order details not found' ||
+          message === 'Cart items not found';
+
+        if (!isRecoverableCheckoutError) {
+          return;
+        }
+
+        try {
+          const orders = (await ordersService.getOrderbyUserId(user.id)) as Order[];
+          const pendingOrder = orders.find((item) => item.paymentStatus === 'PENDING');
+
+          if (pendingOrder?._id) {
+            toast.info('A pending order already exists. Redirecting to payment checkout.');
+            navigate(`/payment/checkout/${pendingOrder._id}`, {
+              state: { order: pendingOrder },
+            });
+          }
+        } catch {
+          // Let the default toast from the mutation hook remain the source of truth.
+        }
+      },
+    });
   };
 
   const handleContinueShopping = () => {
@@ -29,11 +96,17 @@ export default function CartPage() {
   };
 
   // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = cartItems.reduce((sum, item) => {
+    const finalPrice = item.priceAtPurchase * (1 - item.discount / 100);
+    return sum + finalPrice;
+  }, 0);
+  
+  const itemCount = cartItems.length;
+  
   const totalSavings = cartItems.reduce((sum, item) => {
-    if (item.originalPrice) {
-      return sum + (item.originalPrice - item.price) * item.quantity;
+    if (item.discount > 0) {
+      const savings = item.priceAtPurchase * (item.discount / 100);
+      return sum + savings;
     }
     return sum;
   }, 0);
@@ -80,7 +153,7 @@ export default function CartPage() {
                       Total Savings
                     </div>
                     <div className="text-xl font-bold text-green-400">
-                      ${totalSavings.toFixed(2)}
+                      {totalSavings.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                     </div>
                   </div>
                 </div>
@@ -89,7 +162,36 @@ export default function CartPage() {
           </div>
 
           {/* Empty Cart State */}
-          {cartItems.length === 0 ? (
+          {isLoading ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-48 w-full bg-white/5" />
+                ))}
+              </div>
+              <div className="lg:col-span-1">
+                <Skeleton className="h-96 w-full bg-white/5" />
+              </div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-12 max-w-md mx-auto">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-linear-to-br from-red-500/20 to-orange-600/20 flex items-center justify-center">
+                  <ShoppingCart className="w-12 h-12 text-red-400" />
+                </div>
+                <h2 className="text-2xl font-bold mb-3">Failed to load cart</h2>
+                <p className="text-slate-400 mb-6">
+                  {error instanceof Error ? error.message : 'An error occurred while loading your cart.'}
+                </p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 transition-all font-medium shadow-lg"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          ) : cartItems.length === 0 ? (
             <div className="text-center py-16">
               <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-12 max-w-md mx-auto">
                 <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-linear-to-br from-blue-500/20 to-purple-600/20 flex items-center justify-center">
@@ -115,10 +217,9 @@ export default function CartPage() {
                 <div className="space-y-4">
                   <AnimatePresence mode="popLayout">
                     {cartItems.map((item) => (
-                      <motion.div key={item.id} layout>
+                      <motion.div key={item._id} layout>
                         <CartItemCard
                           item={item}
-                          onQuantityChange={handleQuantityChange}
                           onRemove={handleRemoveItem}
                         />
                       </motion.div>

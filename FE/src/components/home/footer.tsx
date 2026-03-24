@@ -4,9 +4,9 @@ import { Gamepad2, ShoppingBag, Library, Users, HelpCircle, Facebook, Twitter, I
 export function Footer() {
   const { t } = useTranslation();
   const quickLinks = [
-    { nameKey: 'home.footer.store', icon: ShoppingBag, href: '#' },
-    { nameKey: 'home.footer.library', icon: Library, href: '#' },
-    { nameKey: 'home.footer.community', icon: Users, href: '#' },
+    { nameKey: 'home.footer.store', icon: ShoppingBag, href: '/store' },
+    { nameKey: 'home.footer.library', icon: Library, href: '/library' },
+    { nameKey: 'home.footer.community', icon: Users, href: '/community' },
     { nameKey: 'home.footer.support', icon: HelpCircle, href: '#' },
   ];
 
@@ -37,7 +37,7 @@ export function Footer() {
                   <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
-              <span className="text-lg sm:text-xl tracking-tight font-bold">NEXUS</span>
+              <span className="text-lg sm:text-xl tracking-tight font-bold">Platfun</span>
             </div>
             <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
               {t('home.footer.platformDesc')}

@@ -1,15 +1,19 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, Building2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Calendar, Building2, ExternalLink, Cpu, HardDrive, ShoppingCart, Check } from 'lucide-react';
 import { Navbar } from '@/components/home';
 import { useGetGameById } from '@/hooks/game/useGetGamebyId';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { getImageUrl } from '@/lib/imageUtils';
 import { Button } from '@/components/ui/button';
+import { useGetSystemsByGameId } from '@/hooks/system/useGetSystemsByGameId';
+import { useAddGameToCart } from '@/hooks/cart/useAddGameToCart';
+import { useIsGameInCart } from '@/hooks/cart/useIsGameInCart';
+import { useGetCategoryById } from '@/hooks/category/useGetCategories';
 
 function formatPrice(price: number) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'VND',
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }).format(price);
@@ -19,7 +23,7 @@ function formatDate(value: string | undefined): string {
     if (!value) return '—';
     try {
         const date = new Date(value);
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleDateString('vi-VN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -32,6 +36,27 @@ function formatDate(value: string | undefined): string {
 export default function GameDetailPage() {
     const { gameId } = useParams<{ gameId: string }>();
     const { data: game, isLoading, error } = useGetGameById(gameId);
+    const {
+        data: systemRequirements = [],
+        isLoading: isLoadingSystems,
+        error: systemsError,
+    } = useGetSystemsByGameId(gameId);
+
+    const { data: category } = useGetCategoryById(game?.categoryId);
+    
+    // Cart functionality
+    const { isInCart } = useIsGameInCart(gameId);
+    const addToCartMutation = useAddGameToCart();
+
+    const handleAddToCart = async () => {
+        if (!gameId) return;
+        
+        try {
+            await addToCartMutation.mutateAsync(gameId);
+        } catch (error) {
+            console.error('Failed to add game to cart:', error);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -145,6 +170,11 @@ export default function GameDetailPage() {
                                 {game.title}
                             </h1>
                             <div className="flex flex-wrap items-center gap-3">
+                                {category?.categoryName && (
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-100">
+                                        {category.categoryName}
+                                    </span>
+                                )}
                                 <span
                                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${
                                         game.isActive
@@ -233,12 +263,107 @@ export default function GameDetailPage() {
                         <div className="pt-4">
                             <Button
                                 size="lg"
-                                className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-medium"
+                                onClick={handleAddToCart}
+                                disabled={addToCartMutation.isPending || isInCart}
+                                className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Add to Cart
+                                {addToCartMutation.isPending ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                                        Adding...
+                                    </>
+                                ) : isInCart ? (
+                                    <>
+                                        <Check className="w-5 h-5 mr-2" />
+                                        Added to Cart
+                                    </>
+                                ) : (
+                                    <>
+                                        <ShoppingCart className="w-5 h-5 mr-2" />
+                                        Add to Cart
+                                    </>
+                                )}
                             </Button>
+                            {addToCartMutation.isError && (
+                                <p className="text-red-400 text-sm mt-2">
+                                    {addToCartMutation.error instanceof Error 
+                                        ? addToCartMutation.error.message 
+                                        : 'Failed to add game to cart. Please try again.'}
+                                </p>
+                            )}
+                            {isInCart && (
+                                <Link
+                                    to="/cart"
+                                    className="inline-block mt-3 text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                                >
+                                    View Cart →
+                                </Link>
+                            )}
                         </div>
                     </div>
+                </div>
+
+                {/* System requirements */}
+                <div className="mt-10">
+                    <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                        <Cpu className="h-5 w-5 text-slate-400" />
+                        System Requirements
+                    </h2>
+
+                    {isLoadingSystems ? (
+                        <p className="text-sm text-slate-400">Loading system requirements...</p>
+                    ) : systemsError ? (
+                        <p className="text-sm text-red-400">Failed to load system requirements.</p>
+                    ) : Array.isArray(systemRequirements) && systemRequirements.length > 0 ? (
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {systemRequirements.map((sys) => (
+                                <div
+                                    key={(sys as any).id ?? (sys as any)._id ?? `${sys.gameId}-${sys.requirementType}`}
+                                    className="border border-white/10 rounded-xl bg-slate-900/60 p-4 space-y-2"
+                                >
+                                    <div className="flex items-center justify-between gap-2">
+                                        <span className="text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-800 text-slate-100">
+                                            {sys.requirementType}
+                                        </span>
+                                        <span className="text-xs text-slate-400 truncate max-w-[60%]">
+                                            {sys.os}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-1 text-xs text-slate-300">
+                                        <div className="flex items-center gap-2">
+                                            <Cpu className="h-3 w-3 text-slate-400" />
+                                            <span className="font-medium">CPU:</span>
+                                            <span className="text-slate-200">{sys.processor}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex h-3 w-3 rounded-full bg-emerald-400/80" />
+                                            <span className="font-medium">RAM:</span>
+                                            <span className="text-slate-200">{sys.memory}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex h-3 w-3 rounded-full bg-indigo-400/80" />
+                                            <span className="font-medium">GPU:</span>
+                                            <span className="text-slate-200">{sys.graphics}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <HardDrive className="h-3 w-3 text-slate-400" />
+                                            <span className="font-medium">Storage:</span>
+                                            <span className="text-slate-200">{sys.storage}</span>
+                                        </div>
+                                        {sys.additionalNotes && (
+                                            <p className="pt-1 text-[11px] text-slate-400">
+                                                {sys.additionalNotes}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-slate-400">
+                            System requirements have not been provided for this game yet.
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

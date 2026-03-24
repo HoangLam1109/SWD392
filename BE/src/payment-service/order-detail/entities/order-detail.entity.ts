@@ -2,10 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 export interface IOrderDetail {
-  orderId: string;
-  gameId: string[];
-  totalPrice: number;
+  orderId?: string;
+  productId: string;
+  priceAtPurchase: number;
   discount: number;
+  orderType: string;
 }
 
 export type OrderDetailDocument = HydratedDocument<IOrderDetail>;
@@ -17,20 +18,20 @@ export type OrderDetailDocument = HydratedDocument<IOrderDetail>;
   },
 })
 export class OrderDetail {
-  @Prop({ required: true, ref: 'Order' })
-  orderId: string;
-
-  @Prop({ required: true, ref: 'Game[]' })
-  gameId: string[];
+  @Prop({ ref: 'Order' })
+  orderId?: string;
 
   @Prop({ required: true })
-  quantity: number;
+  productId: string;
 
   @Prop({ required: true })
-  totalPrice: number;
+  priceAtPurchase: number;
 
   @Prop({ required: true })
   discount: number;
+
+  @Prop({ required: true, enum: ['Game', 'DLC'] })
+  orderType: string;
 }
 
 export const OrderDetailSchema = SchemaFactory.createForClass(OrderDetail);

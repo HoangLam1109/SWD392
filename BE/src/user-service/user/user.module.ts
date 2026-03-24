@@ -5,6 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './entities/user.entity';
 import { UserRepository } from './repositories/user.repository';
 import { PaginationService } from 'src/common/services/pagination.service';
+import { WebWalletModule } from 'src/payment-service/web-wallet/web-wallet.module';
+import { ProfileModule } from '../profile/profile.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { PaginationService } from 'src/common/services/pagination.service';
       [{ name: User.name, schema: UserSchema }],
       'USER_DB',
     ),
+    WebWalletModule,
+    ProfileModule,
   ],
   controllers: [UserController],
   providers: [UserService, UserRepository, PaginationService],

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShoppingBag, Library, Users, Tag, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower } from 'lucide-react';
+import { ShoppingBag, Library, Users, User, Menu, X, ShoppingBasket, LogIn, LogOut, CirclePower, Wallet, History } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/auth/useAuth';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LanguageSwitchButton } from '@/components/common/LanguageSwitchButton';
 import { useLogout } from '@/hooks/auth/useLogout';
-
+import type { Role } from '@/config/navigation/navigation.types';
+import { getPathbyRole } from '@/utils/role.utils';
+import { useGetMyCartWithItems } from '@/hooks/cart/useGetMyCartWithItems';
+import { useGetWalletByUserId } from '@/hooks/wallet/useGetWalletByUserId';
 interface NavbarProps {
   fixed?: boolean;
 }
@@ -24,7 +27,6 @@ export function Navbar({ fixed }: NavbarProps) {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { logout } = useLogout();
-<<<<<<< HEAD
   const dashboardPath = user?.role ? getPathbyRole(user.role as Role) : '/';
   const { data } = useGetMyCartWithItems();
   const cartItems = data?.items?.length ?? 0;
@@ -35,8 +37,6 @@ export function Navbar({ fixed }: NavbarProps) {
           wallet.currency ? ` ${wallet.currency}` : ''
         })`
       : t('common.wallet');
-=======
->>>>>>> parent of 4376748 (Merge branch 'dev' of https://github.com/HoangLam1109/SWD392 into feature/update-login)
   return (
     <nav className={`z-50 w-full ${fixed ? 'fixed top-0 left-0 right-0' : 'relative'}`}>
       <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -62,19 +62,15 @@ export function Navbar({ fixed }: NavbarProps) {
                 <Library className="w-4 h-4" />
                 <span>{t('common.library')}</span>
               </Link>
-              <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
+              <Link to="/community" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <Users className="w-4 h-4" />
                 <span>{t('common.community')}</span>
-              </Link>
-              <Link to="/" className="flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
-                <Tag className="w-4 h-4" />
-                <span>{t('common.deals')}</span>
               </Link>
               <Link to="/cart" className="relative flex items-center gap-2 text-sm hover:text-blue-400 transition-colors">
                 <ShoppingBasket className="w-4 h-4" />
                 <span>{t('common.cart')}</span>
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-[10px] flex items-center justify-center font-bold">
-                  3
+                  {cartItems}
                 </span>
               </Link>
               <div className="w-px h-6 bg-white/10" />
@@ -105,28 +101,29 @@ export function Navbar({ fixed }: NavbarProps) {
                       {t('common.profile')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={()=>navigate('/admin')}
+                      onClick={() => navigate('/transaction-history')}
+                      className="text-white focus:bg-white/10 focus:text-white cursor-pointer [&_svg]:text-white/90"
+                    >
+                      <History className="w-4 h-4 mr-2" />
+                      Transaction history
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => navigate(dashboardPath)}
                       className="text-white focus:bg=white/10 focus:text-white cursor-pointer [&_svg]:text-white/90"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       {t('common.gotodashboard')}
                     </DropdownMenuItem>
-<<<<<<< HEAD
                     <DropdownMenuItem onClick={() => navigate('/wallet')}>
                       <Wallet className="w-4 h-4 mr-2" />
                       {walletBalance} 
 
                     </DropdownMenuItem>
-=======
->>>>>>> parent of 4376748 (Merge branch 'dev' of https://github.com/HoangLam1109/SWD392 into feature/update-login)
                     <DropdownMenuItem onClick={logout}>
                       <CirclePower className="w-4 h-4 mr-2" />
                       {t('common.logout')}
                     </DropdownMenuItem>
-<<<<<<< HEAD
                     
-=======
->>>>>>> parent of 4376748 (Merge branch 'dev' of https://github.com/HoangLam1109/SWD392 into feature/update-login)
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
@@ -176,20 +173,12 @@ export function Navbar({ fixed }: NavbarProps) {
                 Library
               </Link>
               <Link
-                to="/"
+                to="/community"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Users className="w-4 h-4" />
                 Community
-              </Link>
-              <Link
-                to="/"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Tag className="w-4 h-4" />
-                Deals
               </Link>
               <Link
                 to="/cart"
@@ -199,7 +188,7 @@ export function Navbar({ fixed }: NavbarProps) {
                 <ShoppingBasket className="w-4 h-4" />
                 Cart
                 <span className="ml-auto px-2 py-0.5 bg-blue-500 rounded-full text-xs font-bold">
-                  3
+                  {cartItems}
                 </span>
               </Link>
               <div className="w-full h-px bg-white/10 my-2" />
@@ -222,14 +211,27 @@ export function Navbar({ fixed }: NavbarProps) {
                     <User className="w-4 h-4" />
                     {t('common.profile')}
                   </Link>
-                  <Link
-                    to="/admin"
+                  <button
+                    type="button"
                     className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate('/transaction-history');
+                    }}
+                  >
+                    <History className="w-4 h-4" />
+                    Transaction history
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 flex-1 rounded-lg hover:bg-white/5 transition-colors text-sm py-2"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      navigate(dashboardPath);
+                    }}
                   >
                     <LogOut className="w-4 h-4" />
                     {t('common.gotodashboard')}
-<<<<<<< HEAD
                   </button>
                   <button
                     type="button"
@@ -248,9 +250,6 @@ export function Navbar({ fixed }: NavbarProps) {
                     {t('common.logout')}
                   </button>
                   
-=======
-                  </Link>
->>>>>>> parent of 4376748 (Merge branch 'dev' of https://github.com/HoangLam1109/SWD392 into feature/update-login)
                 </div>
               ) : (
                 <Button

@@ -8,9 +8,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/providers/AuthProvider'
 
-<<<<<<< HEAD
-document.documentElement.classList.add('dark')
-=======
 // Clear auth state if token is older than 60 minutes
 const tokenTime = localStorage.getItem('token_time')
 if (tokenTime && Date.now() - Number(tokenTime) > 60 * 60 * 1000) {
@@ -18,7 +15,7 @@ if (tokenTime && Date.now() - Number(tokenTime) > 60 * 60 * 1000) {
   localStorage.removeItem('auth_user')
   localStorage.removeItem('token_time')
 }
->>>>>>> parent of 4376748 (Merge branch 'dev' of https://github.com/HoangLam1109/SWD392 into feature/update-login)
+document.documentElement.classList.add('dark')
 
 const queryClient = new QueryClient({
   defaultOptions: {

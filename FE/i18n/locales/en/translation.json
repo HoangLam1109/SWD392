@@ -17,7 +17,8 @@
     "or": "Or",
     "continueWithGoogle": "Continue with Google",
     "gotodashboard": "Go to dashboard",
-    "logout": "Logout"
+    "logout": "Logout",
+    "wallet": "Wallet"
   },
   "home": {
     "hero": {
@@ -105,7 +106,7 @@
       "newsletterDesc": "Subscribe to get notified about new games and exclusive deals.",
       "enterEmail": "Enter your email",
       "subscribe": "Subscribe",
-      "copyright": "© {{year}} NexusPlay. All rights reserved.",
+      "copyright": "© {{year}} Platfun. All rights reserved.",
       "madeWithLove": "Made with ❤️ for gamers",
       "platformDesc": "Your ultimate gaming platform. Buy, manage, and play thousands of games in one unified ecosystem."
     }

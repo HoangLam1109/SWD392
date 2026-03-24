@@ -11,12 +11,12 @@ export class CreateCartItemDto {
   cartId: string;
 
   @ApiProperty({
-    description: 'Game ID',
+    description: 'Product ID',
     example: '698175d5c4308f3653af15d5',
   })
   @IsMongoId()
   @IsString()
-  gameId: string;
+  productId: string;
 
   @ApiProperty({
     description: 'Price at purchase',
@@ -24,4 +24,11 @@ export class CreateCartItemDto {
   })
   @IsNumber()
   priceAtPurchase: number;
+
+  @ApiProperty({
+    description: 'Discount at purchase',
+    example: 15,
+  })
+  @IsNumber()
+  discount: number;
 }

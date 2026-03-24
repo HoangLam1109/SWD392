@@ -46,7 +46,7 @@ export class WebWalletRepository implements IWebWalletRepository {
     walletData: Partial<IWebWallet>,
   ): Promise<WebWalletDocument | null> {
     return await this.webWalletModel
-      .findByIdAndUpdate(id, walletData, { new: true })
+      .findByIdAndUpdate(id, walletData, { returnDocument: 'after' })
       .orFail(new NotFoundException('WebWallet not found'))
       .exec();
   }

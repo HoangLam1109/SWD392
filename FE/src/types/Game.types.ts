@@ -11,6 +11,7 @@ export interface Game {
     publisher?: string;
     releaseDate?: string;
     url?: string;
+    categoryId?: string;
 }
 export type CreateGameDTO = Partial<Game>;
 export type UpdateGameDTO = Partial<CreateGameDTO>;
