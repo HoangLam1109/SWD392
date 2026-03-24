@@ -111,10 +111,7 @@ export class AuthController {
   @Get('oauth/callback')
   @Public()
   @UseGuards(GoogleAuthGuard)
-  async googleAuthCallback(
-    @GetUser() user: any,
-    @Res() res: Response,
-  ) {
+  async googleAuthCallback(@GetUser() user: any, @Res() res: Response) {
     const tokens = await this.authService.generateTokens(user);
     const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('accessToken', tokens.accessToken, {

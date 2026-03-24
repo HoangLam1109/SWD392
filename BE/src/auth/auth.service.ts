@@ -13,7 +13,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     @Inject('REFRESH_TOKEN_CONFIG') private refreshTokenConfig: any,
-  ) { }
+  ) {}
 
   async logIn(
     email: string,
@@ -151,7 +151,7 @@ export class AuthService {
     user: any,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = {
-      userId: user.userId,
+      userId: user._id.toString(),
       email: user.email,
       role: user.role,
     };

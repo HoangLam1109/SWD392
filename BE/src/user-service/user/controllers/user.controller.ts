@@ -21,14 +21,11 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { UserResponseDto } from '../dto/user-response.dto';
 import { PaginationOptionsDto } from '../../../common/dto/pagination-option.dto';
 import { PaginationResponseDto } from '../../../common/dto/pagination-response.dto';
-import { Role } from 'src/auth/decorators/role.decorator';
 import { GetUser } from 'src/common/decorators/info.decorator';
-import { UserRole } from 'src/user-service/user/enum/user.enum';
 import { UserDocument } from '../entities/user.entity';
 
 @ApiBearerAuth()
 @ApiTags('users')
-@Role(UserRole.ADMIN)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -105,8 +102,7 @@ export class UserController {
     status: 404,
     description: 'User not found',
   })
-  @Role(UserRole.ADMIN, UserRole.MANAGER, UserRole.PLAYER)
-  @Get('/me')
+  @Get('me')
   getMyInfo(@GetUser() user: Partial<UserDocument>) {
     return this.userService.findUserById(user._id?.toString() || '');
   }
