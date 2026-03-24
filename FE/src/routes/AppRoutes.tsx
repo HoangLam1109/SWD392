@@ -12,6 +12,7 @@ import { RoleRoute } from "./RoleRoute";
 import type { Role } from "@/config/navigation/navigation.types";
 import { useGetCurrentUser } from "@/hooks/auth/useGetCurrentUser";
 import { GameManagementPage } from "@/pages/GameManagementPage";
+import OAuthCallback from "@/auth/page/OAuthCallback";
 
 const AppRoutes = () => {
     const { data: currentUser } = useGetCurrentUser();
@@ -25,6 +26,7 @@ const AppRoutes = () => {
             <Route path="temp" element={<Temp />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="oauth/callback" element={<OAuthCallback />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="/store" element={<StorePage />} />
             <Route path="/store/:gameId" element={<GameDetailPage />} />
