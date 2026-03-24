@@ -14,8 +14,8 @@ export class GoogleAuthGuard extends AuthGuard('google') {
       const res = context.switchToHttp().getResponse();
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
       res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
-      return null as any;
+      return null as unknown as TUser;
     }
-    return user;
+    return user as TUser;
   }
 }
