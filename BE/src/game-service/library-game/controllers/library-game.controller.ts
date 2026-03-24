@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Query,
-  Request,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
