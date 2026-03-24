@@ -240,7 +240,7 @@ export class GameSessionService {
       );
 
     await this.libraryGameService.update(libraryGameId, {
-      total_playtime: totalPlaytime,
+      total_playtime: Math.floor(totalPlaytime / 60),
     });
   }
 }
