@@ -11,6 +11,7 @@ import { useLogin } from "@/hooks/auth/useLogin";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import axios from "axios";
 
 
   type FormValues = {
@@ -186,7 +187,10 @@ export default function SigninPage() {
 
                   {error && (
                     <p className="text-sm" style={{ color: "#FF6B6B" }}>
-                      {error.message}
+                      {axios.isAxiosError(error) &&
+                      error.response?.status === 401
+                        ? t("auth.login.invalidCredentials")
+                        : error.message}
                     </p>
                   )}
 

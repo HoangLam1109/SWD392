@@ -33,7 +33,7 @@ const formatDate = (value?: string) => {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "--";
 
-    return date.toLocaleString("vi-VN");
+    return date.toLocaleString("en-US");
 };
 
 export default function TransactionHistoryPage() {
@@ -69,24 +69,24 @@ export default function TransactionHistoryPage() {
                                 Transaction History
                             </div>
                             <div>
-                                <h1 className="text-3xl font-bold sm:text-4xl">Lich su giao dich</h1>
+                                <h1 className="text-3xl font-bold sm:text-4xl">Transaction history</h1>
                                 <p className="mt-2 max-w-2xl text-sm text-slate-400 sm:text-base">
-                                    Theo doi cac don hang, trang thai thanh toan va quay lai thanh toan cho nhung giao dich dang cho xu ly.
+                                    Track your orders, payment statuses, and return to complete transactions that are still pending.
                                 </p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-                                <p className="text-sm text-slate-400">Tong giao dich</p>
+                                <p className="text-sm text-slate-400">Total transactions</p>
                                 <p className="mt-2 text-2xl font-bold">{totalOrders}</p>
                             </div>
                             <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
-                                <p className="text-sm text-emerald-300/80">Da thanh toan</p>
+                                <p className="text-sm text-emerald-300/80">Paid</p>
                                 <p className="mt-2 text-2xl font-bold text-emerald-300">{completedOrders}</p>
                             </div>
                             <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
-                                <p className="text-sm text-amber-300/80">Dang xu ly</p>
+                                <p className="text-sm text-amber-300/80">Pending</p>
                                 <p className="mt-2 text-2xl font-bold text-amber-300">{pendingOrders}</p>
                             </div>
                         </div>
@@ -95,40 +95,40 @@ export default function TransactionHistoryPage() {
 
                 {isLoadingUser && (
                     <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-slate-400 backdrop-blur-xl">
-                        Dang tai thong tin nguoi dung...
+                        Loading user information...
                     </div>
                 )}
 
                 {!isLoadingUser && !currentUser && (
                     <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-xl">
-                        <p className="text-lg font-semibold">Vui long dang nhap de xem lich su giao dich.</p>
+                        <p className="text-lg font-semibold">Please sign in to view your transaction history.</p>
                         <Link
                             to="/login"
                             className="mt-4 inline-flex items-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
                         >
-                            Dang nhap
+                            Sign in
                         </Link>
                     </div>
                 )}
 
                 {!isLoadingUser && currentUser && isLoadingOrders && (
                     <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-slate-400 backdrop-blur-xl">
-                        Dang tai lich su giao dich...
+                        Loading transaction history...
                     </div>
                 )}
 
                 {!isLoadingUser && currentUser && !isLoadingOrders && orders.length === 0 && (
                     <div className="rounded-3xl border border-dashed border-white/10 bg-white/5 p-10 text-center backdrop-blur-xl">
                         <History className="mx-auto h-12 w-12 text-slate-500" />
-                        <h2 className="mt-4 text-xl font-semibold">Chua co giao dich nao</h2>
+                        <h2 className="mt-4 text-xl font-semibold">No transactions yet</h2>
                         <p className="mt-2 text-slate-400">
-                            Cac don hang cua ban se xuat hien tai day sau khi mua game.
+                            Your orders will appear here after you purchase games.
                         </p>
                         <Link
                             to="/store"
                             className="mt-6 inline-flex items-center rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-slate-200"
                         >
-                            Den cua hang
+                            Go to store
                         </Link>
                     </div>
                 )}
@@ -136,9 +136,9 @@ export default function TransactionHistoryPage() {
                 {!isLoadingUser && currentUser && !isLoadingOrders && orders.length > 0 && (
                     <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
                         <div className="border-b border-white/10 px-6 py-5">
-                            <h2 className="text-xl font-semibold">Danh sach giao dich</h2>
+                            <h2 className="text-xl font-semibold">Transaction list</h2>
                             <p className="mt-1 text-sm text-slate-400">
-                                Xem lai trang thai thanh toan va tiep tuc thanh toan neu don hang van dang cho xu ly.
+                                Review payment status and continue checkout if an order is still pending.
                             </p>
                         </div>
 
@@ -146,12 +146,12 @@ export default function TransactionHistoryPage() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="border-white/10 hover:bg-transparent">
-                                        <TableHead className="text-slate-300">Ma don hang</TableHead>
-                                        <TableHead className="text-slate-300">Ngay tao</TableHead>
-                                        <TableHead className="text-slate-300">Hoan tat</TableHead>
-                                        <TableHead className="text-slate-300">Tong tien</TableHead>
-                                        <TableHead className="text-slate-300">Trang thai</TableHead>
-                                        <TableHead className="text-right text-slate-300">Thao tac</TableHead>
+                                        <TableHead className="text-slate-300">Order ID</TableHead>
+                                        <TableHead className="text-slate-300">Created</TableHead>
+                                        <TableHead className="text-slate-300">Completed</TableHead>
+                                        <TableHead className="text-slate-300">Total</TableHead>
+                                        <TableHead className="text-slate-300">Status</TableHead>
+                                        <TableHead className="text-right text-slate-300">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -170,7 +170,7 @@ export default function TransactionHistoryPage() {
                                                     {formatDate(order.completedAt)}
                                                 </TableCell>
                                                 <TableCell className="font-semibold text-white">
-                                                    {order.totalPrice.toLocaleString("vi-VN")} VND
+                                                    {order.totalPrice.toLocaleString("en-US")} VND
                                                 </TableCell>
                                                 <TableCell>
                                                     <span
@@ -192,7 +192,7 @@ export default function TransactionHistoryPage() {
                                                             className="inline-flex items-center gap-2 rounded-xl border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs font-semibold text-blue-300 transition-colors hover:bg-blue-500/20"
                                                         >
                                                             <CreditCard className="h-4 w-4" />
-                                                            Tiep tuc thanh toan
+                                                            Continue payment
                                                         </Link>
                                                     ) : (
                                                         <span className="text-sm text-slate-500">--</span>

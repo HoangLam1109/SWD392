@@ -30,6 +30,15 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
+        const requestUrl = originalRequest.url ?? "";
+        const isAuthCredentialRequest =
+            requestUrl.includes("auth/login") ||
+            requestUrl.includes("auth/register");
+
+        if (isAuthCredentialRequest && error.response?.status === 401) {
+            return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
