@@ -9,6 +9,10 @@ export const useLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('token_time');
         localStorage.removeItem('auth_user');
+        queryClient.removeQueries({ queryKey: ['myCart'] });
+        queryClient.removeQueries({ queryKey: ['myCart', 'withItems'] });
+        queryClient.removeQueries({ queryKey: ['carts'] });
+        queryClient.removeQueries({ queryKey: ['cart'] });
         queryClient.setQueryData(['currentUser'], null);
         queryClient.removeQueries({ queryKey: ['currentUser'] });
         navigate('/login', { replace: true });

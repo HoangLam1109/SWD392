@@ -121,7 +121,9 @@
       "genre": "Genre",
       "allGenres": "All genres",
       "gameList": "Game list ({{count}})",
-      "noGames": "No games"
+      "noGames": "No games",
+      "category": "Category",
+      "allCategories": "All categories"
     }
   },
   "cart": {

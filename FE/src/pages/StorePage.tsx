@@ -7,7 +7,8 @@ import type { FilterState } from '@/components/store/StoreFilters';
 import type { Game } from '@/types/Game.types';
 import { GameList } from '@/components/store/GameList';
 import { useGetGames } from '@/hooks/game/useGetGames';
-
+import { useGetMyLibraryGames } from '@/hooks/library/useGetMyLibraryGames';
+import { LibraryGameStatus } from '@/types/LibraryGame.types';
 
 export default function StorePage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,6 +22,18 @@ export default function StorePage() {
     sortOrder: 'desc',
   });
   const { data: allGames = [], isLoading, error } = useGetGames();
+  const { data: myLibraryGames = [] } = useGetMyLibraryGames();
+
+  const ownedGameIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const entry of myLibraryGames) {
+      if (entry.status === LibraryGameStatus.OWNED) {
+        if (entry.gameId) ids.add(entry.gameId);
+        if (entry.id) ids.add(entry.id);
+      }
+    }
+    return ids;
+  }, [myLibraryGames]);
 
   // Filter and sort products
   const filteredGames = useMemo(() => {
@@ -153,7 +166,12 @@ export default function StorePage() {
               </div>
 
               {/* Games */}
-              <GameList games={filteredGames} isLoading={isLoading} error={error} />
+              <GameList
+                games={filteredGames}
+                isLoading={isLoading}
+                error={error}
+                ownedGameIds={ownedGameIds}
+              />
 
               {/* No Results */}
               {filteredGames.length === 0 && (

@@ -1,7 +1,3 @@
-/**
- * LibrarySidebar Component
- * Sidebar chứa search, filter theo genre và danh sách tên game
- */
 import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,21 +13,13 @@ import type { LibraryGameView } from '@/types/LibraryGame.types';
 
 interface LibrarySidebarProps {
     className?: string;
-    /** Giá trị ô tìm kiếm */
     searchValue: string;
-    /** Callback khi đổi search */
     onSearchChange: (value: string) => void;
-    /** Genre đang chọn (hoặc 'all') */
     categoryFilter: string | 'all';
-    /** Callback khi đổi genre */
     onCategoryFilterChange: (value: string | 'all') => void;
-    /** Danh sách category cho dropdown */
     categories: string[];
-    /** Danh sách game để hiển thị tên (thường là danh sách đã filter) */
     games: LibraryGameView[];
-    /** ID game đang được chọn (highlight trong list) */
     selectedGameId?: string;
-    /** Callback khi click vào một game trong list */
     onSelectGame?: (game: LibraryGameView) => void;
 }
 
@@ -82,22 +70,22 @@ export function LibrarySidebar({
                     }
                 >
                     <SelectTrigger className="w-full h-9 bg-slate-800/50 border-slate-600 text-white text-sm focus:border-blue-400">
-                        <SelectValue placeholder={t('library.sidebar.allGenres')} />
+                        <SelectValue placeholder={t('library.sidebar.allCategories')} />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-900 border-slate-600">
                         <SelectItem
                             value="all"
                             className="text-white hover:bg-slate-700 focus:bg-slate-700"
                         >
-                            {t('library.sidebar.allGenres')}
+                            {t('library.sidebar.allCategories')}
                         </SelectItem>
-                        {categories.map((category) => (
+                        {categories.map((categoryName) => (
                             <SelectItem
-                                key={category}
-                                value={category}
+                                key={categoryName}
+                                value={categoryName}
                                 className="text-white hover:bg-slate-700 focus:bg-slate-700"
                             >
-                                {category}
+                                {categoryName}
                             </SelectItem>
                         ))}
                     </SelectContent>

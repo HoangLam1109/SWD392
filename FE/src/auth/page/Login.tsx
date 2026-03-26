@@ -12,8 +12,8 @@ import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import axios from "axios";
-
-
+import logo from "../../assets/platfun-logo.svg";
+import { Link as RouterLink } from "react-router-dom";
   type FormValues = {
     email: string;
     password: string;
@@ -67,9 +67,9 @@ export default function SigninPage() {
         <div className="w-full max-w-md space-y-6">
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <a href="/" className="transition-transform hover:scale-105">
-              <img src="/src/assets/platfun-logo.svg" className="h-12" alt="platfun Logo" />
-            </a>
+            <RouterLink to="/" className="transition-transform hover:scale-105">
+              <img src={logo} className="h-12" alt="platfun Logo" />
+            </RouterLink>
           </div>
 
           {/* Card */}
@@ -225,7 +225,6 @@ export default function SigninPage() {
                       )}
                     />
                     <a
-                      href="/forgot-password"
                       className="text-sm font-medium transition-colors"
                       style={{ color: '#00E5FF' }}
                       onMouseEnter={(e) => {

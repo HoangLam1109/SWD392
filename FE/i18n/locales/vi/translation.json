@@ -119,9 +119,10 @@
     "sidebar": {
       "searchPlaceholder": "Tìm theo tên game...",
       "genre": "Thể loại",
-      "allGenres": "Tất cả thể loại",
+      "allCategories": "Tất cả danh mục",
       "gameList": "Danh sách game ({{count}})",
-      "noGames": "Không có game nào"
+      "noGames": "Không có game nào",
+      "category": "Danh mục"
     }
   },
   "cart": {

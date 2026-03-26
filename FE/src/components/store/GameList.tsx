@@ -6,9 +6,16 @@ type GameListProps = {
     games?: Game[];
     isLoading?: boolean;
     error?: Error | null;
+    /** Game IDs the user already owns (library status OWNED) — hide/disable add to cart */
+    ownedGameIds?: Set<string>;
 };
 
-export function GameList({ games: externalGames, isLoading: externalLoading, error: externalError }: GameListProps = {}) {
+export function GameList({
+    games: externalGames,
+    isLoading: externalLoading,
+    error: externalError,
+    ownedGameIds,
+}: GameListProps = {}) {
     const shouldFetch = externalGames === undefined;
     const { data: fetchedGames, isLoading: fetchedLoading, error: fetchedError } = useGetGames();
     const games = shouldFetch ? (fetchedGames ?? []) : externalGames;
@@ -36,7 +43,11 @@ export function GameList({ games: externalGames, isLoading: externalLoading, err
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {games?.map((game) => (
-                <GameCard key={game._id } game={game} />
+                <GameCard
+                    key={game._id}
+                    game={game}
+                    isOwned={Boolean(ownedGameIds?.has(game._id))}
+                />
             ))}
         </div>
     );
