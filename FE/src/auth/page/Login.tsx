@@ -253,8 +253,8 @@ export default function SigninPage() {
           {/* Register Link */}
           <p className="text-center text-sm" style={{ color: '#A1A1AA' }}>
             {t("auth.login.noAccount")}{" "}
-            <a
-              href="/register"
+            <RouterLink
+              to="/register"
               className="font-semibold transition-colors"
               style={{ color: '#00E5FF' }}
               onMouseEnter={(e) => {
@@ -265,7 +265,7 @@ export default function SigninPage() {
               }}
             >
               {t("auth.login.registerForFree")}
-            </a>
+            </RouterLink>
           </p>
         </div>
       </div>
