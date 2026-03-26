@@ -12,8 +12,8 @@ import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import axios from "axios";
-
-
+import logo from "../../assets/platfun-logo.svg";
+import { Link as RouterLink } from "react-router-dom";
   type FormValues = {
     email: string;
     password: string;
@@ -67,9 +67,9 @@ export default function SigninPage() {
         <div className="w-full max-w-md space-y-6">
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <a href="/" className="transition-transform hover:scale-105">
-              <img src="/src/assets/platfun-logo.svg" className="h-12" alt="platfun Logo" />
-            </a>
+            <RouterLink to="/" className="transition-transform hover:scale-105">
+              <img src={logo} className="h-12" alt="platfun Logo" />
+            </RouterLink>
           </div>
 
           {/* Card */}
@@ -83,7 +83,7 @@ export default function SigninPage() {
               </p>
               <Button
                 variant="outline"
-                onClick={() => { window.location.href = `${import.meta.env.VITE_API_URL}/auth/oauth`; }}
+                onClick={() => {  window.location.assign(`${import.meta.env.VITE_API_URL}/auth/oauth`); }}
                 className="w-full h-11 gap-3 border-2 hover:border-[#00E5FF] hover:bg-gray-300 hover:cursor-pointer hover:scale-105 transition-transform duration-300 ease-out"
               >
                 <svg
@@ -225,7 +225,6 @@ export default function SigninPage() {
                       )}
                     />
                     <a
-                      href="/forgot-password"
                       className="text-sm font-medium transition-colors"
                       style={{ color: '#00E5FF' }}
                       onMouseEnter={(e) => {
@@ -254,8 +253,8 @@ export default function SigninPage() {
           {/* Register Link */}
           <p className="text-center text-sm" style={{ color: '#A1A1AA' }}>
             {t("auth.login.noAccount")}{" "}
-            <a
-              href="/register"
+            <RouterLink
+              to="/register"
               className="font-semibold transition-colors"
               style={{ color: '#00E5FF' }}
               onMouseEnter={(e) => {
@@ -266,7 +265,7 @@ export default function SigninPage() {
               }}
             >
               {t("auth.login.registerForFree")}
-            </a>
+            </RouterLink>
           </p>
         </div>
       </div>

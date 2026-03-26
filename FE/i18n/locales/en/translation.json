@@ -89,7 +89,13 @@
       "title": "Popular &",
       "titleHighlight": "Trending",
       "description": "Discover the most popular games on our platform",
-      "addToLibrary": "Add to Library"
+      "addToLibrary": "Add to Library",
+      "topNewestTitle": "Top 10 newest games",
+      "scrollPrev": "Scroll left",
+      "scrollNext": "Scroll right",
+      "scrollCarousel": "Scroll for more",
+      "loadError": "Could not load games.",
+      "tagAvailable": "On sale"
     },
     "footer": {
       "store": "Store",
@@ -121,7 +127,9 @@
       "genre": "Genre",
       "allGenres": "All genres",
       "gameList": "Game list ({{count}})",
-      "noGames": "No games"
+      "noGames": "No games",
+      "category": "Category",
+      "allCategories": "All categories"
     }
   },
   "cart": {

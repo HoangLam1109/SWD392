@@ -9,9 +9,11 @@ import { toast } from 'sonner';
 
 interface GameCardProps {
   game: Game;
+  /** User already owns this game — do not allow add to cart */
+  isOwned?: boolean;
 }
 
-export function GameCard({ game }: GameCardProps) {
+export function GameCard({ game, isOwned = false }: GameCardProps) {
   const { t } = useTranslation();
   const { mutate: addToCart, isPending } = useAddGameToCart();
 
@@ -22,6 +24,7 @@ export function GameCard({ game }: GameCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isOwned) return;
     addToCart(game._id, {
       onSuccess: () => {
         toast.success(t('cart.added', { defaultValue: 'Game added to cart' }));
@@ -78,13 +81,22 @@ export function GameCard({ game }: GameCardProps) {
           </div>
 
           <button
+            type="button"
             onClick={handleAddToCart}
-            disabled={isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all group/btn shadow-lg"
+            disabled={isPending || isOwned}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all group/btn shadow-lg ${
+              isOwned
+                ? 'bg-slate-700 text-slate-300 cursor-not-allowed'
+                : 'bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed'
+            }`}
           >
             <ShoppingCart className={`w-4 h-4 ${isPending ? 'animate-pulse' : 'group-hover/btn:scale-110'} transition-transform`} />
             <span className="text-sm font-medium">
-              {isPending ? t('common.adding', { defaultValue: 'Adding...' }) : t('common.add')}
+              {isOwned
+                ? t('store.owned', { defaultValue: 'Owned' })
+                : isPending
+                  ? t('common.adding', { defaultValue: 'Adding...' })
+                  : t('common.add')}
             </span>
           </button>
         </div>

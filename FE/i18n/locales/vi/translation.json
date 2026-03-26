@@ -89,7 +89,13 @@
       "title": "Phổ biến &",
       "titleHighlight": "Xu hướng",
       "description": "Khám phá những game phổ biến nhất trên nền tảng",
-      "addToLibrary": "Thêm vào thư viện"
+      "addToLibrary": "Thêm vào thư viện",
+      "topNewestTitle": "Top 10 game mới nhất",
+      "scrollPrev": "Cuộn sang trái",
+      "scrollNext": "Cuộn sang phải",
+      "scrollCarousel": "Cuộn xem thêm",
+      "loadError": "Không tải được danh sách game.",
+      "tagAvailable": "Đang bán"
     },
     "footer": {
       "store": "Cửa hàng",
@@ -119,9 +125,10 @@
     "sidebar": {
       "searchPlaceholder": "Tìm theo tên game...",
       "genre": "Thể loại",
-      "allGenres": "Tất cả thể loại",
+      "allCategories": "Tất cả danh mục",
       "gameList": "Danh sách game ({{count}})",
-      "noGames": "Không có game nào"
+      "noGames": "Không có game nào",
+      "category": "Danh mục"
     }
   },
   "cart": {

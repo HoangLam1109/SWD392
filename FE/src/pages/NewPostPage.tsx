@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ArrowLeft, Upload, ImagePlus, Send, Loader2, X } from "lucide-react"
+import type { Variants } from "framer-motion"
+import { ArrowLeft, ImagePlus, Send, Loader2, X } from "lucide-react"
 import { blogService } from "../service/blog.service"
 import { useNavigate, Link } from "react-router-dom"
 import { Navbar, Footer } from "@/components/home"
@@ -10,12 +11,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
-const sectionVariants = {
+const sectionVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
         opacity: 1,
         y: 0,
-        transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+        transition: { duration: 0.5, ease: "easeOut" }
     }
 }
 

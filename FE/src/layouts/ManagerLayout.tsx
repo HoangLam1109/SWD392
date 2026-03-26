@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { useSidebarNavigation } from "../hooks/useSidebarNavigation";
 import { Sidebar } from "../components/common/Sidebar";
 import type { Role } from "../config/navigation/navigation.types";
+import { UserRole } from "@/types/User.types";
 
 export interface ManagerLayoutProps {
     currentUser?: {
@@ -19,11 +20,11 @@ const ManagerLayoutComponent = ({ currentUser, onLogout, currentPage, onNavigate
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const navigationItems = useSidebarNavigation(currentUser?.role as Role);
 
-    const isAdmin = currentUser?.role === "Admin";
+    const isAdmin = currentUser?.role === UserRole.ADMIN;
     const SidebarComponent =  Sidebar;
 
-    const fallbackName = isAdmin ? "Admin" : "Manager";
-    const roleLabel = isAdmin ? "Admin" : "Manager";
+    const fallbackName = isAdmin ? UserRole.ADMIN : UserRole.MANAGER;
+    const roleLabel = isAdmin ? UserRole.ADMIN : UserRole.MANAGER;
 
     return (
         <div className={`flex h-screen bg-slate-900`}>

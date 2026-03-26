@@ -1,7 +1,3 @@
-/**
- * LibraryPage Component
- * Game library interface backed by the library-game API
- */
 import { useMemo, useState } from 'react';
 import { GameCard } from '@/components/library/GameCard';
 import { LibrarySidebar } from '@/components/library/LibararySidebar';
@@ -74,8 +70,8 @@ export function LibraryPage() {
         return Array.from(
             new Set(
                 libraryGames
-                    .map((game) => game.categoryName ?? game.genre)
-                    .filter((genre): genre is string => Boolean(genre))
+                    .map((game) => game.categoryName ?? '')
+                    .filter((category): category is string => Boolean(category))
             )
         ).sort((a, b) => a.localeCompare(b));
     }, [libraryGames]);

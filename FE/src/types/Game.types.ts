@@ -15,3 +15,11 @@ export interface Game {
 }
 export type CreateGameDTO = Partial<Game>;
 export type UpdateGameDTO = Partial<CreateGameDTO>;
+
+export interface GamesPaginatedResponse {
+    data: Game[];
+    hasNextPage: boolean;
+    totalCount?: number;
+    nextCursor?: string;
+}
+

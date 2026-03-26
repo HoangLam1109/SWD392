@@ -1,5 +1,5 @@
 import apiClient from "@/lib/apiClient";
-import type { UpdateOrderDTO } from "@/types/Orders.types";
+import type { Order, UpdateOrderDTO } from "@/types/Orders.types";
 
 export const ordersService = {
     getOrders: async (params?: { cursor?: string; limit?: number; search?: string; searchField?: string }) => {

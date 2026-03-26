@@ -17,6 +17,7 @@ import type { Role } from '@/config/navigation/navigation.types';
 import { getPathbyRole } from '@/utils/role.utils';
 import { useGetMyCartWithItems } from '@/hooks/cart/useGetMyCartWithItems';
 import { useGetWalletByUserId } from '@/hooks/wallet/useGetWalletByUserId';
+import logo from "../../assets/platfun-logo.svg";
 interface NavbarProps {
   fixed?: boolean;
 }
@@ -47,7 +48,7 @@ export function Navbar({ fixed }: NavbarProps) {
               <div className="relative">
                 <div className="absolute inset-0 bg-linear-to-r from-blue-500 to-purple-600 rounded-lg blur-lg opacity-50" />
                 <div className="relative">
-                  <img src="/src/assets/platfun-logo.svg" alt="logo" className="h-12" />
+                  <img src={logo} alt="logo" className="h-12" />
                 </div>
               </div>
             </Link>
