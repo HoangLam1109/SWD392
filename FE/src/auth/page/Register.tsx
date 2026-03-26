@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useRegister } from "@/hooks/auth/useRegister.ts";
 import { useAuth } from "@/hooks/auth/useAuth.ts";
 import { toast } from "sonner";
+import { Link as RouterLink } from "react-router-dom";
 type FormValues = {
     email: string;
     password: string;
@@ -294,12 +295,12 @@ export default function RegisterPage() {
                 {/* Login Link */}
                 <p className="text-center text-sm text-[#A1A1AA]">
                     {t("auth.register.alreadyHaveAccount")}{" "}
-                    <a
-                        href="/login"
+                    <RouterLink
+                        to="/login"
                         className="font-semibold transition-colors text-[#00E5FF] hover:underline hover:cursor-pointer hover:text-white"
                     >
                         {t("auth.register.signIn")}
-                    </a>
+                    </RouterLink>
                 </p>
             </div>
         </div>
