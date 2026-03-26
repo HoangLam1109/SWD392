@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
+import { AxiosError } from 'axios';
 import { ImageWithFallback } from '../ui/image-with-fallback';
 import { getImageUrl } from '@/lib/imageUtils';
 import type { Game } from '@/types/Game.types';
@@ -30,7 +31,13 @@ export function GameCard({ game, isOwned = false }: GameCardProps) {
         toast.success(t('cart.added', { defaultValue: 'Game added to cart' }));
       },
       onError: (error) => {
-        toast.error(error.message || t('cart.error', { defaultValue: 'Failed to add to cart' }));
+        const axiosError = error as AxiosError<{ message?: string }>;
+        const backendMessage = axiosError.response?.data?.message;
+        if (backendMessage === 'Product already in cart') {
+          toast.error(t('cart.alreadyAdded', { defaultValue: 'Game already added' }));
+          return;
+        }
+        toast.error(backendMessage || error.message || t('cart.error', { defaultValue: 'Failed to add to cart' }));
       }
     });
   };
