@@ -79,31 +79,58 @@ export class OrderDetailService {
       if (orderDetail.orderType === 'DLC') {
         await this.userGameItemService.create({
           userId: userId,
-          itemId: orderDetail.productId,
+          itemId: orderDetail.productId!,
           isEquipped: false,
           quantity: 1,
         });
       } else if (orderDetail.orderType === 'Game') {
         await this.libraryGameService.createWithKey(
           userId,
-          orderDetail.productId,
+          orderDetail.productId!,
         );
       }
     }
   }
 
-  async findOrderDetailById(id: string): Promise<OrderDetailDocument> {
+  async findOrderDetailById(id: string): Promise<Partial<OrderDetailDocument>> {
     const orderDetail = await this.orderDetailRepository.findById(id);
     if (!orderDetail) {
       throw new NotFoundException('Order detail not found');
     }
-    return orderDetail;
+
+    const productName = await this.productValidationService.returnProductName(
+      orderDetail.productId,
+      orderDetail.orderType === 'Game' ? 'Game' : 'DLC',
+    );
+
+    // Use toObject() to include all document properties including timestamps
+    return {
+      ...orderDetail.toObject(),
+      productName,
+    } as Partial<OrderDetailDocument>;
   }
 
   async findOrderDetailsByOrderId(
     orderId: string,
-  ): Promise<OrderDetailDocument[]> {
-    return await this.orderDetailRepository.findByOrderId(orderId);
+  ): Promise<Partial<OrderDetailDocument>[]> {
+    const orderDetails =
+      await this.orderDetailRepository.findByOrderId(orderId);
+
+    return Promise.all(
+      orderDetails.map(async (orderDetail) => {
+        const productName =
+          await this.productValidationService.returnProductName(
+            orderDetail.productId,
+            orderDetail.orderType === 'Game' ? 'Game' : 'DLC',
+          );
+
+        // Use toObject() to include all document properties including timestamps
+        return {
+          ...orderDetail.toObject(),
+          productName,
+        } as Partial<OrderDetailDocument>;
+      }),
+    );
   }
 
   async findAll(): Promise<OrderDetailDocument[]> {

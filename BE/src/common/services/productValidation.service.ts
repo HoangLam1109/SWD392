@@ -25,6 +25,15 @@ export class ProductValidationService {
     throw new NotFoundException('Product not found');
   }
 
+  async returnProductName(productId: string, type: string): Promise<string> {
+    if (type === 'Game') {
+      const game = await this.gameService.findGameById(productId);
+      return game?.title || '';
+    }
+    const gameItem = await this.gameItemService.findGameItemById(productId);
+    return gameItem?.itemName || '';
+  }
+
   async calculateTotalPrice(productIds: string[]) {
     const products: Product[] = [];
     for (const productId of productIds) {
