@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCartDto } from '../dto/create-cart.dto';
 import { UpdateCartDto } from '../dto/update-cart.dto';
 import { CartRepository } from '../repositories/cart.repository';
@@ -67,6 +71,14 @@ export class CartService {
     let cart = await this.cartRepository.findByUserId(userId);
     if (!cart) {
       cart = await this.createCart(userId, {});
+    }
+
+    const cartItems = await this.cartItemService.findCartItemsByCartId(
+      cart._id.toString(),
+    );
+
+    if (cartItems.some((item) => item.productId.toString() === productId)) {
+      throw new BadRequestException('Product already in cart');
     }
 
     const cartItem = await this.cartItemService.createCartItemFromId(
