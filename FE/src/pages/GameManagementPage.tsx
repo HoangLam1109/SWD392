@@ -25,8 +25,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Pencil, Trash2, Plus, Eye, Cpu } from 'lucide-react';
-import { useGetGames } from '@/hooks/game/useGetGames';
+import { Search, Pencil, Trash2, Plus, Eye, Cpu, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useGetGamesPaginated } from '@/hooks/game/useGetGamesPaginated';
 import { useCreateGame } from '@/hooks/game/useCreateGame';
 import { useUpdateGame } from '@/hooks/game/useUpdateGame';
 import { useDeleteGame } from '@/hooks/game/useDeleteGame';
@@ -48,8 +48,19 @@ export function GameManagementPage() {
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
     const [gameToView, setGameToView] = useState<Game | null>(null);
     const [gameForSystem, setGameForSystem] = useState<Game | null>(null);
+    const [listCursor, setListCursor] = useState<string | undefined>(undefined);
+    const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([undefined]);
+    const pageSize = 10;
 
-    const { data: games = [], isLoading } = useGetGames();
+    const { data, isLoading } = useGetGamesPaginated({
+        cursor: listCursor,
+        pageSize,
+        search,
+    });
+    const games = data?.data ?? [];
+    const totalCount = data?.totalCount ?? 0;
+    const hasNextPage = data?.hasNextPage ?? false;
+    const nextCursor = data?.nextCursor;
     const createGameMutation = useCreateGame();
     const updateGameMutation = useUpdateGame();
     const deleteGameMutation = useDeleteGame();
@@ -57,19 +68,31 @@ export function GameManagementPage() {
 
     const filteredGames = useMemo(() => {
         let list = Array.isArray(games) ? games : [];
-        if (search.trim()) {
-            const q = search.toLowerCase();
-            list = list.filter(
-                (g) =>
-                    g.title?.toLowerCase().includes(q) ||
-                    g.developer?.toLowerCase().includes(q) ||
-                    g.publisher?.toLowerCase().includes(q)
-            );
-        }
         if (statusFilter === 'active') list = list.filter((g) => g.isActive);
         if (statusFilter === 'inactive') list = list.filter((g) => !g.isActive);
         return list;
-    }, [games, search, statusFilter]);
+    }, [games, statusFilter]);
+
+    const handleNextPage = () => {
+        if (hasNextPage && nextCursor) {
+            setCursorStack([...cursorStack, listCursor]);
+            setListCursor(nextCursor);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (cursorStack.length > 1) {
+            const nextStack = [...cursorStack];
+            nextStack.pop();
+            setCursorStack(nextStack);
+            setListCursor(nextStack[nextStack.length - 1]);
+        }
+    };
+
+    const resetPagination = () => {
+        setListCursor(undefined);
+        setCursorStack([undefined]);
+    };
 
     const handleCreateGame = (data: CreateGameDTO | UpdateGameDTO): Promise<void> => {
         return createGameMutation
@@ -86,8 +109,20 @@ export function GameManagementPage() {
 
     const handleDeleteGame = (): Promise<void> => {
         if (!selectedGame?._id) return Promise.reject(new Error('No game selected'));
-        return deleteGameMutation.mutateAsync(selectedGame._id).then(() => undefined);
+        const wasLastOnPage = games.length === 1 && cursorStack.length > 1;
+        return deleteGameMutation
+            .mutateAsync(selectedGame._id)
+            .then(() => {
+                if (wasLastOnPage) handlePreviousPage();
+            })
+            .then(() => undefined);
     };
+
+    const currentPageNumber = cursorStack.length;
+    const canGoPrevious = cursorStack.length > 1;
+    const canGoNext = hasNextPage;
+    const estimatedTotalPages =
+        totalCount > 0 ? Math.ceil(totalCount / pageSize) : 1;
 
     const handleEditClick = (game: Game) => {
         setSelectedGame(game);
@@ -177,9 +212,12 @@ export function GameManagementPage() {
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input
                                     id="search"
-                                    placeholder="Search by title, developer, publisher..."
+                                    placeholder="Search by title..."
                                     value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        resetPagination();
+                                    }}
                                     className="pl-10 bg-slate-900/60 border-slate-700 text-slate-50 placeholder:text-slate-500"
                                 />
                             </div>
@@ -188,7 +226,10 @@ export function GameManagementPage() {
                             <Label htmlFor="status" className="text-slate-200">Status</Label>
                             <Select
                                 value={statusFilter}
-                                onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}
+                                onValueChange={(v) => {
+                                    setStatusFilter(v as typeof statusFilter);
+                                    resetPagination();
+                                }}
                             >
                                 <SelectTrigger
                                     id="status"
@@ -209,7 +250,9 @@ export function GameManagementPage() {
 
             <Card className="bg-slate-900/60 border-slate-700">
                 <CardHeader>
-                    <CardTitle className="text-slate-50">Games ({filteredGames.length})</CardTitle>
+                    <CardTitle className="text-slate-50">
+                        Games ({totalCount > 0 ? totalCount : filteredGames.length})
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
@@ -342,6 +385,47 @@ export function GameManagementPage() {
                             </TableBody>
                         </Table>
                     </div>
+                    {!isLoading &&
+                        totalCount > 0 &&
+                        (hasNextPage || canGoPrevious) && (
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-slate-700">
+                            <p className="text-sm text-slate-400">
+                                Page <span className="text-slate-50 font-medium">{currentPageNumber}</span>
+                                {estimatedTotalPages > 1 && (
+                                    <>
+                                        {' '}
+                                        of ~<span className="text-slate-50 font-medium">{estimatedTotalPages}</span>
+                                    </>
+                                )}
+                                {' '}
+                                ({totalCount} total)
+                            </p>
+                            <div className="flex gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handlePreviousPage}
+                                    disabled={!canGoPrevious}
+                                    className="border-slate-600 text-slate-50 hover:bg-slate-800 disabled:opacity-50"
+                                >
+                                    <ChevronLeft className="h-4 w-4 mr-1" />
+                                    Previous
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleNextPage}
+                                    disabled={!canGoNext}
+                                    className="border-slate-600 text-slate-50 hover:bg-slate-800 disabled:opacity-50"
+                                >
+                                    Next
+                                    <ChevronRight className="h-4 w-4 ml-1" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 

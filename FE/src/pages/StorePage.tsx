@@ -1,14 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, SlidersHorizontal, X, Grid3x3, List } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Grid3x3, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Navbar } from '@/components/home';
 import { StoreFilters } from '@/components/store';
 import type { FilterState } from '@/components/store/StoreFilters';
-import type { Game } from '@/types/Game.types';
 import { GameList } from '@/components/store/GameList';
-import { useGetGames } from '@/hooks/game/useGetGames';
+import { useGetGamesPaginated } from '@/hooks/game/useGetGamesPaginated';
 import { useGetMyLibraryGames } from '@/hooks/library/useGetMyLibraryGames';
 import { LibraryGameStatus } from '@/types/LibraryGame.types';
+
+const STORE_PAGE_SIZE = 12;
 
 export default function StorePage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,8 +22,49 @@ export default function StorePage() {
     sortBy: 'releaseDate',
     sortOrder: 'desc',
   });
-  const { data: allGames = [], isLoading, error } = useGetGames();
+  const [listCursor, setListCursor] = useState<string | undefined>(undefined);
+  const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([undefined]);
+
+  const { data, isLoading, error } = useGetGamesPaginated({
+    cursor: listCursor,
+    pageSize: STORE_PAGE_SIZE,
+    search: searchQuery,
+    sortBy: filters.sortBy,
+    sortOrder: filters.sortOrder,
+  });
+  const pageGames = data?.data ?? [];
+  const totalCount = data?.totalCount ?? 0;
+  const hasNextPage = data?.hasNextPage ?? false;
+  const nextCursor = data?.nextCursor;
+
   const { data: myLibraryGames = [] } = useGetMyLibraryGames();
+
+  useEffect(() => {
+    setListCursor(undefined);
+    setCursorStack([undefined]);
+  }, [searchQuery, filters.sortBy, filters.sortOrder]);
+
+  const handleNextPage = () => {
+    if (hasNextPage && nextCursor) {
+      setCursorStack((stack) => [...stack, listCursor]);
+      setListCursor(nextCursor);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (cursorStack.length > 1) {
+      const nextStack = [...cursorStack];
+      nextStack.pop();
+      setCursorStack(nextStack);
+      setListCursor(nextStack[nextStack.length - 1]);
+    }
+  };
+
+  const currentPageNumber = cursorStack.length;
+  const canGoPrevious = cursorStack.length > 1;
+  const canGoNext = hasNextPage;
+  const estimatedTotalPages =
+    totalCount > 0 ? Math.ceil(totalCount / STORE_PAGE_SIZE) : 1;
 
   const ownedGameIds = useMemo(() => {
     const ids = new Set<string>();
@@ -35,38 +77,12 @@ export default function StorePage() {
     return ids;
   }, [myLibraryGames]);
 
-  // Filter and sort products
+  // Price range is client-only on the current page (server list is not filtered by price)
   const filteredGames = useMemo(() => {
-    let games: Game[] = [...allGames];
-    // Filter by search query
-    if (searchQuery) {
-      games = games.filter((g) =>
-        g.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-
-    // Filter by price range
-    games = games.filter(
-      (p) => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
+    return pageGames.filter(
+      (p) => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1],
     );
-
-    // Sort products
-    if (filters.sortBy === 'price') {
-      const direction = filters.sortOrder === 'asc' ? 1 : -1;
-      games.sort((a, b) => (a.price - b.price) * direction);
-    } else {
-      const direction = filters.sortOrder === 'asc' ? 1 : -1;
-      games.sort(
-        (a, b) =>
-          (new Date(a.releaseDate ?? '').getTime() -
-            new Date(b.releaseDate ?? '').getTime()) *
-          direction,
-      );
-    }
-
-    return games;
-  }, [allGames, searchQuery, filters]);
+  }, [pageGames, filters.priceRange]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -125,7 +141,23 @@ export default function StorePage() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <span className="text-slate-400">
-                    {filteredGames.length} {filteredGames.length === 1 ? 'game' : 'games'} found
+                    {error ? (
+                      'Could not load games'
+                    ) : isLoading ? (
+                      'Loading games…'
+                    ) : totalCount > 0 ? (
+                      <>
+                        {totalCount} {totalCount === 1 ? 'game' : 'games'} in catalog
+                        {filteredGames.length !== pageGames.length && pageGames.length > 0 && (
+                          <span className="text-slate-500">
+                            {' '}
+                            · {filteredGames.length} on this page after price filter
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      '0 games found'
+                    )}
                   </span>
                 </div>
 
@@ -173,8 +205,46 @@ export default function StorePage() {
                 ownedGameIds={ownedGameIds}
               />
 
+              {!isLoading &&
+                totalCount > 0 &&
+                (hasNextPage || canGoPrevious) && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-white/10">
+                    <p className="text-sm text-slate-400">
+                      Page <span className="text-white font-medium">{currentPageNumber}</span>
+                      {estimatedTotalPages > 1 && (
+                        <>
+                          {' '}
+                          of ~<span className="text-white font-medium">{estimatedTotalPages}</span>
+                        </>
+                      )}
+                      {' '}
+                      ({totalCount} total)
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handlePreviousPage}
+                        disabled={!canGoPrevious}
+                        className="flex items-center gap-1 px-4 py-2 rounded-lg backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors disabled:opacity-40 disabled:pointer-events-none text-sm"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Previous
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleNextPage}
+                        disabled={!canGoNext}
+                        className="flex items-center gap-1 px-4 py-2 rounded-lg backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors disabled:opacity-40 disabled:pointer-events-none text-sm"
+                      >
+                        Next
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
               {/* No Results */}
-              {filteredGames.length === 0 && (
+              {!isLoading && filteredGames.length === 0 && (
                 <div className="text-center py-16">
                   <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-12">
                     <Search className="w-16 h-16 mx-auto mb-4 text-slate-500" />
