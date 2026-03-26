@@ -14,12 +14,16 @@ apiClient.interceptors.request.use(
         if (config.url?.includes("auth/refresh")){
             return config;
         }
+        const token = localStorage.getItem("token");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-let refreshPromise: Promise<void> | null = null;
+let refreshPromise: Promise<string> | null = null;
 
 apiClient.interceptors.response.use(
     (response) => response,
@@ -35,19 +39,25 @@ apiClient.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        const isRefreshRequest = requestUrl.includes("auth/refresh");
-
-        if (error.response?.status === 401 && !originalRequest._retry && !isRefreshRequest) {
+        if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
                 if (!refreshPromise) {
-                    refreshPromise = authService.refreshToken().then(() => undefined);
+                    refreshPromise = authService.refreshToken().then((data) => {
+                        if (data?.accessToken) {
+                            localStorage.setItem("token", data.accessToken);
+                            return data.accessToken;
+                        }
+                        throw new Error("No access token");
+                    });
                 }
-                await refreshPromise;
+                const newToken = await refreshPromise;
                 refreshPromise = null;
+                originalRequest.headers.Authorization = `Bearer ${newToken}`;
                 return apiClient(originalRequest);
             } catch (refreshError) {
                 refreshPromise = null;
+                localStorage.removeItem("token");
                 return Promise.reject(refreshError);
             }
         }

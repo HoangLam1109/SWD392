@@ -16,8 +16,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Khi có token, thử refresh để lấy access token mới. Nếu refresh lỗi thì giữ nguyên token/user (không đăng xuất).
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
     refreshToken()
       .then((data) => {
+        if (data?.accessToken) {
+          localStorage.setItem("token", data.accessToken);
+        }
         if (data?.user) {
           setUserState(data.user);
           localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
@@ -31,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setUser = useCallback((user: User | null) => {
     setUserState(user);
     if (user) localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
-    else localStorage.removeItem(AUTH_USER_KEY);
+    else localStorage.clear();
   }, []);
 
   const logout = useCallback(() => {
