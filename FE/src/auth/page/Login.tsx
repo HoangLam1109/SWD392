@@ -83,7 +83,7 @@ export default function SigninPage() {
               </p>
               <Button
                 variant="outline"
-                onClick={() => { navigate(`${import.meta.env.VITE_API_URL}/auth/oauth`); }}
+                onClick={() => {  window.location.assign(`${import.meta.env.VITE_API_URL}/auth/oauth`); }}
                 className="w-full h-11 gap-3 border-2 hover:border-[#00E5FF] hover:bg-gray-300 hover:cursor-pointer hover:scale-105 transition-transform duration-300 ease-out"
               >
                 <svg
