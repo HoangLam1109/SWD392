@@ -39,6 +39,12 @@ export class OrderDetailResponseDto {
   orderType: string;
 
   @ApiProperty({
+    description: 'Product name',
+    example: 'Super Game Title',
+  })
+  productName: string;
+
+  @ApiProperty({
     description: 'Order detail creation date',
     example: '2024-02-28T10:30:00Z',
   })

@@ -128,7 +128,7 @@ export class AuthController {
     const userData = encodeURIComponent(JSON.stringify(user));
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     res.redirect(
-      `${frontendUrl}/oauth/callback?accessToken=${tokens.accessToken}&user=${userData}`,
+      `${frontendUrl}/oauth/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}&user=${userData}`,
     );
   }
 
