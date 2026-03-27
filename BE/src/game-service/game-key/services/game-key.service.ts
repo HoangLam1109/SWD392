@@ -37,8 +37,8 @@ export class GameKeyService {
 
   async findById(id: string): Promise<GameKeyDocument> {
     const gameKey = await this.gameKeyRepository.findById(id);
-    if (!gameKey) {
-      throw new NotFoundException('Game key not found');
+    if (!gameKey || gameKey.status === 'EXPIRED') {
+      throw new NotFoundException('Game key not found or has been expired');
     }
     return gameKey;
   }
@@ -48,8 +48,8 @@ export class GameKeyService {
     gameId: string,
   ): Promise<GameKeyDocument> {
     const gameKey = await this.gameKeyRepository.findById(id);
-    if (!gameKey) {
-      throw new NotFoundException('Game key not found');
+    if (!gameKey || gameKey.status === 'EXPIRED') {
+      throw new NotFoundException('Game key not found or has been expired');
     }
     if (gameKey.gameId !== gameId) {
       throw new NotFoundException('Game key does not belong to this game');
@@ -85,8 +85,8 @@ export class GameKeyService {
     updateGameKeyDto: UpdateGameKeyDto,
   ): Promise<GameKeyDocument> {
     const gameKey = await this.gameKeyRepository.findById(id);
-    if (!gameKey) {
-      throw new NotFoundException('Game key not found');
+    if (!gameKey || gameKey.status === 'EXPIRED') {
+      throw new NotFoundException('Game key not found or has been expired');
     }
 
     if (
@@ -113,8 +113,8 @@ export class GameKeyService {
 
   async remove(id: string): Promise<GameKeyDocument> {
     const gameKey = await this.gameKeyRepository.findById(id);
-    if (!gameKey) {
-      throw new NotFoundException('Game key not found');
+    if (!gameKey || gameKey.status === 'EXPIRED') {
+      throw new NotFoundException('Game key not found or has been expired');
     }
     const result = await this.gameKeyRepository.deleteById(id);
     if (!result) {
