@@ -159,7 +159,7 @@ export class LibraryGameService {
       this.userService.findUserById(input.user_id),
       this.gameService.findGameById(input.game_id),
       input.key_id
-        ? this.gameKeyService.findById(input.key_id)
+        ? this.gameKeyService.findAndValidateKey(input.key_id, input.game_id)
         : Promise.resolve(null),
     ]);
 

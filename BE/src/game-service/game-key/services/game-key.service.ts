@@ -43,6 +43,21 @@ export class GameKeyService {
     return gameKey;
   }
 
+  async findAndValidateKey(
+    id: string,
+    gameId: string,
+  ): Promise<GameKeyDocument> {
+    const gameKey = await this.gameKeyRepository.findById(id);
+    if (!gameKey) {
+      throw new NotFoundException('Game key not found');
+    }
+    if (gameKey.gameId !== gameId) {
+      throw new NotFoundException('Game key does not belong to this game');
+    }
+
+    return gameKey;
+  }
+
   async findByGameId(gameId: string): Promise<GameKeyDocument[]> {
     return await this.gameKeyRepository.findByGameId(gameId);
   }
