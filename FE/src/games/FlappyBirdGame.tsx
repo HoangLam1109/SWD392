@@ -4,7 +4,10 @@ import {
   useStartPlaying,
   useEndPlaying,
 } from "@/hooks/game-session/useGameSession";
-import { useGetLeaderboardHighestScore, useGetUserHighestScore } from "@/hooks/library/useGetLeaderboardHighestScore";
+import {
+  useGetLeaderboardHighestScore,
+  useGetUserHighestScore,
+} from "@/hooks/library/useGetLeaderboardHighestScore";
 
 type GamePhase = "idle" | "playing" | "gameover";
 
@@ -137,9 +140,7 @@ export function FlappyBirdGame({ libraryGameId }: FlappyBirdGameProps) {
       Math.max(
         currentBest,
         scoreRef.current,
-        leaderboardQuery.data && leaderboardQuery.data.length > 0
-          ? leaderboardQuery.data[0].highest_score
-          : 0,
+        userHighestScoreQuery.data?.highest_score || 0,
       ),
     );
     stopLoop();
@@ -148,10 +149,16 @@ export function FlappyBirdGame({ libraryGameId }: FlappyBirdGameProps) {
       endPlayingMutation.mutate({
         gameSessionId: currentSessionId,
         sessionScore: scoreRef.current,
+      }, {
+        onSuccess: () => {
+          // Refetch the user's highest score after game ends
+          userHighestScoreQuery.refetch();
+          leaderboardQuery.refetch();
+        }
       });
       setCurrentSessionId(null);
     }
-  }, [currentSessionId, endPlayingMutation, stopLoop]);
+  }, [currentSessionId, endPlayingMutation, stopLoop, userHighestScoreQuery, leaderboardQuery]);
 
   const flap = useCallback(() => {
     if (phaseRef.current !== "playing") {
