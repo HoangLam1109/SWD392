@@ -22,7 +22,7 @@ export class ProductValidationService {
     if (gameItem && gameItem.isAvailable) {
       return { product: gameItem, type: 'gameItem' };
     }
-    throw new NotFoundException('Product not found');
+    throw new NotFoundException('Product not found or not currently available');
   }
 
   async returnProductName(productId: string, type: string): Promise<string> {
