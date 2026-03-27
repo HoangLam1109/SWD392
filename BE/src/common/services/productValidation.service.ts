@@ -15,11 +15,11 @@ export class ProductValidationService {
     productId: string,
   ): Promise<{ product: Product; type: 'game' | 'gameItem' }> {
     const product = await this.gameService.findGameById(productId);
-    if (product) {
+    if (product && product.isActive) {
       return { product, type: 'game' };
     }
     const gameItem = await this.gameItemService.findGameItemById(productId);
-    if (gameItem) {
+    if (gameItem && gameItem.isAvailable) {
       return { product: gameItem, type: 'gameItem' };
     }
     throw new NotFoundException('Product not found');
